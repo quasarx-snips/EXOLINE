@@ -1,0 +1,1082 @@
+{
+  "version": "0.0.2",
+  "system_id": "sol",
+  "system_name": "Sol",
+  "sun": {
+    "name": "Sun",
+    "type": "G2V",
+    "asset": "assets/orbital/sun/sun_orbital.png"
+  },
+  "planet_names": [
+    "Mercury",
+    "Venus",
+    "Earth",
+    "Mars",
+    "Jupiter",
+    "Saturn",
+    "Uranus",
+    "Neptune",
+    "Pluto",
+    "Ceres",
+    "Haumea",
+    "Makemake",
+    "Eris"
+  ],
+  "dwarf_planets": [
+    "Ceres",
+    "Haumea",
+    "Makemake",
+    "Eris"
+  ],
+  "belts": {
+    "asteroid_belt": {
+      "inner_au": 2.1,
+      "outer_au": 3.3
+    },
+    "kuiper_belt": {
+      "inner_au": 30,
+      "outer_au": 50
+    },
+    "oort_cloud": {
+      "inner_au": 2000,
+      "outer_au": 100000
+    }
+  },
+  "bodies": [
+    {
+      "id": "mercury",
+      "name": "Mercury",
+      "kind": "planet",
+      "type": "rocky",
+      "distance_au": 0.387,
+      "seed": 3556637575,
+      "orbital_asset": "assets/orbital/mercury/mercury_orbital.png",
+      "surface_asset": "assets/surface/mercury/mercury_surface.png",
+      "moon_names": [],
+      "mineral_profile": {
+        "Metals": 0.55,
+        "Water": 0.01,
+        "Rare Minerals": 0.12,
+        "Organics": 0.01,
+        "Silicates": 0.23,
+        "Volatiles": 0.01,
+        "Nuclear Fuel": 0.07
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "venus",
+      "name": "Venus",
+      "kind": "planet",
+      "type": "rocky",
+      "distance_au": 0.723,
+      "seed": 603268537,
+      "orbital_asset": "assets/orbital/venus/venus_orbital.png",
+      "surface_asset": "assets/surface/venus/venus_surface.png",
+      "moon_names": [],
+      "mineral_profile": {
+        "Metals": 0.2,
+        "Water": 0.01,
+        "Rare Minerals": 0.05,
+        "Organics": 0.01,
+        "Silicates": 0.36,
+        "Volatiles": 0.34,
+        "Nuclear Fuel": 0.03
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "earth",
+      "name": "Earth",
+      "kind": "planet",
+      "type": "ocean",
+      "distance_au": 1.0,
+      "seed": 862331856,
+      "orbital_asset": "assets/orbital/earth/earth_orbital.png",
+      "surface_asset": "assets/surface/earth/earth_surface.png",
+      "moon_names": [
+        "Moon"
+      ],
+      "mineral_profile": {
+        "Metals": 0.18,
+        "Water": 0.29,
+        "Rare Minerals": 0.07,
+        "Organics": 0.18,
+        "Silicates": 0.17,
+        "Volatiles": 0.08,
+        "Nuclear Fuel": 0.03
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "mars",
+      "name": "Mars",
+      "kind": "planet",
+      "type": "desert",
+      "distance_au": 1.524,
+      "seed": 966900852,
+      "orbital_asset": "assets/orbital/mars/mars_orbital.png",
+      "surface_asset": "assets/surface/mars/mars_surface.png",
+      "moon_names": [
+        "Phobos",
+        "Deimos"
+      ],
+      "mineral_profile": {
+        "Metals": 0.23,
+        "Water": 0.15,
+        "Rare Minerals": 0.07,
+        "Organics": 0.04,
+        "Silicates": 0.28,
+        "Volatiles": 0.18,
+        "Nuclear Fuel": 0.05
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "jupiter",
+      "name": "Jupiter",
+      "kind": "planet",
+      "type": "gas_giant",
+      "distance_au": 5.204,
+      "seed": 3999766881,
+      "orbital_asset": "assets/orbital/jupiter/jupiter_orbital.png",
+      "surface_asset": "assets/surface/jupiter/jupiter_surface.png",
+      "moon_names": [
+        "Io",
+        "Europa",
+        "Ganymede",
+        "Callisto"
+      ],
+      "mineral_profile": {
+        "Metals": 0.03,
+        "Water": 0.1,
+        "Rare Minerals": 0.05,
+        "Organics": 0.03,
+        "Silicates": 0.02,
+        "Volatiles": 0.67,
+        "Nuclear Fuel": 0.1
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "saturn",
+      "name": "Saturn",
+      "kind": "planet",
+      "type": "gas_giant",
+      "distance_au": 9.583,
+      "seed": 3515807535,
+      "orbital_asset": "assets/orbital/saturn/saturn_orbital.png",
+      "surface_asset": "assets/surface/saturn/saturn_surface.png",
+      "moon_names": [
+        "Titan",
+        "Enceladus",
+        "Rhea",
+        "Iapetus",
+        "Dione",
+        "Tethys",
+        "Mimas"
+      ],
+      "mineral_profile": {
+        "Metals": 0.02,
+        "Water": 0.12,
+        "Rare Minerals": 0.04,
+        "Organics": 0.03,
+        "Silicates": 0.02,
+        "Volatiles": 0.67,
+        "Nuclear Fuel": 0.1
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "uranus",
+      "name": "Uranus",
+      "kind": "planet",
+      "type": "ice_giant",
+      "distance_au": 19.218,
+      "seed": 1095890386,
+      "orbital_asset": "assets/orbital/uranus/uranus_orbital.png",
+      "surface_asset": "assets/surface/uranus/uranus_surface.png",
+      "moon_names": [
+        "Titania",
+        "Oberon",
+        "Ariel",
+        "Umbriel",
+        "Miranda"
+      ],
+      "mineral_profile": {
+        "Metals": 0.03,
+        "Water": 0.15,
+        "Rare Minerals": 0.05,
+        "Organics": 0.04,
+        "Silicates": 0.03,
+        "Volatiles": 0.62,
+        "Nuclear Fuel": 0.08
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "neptune",
+      "name": "Neptune",
+      "kind": "planet",
+      "type": "ice_giant",
+      "distance_au": 30.11,
+      "seed": 2578651906,
+      "orbital_asset": "assets/orbital/neptune/neptune_orbital.png",
+      "surface_asset": "assets/surface/neptune/neptune_surface.png",
+      "moon_names": [
+        "Triton"
+      ],
+      "mineral_profile": {
+        "Metals": 0.03,
+        "Water": 0.13,
+        "Rare Minerals": 0.04,
+        "Organics": 0.04,
+        "Silicates": 0.03,
+        "Volatiles": 0.65,
+        "Nuclear Fuel": 0.08
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "pluto",
+      "name": "Pluto",
+      "kind": "dwarf_planet",
+      "type": "ice",
+      "distance_au": 39.482,
+      "seed": 1003357696,
+      "orbital_asset": "assets/orbital/pluto/pluto_orbital.png",
+      "surface_asset": "assets/surface/pluto/pluto_surface.png",
+      "moon_names": [
+        "Charon"
+      ],
+      "mineral_profile": {
+        "Metals": 0.1,
+        "Water": 0.3,
+        "Rare Minerals": 0.1,
+        "Organics": 0.05,
+        "Silicates": 0.25,
+        "Volatiles": 0.18,
+        "Nuclear Fuel": 0.02
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "jupiter:io",
+      "name": "Io",
+      "kind": "major_moon",
+      "parent": "Jupiter",
+      "type": "volcanic",
+      "orbital_radius_km": 421700,
+      "seed": 2647816476,
+      "source_reference": "https://science.nasa.gov/photojournal/global-image-of-io-true-color/",
+      "orbital_asset": "assets/orbital/jupiter/moons/io/io_orbital.png",
+      "surface_asset": "assets/surface/jupiter/moons/io/io_surface.png",
+      "mineral_profile": {
+        "Metals": 0.2,
+        "Water": 0.02,
+        "Rare Minerals": 0.06,
+        "Organics": 0.02,
+        "Silicates": 0.5,
+        "Volatiles": 0.18,
+        "Nuclear Fuel": 0.02
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "jupiter:europa",
+      "name": "Europa",
+      "kind": "major_moon",
+      "parent": "Jupiter",
+      "type": "ice",
+      "orbital_radius_km": 671100,
+      "seed": 2757451091,
+      "source_reference": "https://science.nasa.gov/jupiter/jupiter-moons/europa/",
+      "orbital_asset": "assets/orbital/jupiter/moons/europa/europa_orbital.png",
+      "surface_asset": "assets/surface/jupiter/moons/europa/europa_surface.png",
+      "mineral_profile": {
+        "Metals": 0.07,
+        "Water": 0.48,
+        "Rare Minerals": 0.06,
+        "Organics": 0.02,
+        "Silicates": 0.25,
+        "Volatiles": 0.1,
+        "Nuclear Fuel": 0.02
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "jupiter:ganymede",
+      "name": "Ganymede",
+      "kind": "major_moon",
+      "parent": "Jupiter",
+      "type": "ice",
+      "orbital_radius_km": 1070400,
+      "seed": 1237545815,
+      "source_reference": "https://science.nasa.gov/photojournal/ganymede-global/",
+      "orbital_asset": "assets/orbital/jupiter/moons/ganymede/ganymede_orbital.png",
+      "surface_asset": "assets/surface/jupiter/moons/ganymede/ganymede_surface.png",
+      "mineral_profile": {
+        "Metals": 0.07,
+        "Water": 0.48,
+        "Rare Minerals": 0.06,
+        "Organics": 0.02,
+        "Silicates": 0.25,
+        "Volatiles": 0.1,
+        "Nuclear Fuel": 0.02
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "jupiter:callisto",
+      "name": "Callisto",
+      "kind": "major_moon",
+      "parent": "Jupiter",
+      "type": "ice",
+      "orbital_radius_km": 1882700,
+      "seed": 3706488337,
+      "source_reference": "https://science.nasa.gov/photojournal/global-callisto-in-color/",
+      "orbital_asset": "assets/orbital/jupiter/moons/callisto/callisto_orbital.png",
+      "surface_asset": "assets/surface/jupiter/moons/callisto/callisto_surface.png",
+      "mineral_profile": {
+        "Metals": 0.07,
+        "Water": 0.48,
+        "Rare Minerals": 0.06,
+        "Organics": 0.02,
+        "Silicates": 0.25,
+        "Volatiles": 0.1,
+        "Nuclear Fuel": 0.02
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "saturn:titan",
+      "name": "Titan",
+      "kind": "major_moon",
+      "parent": "Saturn",
+      "type": "toxic",
+      "orbital_radius_km": 1221870,
+      "seed": 3822598399,
+      "source_reference": "https://science.nasa.gov/saturn/moons/titan/",
+      "orbital_asset": "assets/orbital/saturn/moons/titan/titan_orbital.png",
+      "surface_asset": "assets/surface/saturn/moons/titan/titan_surface.png",
+      "mineral_profile": {
+        "Metals": 0.1923,
+        "Water": 0.0192,
+        "Rare Minerals": 0.0577,
+        "Organics": 0.0577,
+        "Silicates": 0.4808,
+        "Volatiles": 0.1731,
+        "Nuclear Fuel": 0.0192
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "saturn:enceladus",
+      "name": "Enceladus",
+      "kind": "major_moon",
+      "parent": "Saturn",
+      "type": "ice",
+      "orbital_radius_km": 238020,
+      "seed": 3336350643,
+      "source_reference": "https://science.nasa.gov/photojournal/the-saturnian-moon-enceladus/",
+      "orbital_asset": "assets/orbital/saturn/moons/enceladus/enceladus_orbital.png",
+      "surface_asset": "assets/surface/saturn/moons/enceladus/enceladus_surface.png",
+      "mineral_profile": {
+        "Metals": 0.07,
+        "Water": 0.48,
+        "Rare Minerals": 0.06,
+        "Organics": 0.02,
+        "Silicates": 0.25,
+        "Volatiles": 0.1,
+        "Nuclear Fuel": 0.02
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "saturn:rhea",
+      "name": "Rhea",
+      "kind": "major_moon",
+      "parent": "Saturn",
+      "type": "ice",
+      "orbital_radius_km": 527070,
+      "seed": 1807953962,
+      "source_reference": "https://science.nasa.gov/photojournal/regarding-rhea/",
+      "orbital_asset": "assets/orbital/saturn/moons/rhea/rhea_orbital.png",
+      "surface_asset": "assets/surface/saturn/moons/rhea/rhea_surface.png",
+      "mineral_profile": {
+        "Metals": 0.07,
+        "Water": 0.48,
+        "Rare Minerals": 0.06,
+        "Organics": 0.02,
+        "Silicates": 0.25,
+        "Volatiles": 0.1,
+        "Nuclear Fuel": 0.02
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "saturn:iapetus",
+      "name": "Iapetus",
+      "kind": "major_moon",
+      "parent": "Saturn",
+      "type": "ice",
+      "orbital_radius_km": 3561300,
+      "seed": 1873522899,
+      "source_reference": "https://science.nasa.gov/photojournal/iapetus/",
+      "orbital_asset": "assets/orbital/saturn/moons/iapetus/iapetus_orbital.png",
+      "surface_asset": "assets/surface/saturn/moons/iapetus/iapetus_surface.png",
+      "mineral_profile": {
+        "Metals": 0.07,
+        "Water": 0.48,
+        "Rare Minerals": 0.06,
+        "Organics": 0.02,
+        "Silicates": 0.25,
+        "Volatiles": 0.1,
+        "Nuclear Fuel": 0.02
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "saturn:dione",
+      "name": "Dione",
+      "kind": "major_moon",
+      "parent": "Saturn",
+      "type": "ice",
+      "orbital_radius_km": 377400,
+      "seed": 1709938713,
+      "source_reference": "https://science.nasa.gov/photojournal/dione/",
+      "orbital_asset": "assets/orbital/saturn/moons/dione/dione_orbital.png",
+      "surface_asset": "assets/surface/saturn/moons/dione/dione_surface.png",
+      "mineral_profile": {
+        "Metals": 0.07,
+        "Water": 0.48,
+        "Rare Minerals": 0.06,
+        "Organics": 0.02,
+        "Silicates": 0.25,
+        "Volatiles": 0.1,
+        "Nuclear Fuel": 0.02
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "saturn:tethys",
+      "name": "Tethys",
+      "kind": "major_moon",
+      "parent": "Saturn",
+      "type": "ice",
+      "orbital_radius_km": 294660,
+      "seed": 2421012130,
+      "source_reference": "https://science.nasa.gov/photojournal/map-of-tethys/",
+      "orbital_asset": "assets/orbital/saturn/moons/tethys/tethys_orbital.png",
+      "surface_asset": "assets/surface/saturn/moons/tethys/tethys_surface.png",
+      "mineral_profile": {
+        "Metals": 0.07,
+        "Water": 0.48,
+        "Rare Minerals": 0.06,
+        "Organics": 0.02,
+        "Silicates": 0.25,
+        "Volatiles": 0.1,
+        "Nuclear Fuel": 0.02
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "saturn:mimas",
+      "name": "Mimas",
+      "kind": "major_moon",
+      "parent": "Saturn",
+      "type": "ice",
+      "orbital_radius_km": 185540,
+      "seed": 1612510200,
+      "source_reference": "https://science.nasa.gov/photojournal/saturns-moon-mimas/",
+      "orbital_asset": "assets/orbital/saturn/moons/mimas/mimas_orbital.png",
+      "surface_asset": "assets/surface/saturn/moons/mimas/mimas_surface.png",
+      "mineral_profile": {
+        "Metals": 0.07,
+        "Water": 0.48,
+        "Rare Minerals": 0.06,
+        "Organics": 0.02,
+        "Silicates": 0.25,
+        "Volatiles": 0.1,
+        "Nuclear Fuel": 0.02
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "uranus:titania",
+      "name": "Titania",
+      "kind": "major_moon",
+      "parent": "Uranus",
+      "type": "ice",
+      "orbital_radius_km": 435910,
+      "seed": 1342274184,
+      "source_reference": "https://science.nasa.gov/uranus/moons/titania/",
+      "orbital_asset": "assets/orbital/uranus/moons/titania/titania_orbital.png",
+      "surface_asset": "assets/surface/uranus/moons/titania/titania_surface.png",
+      "mineral_profile": {
+        "Metals": 0.07,
+        "Water": 0.48,
+        "Rare Minerals": 0.06,
+        "Organics": 0.02,
+        "Silicates": 0.25,
+        "Volatiles": 0.1,
+        "Nuclear Fuel": 0.02
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "uranus:oberon",
+      "name": "Oberon",
+      "kind": "major_moon",
+      "parent": "Uranus",
+      "type": "ice",
+      "orbital_radius_km": 583520,
+      "seed": 3837349100,
+      "source_reference": "https://science.nasa.gov/uranus/moons/oberon/",
+      "orbital_asset": "assets/orbital/uranus/moons/oberon/oberon_orbital.png",
+      "surface_asset": "assets/surface/uranus/moons/oberon/oberon_surface.png",
+      "mineral_profile": {
+        "Metals": 0.07,
+        "Water": 0.48,
+        "Rare Minerals": 0.06,
+        "Organics": 0.02,
+        "Silicates": 0.25,
+        "Volatiles": 0.1,
+        "Nuclear Fuel": 0.02
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "uranus:ariel",
+      "name": "Ariel",
+      "kind": "major_moon",
+      "parent": "Uranus",
+      "type": "ice",
+      "orbital_radius_km": 190900,
+      "seed": 3283899411,
+      "source_reference": "https://science.nasa.gov/uranus/moons/ariel/",
+      "orbital_asset": "assets/orbital/uranus/moons/ariel/ariel_orbital.png",
+      "surface_asset": "assets/surface/uranus/moons/ariel/ariel_surface.png",
+      "mineral_profile": {
+        "Metals": 0.07,
+        "Water": 0.48,
+        "Rare Minerals": 0.06,
+        "Organics": 0.02,
+        "Silicates": 0.25,
+        "Volatiles": 0.1,
+        "Nuclear Fuel": 0.02
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "uranus:umbriel",
+      "name": "Umbriel",
+      "kind": "major_moon",
+      "parent": "Uranus",
+      "type": "ice",
+      "orbital_radius_km": 266000,
+      "seed": 1896834947,
+      "source_reference": "https://science.nasa.gov/uranus/moons/umbriel/",
+      "orbital_asset": "assets/orbital/uranus/moons/umbriel/umbriel_orbital.png",
+      "surface_asset": "assets/surface/uranus/moons/umbriel/umbriel_surface.png",
+      "mineral_profile": {
+        "Metals": 0.07,
+        "Water": 0.48,
+        "Rare Minerals": 0.06,
+        "Organics": 0.02,
+        "Silicates": 0.25,
+        "Volatiles": 0.1,
+        "Nuclear Fuel": 0.02
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "uranus:miranda",
+      "name": "Miranda",
+      "kind": "major_moon",
+      "parent": "Uranus",
+      "type": "ice",
+      "orbital_radius_km": 129900,
+      "seed": 3811070530,
+      "source_reference": "https://science.nasa.gov/uranus/moons/miranda/",
+      "orbital_asset": "assets/orbital/uranus/moons/miranda/miranda_orbital.png",
+      "surface_asset": "assets/surface/uranus/moons/miranda/miranda_surface.png",
+      "mineral_profile": {
+        "Metals": 0.07,
+        "Water": 0.48,
+        "Rare Minerals": 0.06,
+        "Organics": 0.02,
+        "Silicates": 0.25,
+        "Volatiles": 0.1,
+        "Nuclear Fuel": 0.02
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "neptune:triton",
+      "name": "Triton",
+      "kind": "major_moon",
+      "parent": "Neptune",
+      "type": "ice",
+      "orbital_radius_km": 354760,
+      "seed": 770440196,
+      "source_reference": "https://science.nasa.gov/neptune/moons/",
+      "orbital_asset": "assets/orbital/neptune/moons/triton/triton_orbital.png",
+      "surface_asset": "assets/surface/neptune/moons/triton/triton_surface.png",
+      "mineral_profile": {
+        "Metals": 0.07,
+        "Water": 0.48,
+        "Rare Minerals": 0.06,
+        "Organics": 0.02,
+        "Silicates": 0.25,
+        "Volatiles": 0.1,
+        "Nuclear Fuel": 0.02
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "earth:moon",
+      "name": "Moon",
+      "kind": "major_moon",
+      "parent": "Earth",
+      "type": "barren",
+      "orbital_radius_km": 384400,
+      "seed": 3106845242,
+      "source_reference": "https://science.nasa.gov/moon/",
+      "orbital_asset": "assets/orbital/earth/moons/moon/moon_orbital.png",
+      "surface_asset": "assets/surface/earth/moons/moon/moon_surface.png",
+      "mineral_profile": {
+        "Metals": 0.2,
+        "Water": 0.02,
+        "Rare Minerals": 0.06,
+        "Organics": 0.02,
+        "Silicates": 0.5,
+        "Volatiles": 0.18,
+        "Nuclear Fuel": 0.02
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "mars:phobos",
+      "name": "Phobos",
+      "kind": "major_moon",
+      "parent": "Mars",
+      "type": "barren",
+      "orbital_radius_km": 9376,
+      "seed": 2797997128,
+      "source_reference": "https://science.nasa.gov/mars/moons/phobos/",
+      "orbital_asset": "assets/orbital/mars/moons/phobos/phobos_orbital.png",
+      "surface_asset": "assets/surface/mars/moons/phobos/phobos_surface.png",
+      "mineral_profile": {
+        "Metals": 0.2,
+        "Water": 0.02,
+        "Rare Minerals": 0.06,
+        "Organics": 0.02,
+        "Silicates": 0.5,
+        "Volatiles": 0.18,
+        "Nuclear Fuel": 0.02
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "mars:deimos",
+      "name": "Deimos",
+      "kind": "major_moon",
+      "parent": "Mars",
+      "type": "barren",
+      "orbital_radius_km": 23460,
+      "seed": 3010914444,
+      "source_reference": "https://science.nasa.gov/photojournal/deimos/",
+      "orbital_asset": "assets/orbital/mars/moons/deimos/deimos_orbital.png",
+      "surface_asset": "assets/surface/mars/moons/deimos/deimos_surface.png",
+      "mineral_profile": {
+        "Metals": 0.2,
+        "Water": 0.02,
+        "Rare Minerals": 0.06,
+        "Organics": 0.02,
+        "Silicates": 0.5,
+        "Volatiles": 0.18,
+        "Nuclear Fuel": 0.02
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "pluto:charon",
+      "name": "Charon",
+      "kind": "major_moon",
+      "parent": "Pluto",
+      "type": "ice",
+      "orbital_radius_km": 19570,
+      "seed": 1026972903,
+      "source_reference": "https://science.nasa.gov/dwarf-planets/pluto/moons/charon/",
+      "orbital_asset": "assets/orbital/pluto/moons/charon/charon_orbital.png",
+      "surface_asset": "assets/surface/pluto/moons/charon/charon_surface.png",
+      "mineral_profile": {
+        "Metals": 0.07,
+        "Water": 0.48,
+        "Rare Minerals": 0.06,
+        "Organics": 0.02,
+        "Silicates": 0.25,
+        "Volatiles": 0.1,
+        "Nuclear Fuel": 0.02
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "ceres",
+      "name": "Ceres",
+      "kind": "dwarf_planet",
+      "type": "barren",
+      "distance_au": 2.77,
+      "seed": 1743387688,
+      "orbital_asset": "assets/orbital/ceres/ceres_orbital.png",
+      "surface_asset": "assets/surface/ceres/ceres_surface.png",
+      "moon_names": [],
+      "mineral_profile": {
+        "Metals": 0.15,
+        "Water": 0.25,
+        "Rare Minerals": 0.1,
+        "Organics": 0.05,
+        "Silicates": 0.3,
+        "Volatiles": 0.12,
+        "Nuclear Fuel": 0.03
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "haumea",
+      "name": "Haumea",
+      "kind": "dwarf_planet",
+      "type": "ice",
+      "distance_au": 43.13,
+      "seed": 3424458184,
+      "orbital_asset": "assets/orbital/haumea/haumea_orbital.png",
+      "surface_asset": "assets/surface/haumea/haumea_surface.png",
+      "moon_names": [],
+      "mineral_profile": {
+        "Metals": 0.15,
+        "Water": 0.25,
+        "Rare Minerals": 0.1,
+        "Organics": 0.05,
+        "Silicates": 0.3,
+        "Volatiles": 0.12,
+        "Nuclear Fuel": 0.03
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "makemake",
+      "name": "Makemake",
+      "kind": "dwarf_planet",
+      "type": "ice",
+      "distance_au": 45.79,
+      "seed": 1245615290,
+      "orbital_asset": "assets/orbital/makemake/makemake_orbital.png",
+      "surface_asset": "assets/surface/makemake/makemake_surface.png",
+      "moon_names": [],
+      "mineral_profile": {
+        "Metals": 0.15,
+        "Water": 0.25,
+        "Rare Minerals": 0.1,
+        "Organics": 0.05,
+        "Silicates": 0.3,
+        "Volatiles": 0.12,
+        "Nuclear Fuel": 0.03
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    },
+    {
+      "id": "eris",
+      "name": "Eris",
+      "kind": "dwarf_planet",
+      "type": "ice",
+      "distance_au": 67.78,
+      "seed": 1672859318,
+      "orbital_asset": "assets/orbital/eris/eris_orbital.png",
+      "surface_asset": "assets/surface/eris/eris_surface.png",
+      "moon_names": [],
+      "mineral_profile": {
+        "Metals": 0.15,
+        "Water": 0.25,
+        "Rare Minerals": 0.1,
+        "Organics": 0.05,
+        "Silicates": 0.3,
+        "Volatiles": 0.12,
+        "Nuclear Fuel": 0.03
+      },
+      "derived_resources": [
+        "Food",
+        "Oxygen",
+        "Fuel",
+        "Components",
+        "Science Data",
+        "Reward Tokens",
+        "Blueprint Tokens"
+      ]
+    }
+  ]
+}

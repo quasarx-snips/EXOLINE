@@ -1,0 +1,27 @@
+{
+  "resources": [
+    "Metals",
+    "Water",
+    "Food",
+    "Oxygen",
+    "Fuel",
+    "Rare Minerals",
+    "Organics",
+    "Silicates",
+    "Volatiles",
+    "Nuclear Fuel",
+    "Components",
+    "Science Data",
+    "Reward Tokens",
+    "Blueprint Tokens"
+  ],
+  "natural_geological": [
+    "Metals",
+    "Water",
+    "Rare Minerals",
+    "Organics",
+    "Silicates",
+    "Volatiles",
+    "Nuclear Fuel"
+  ]
+}

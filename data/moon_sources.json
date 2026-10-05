@@ -1,0 +1,23 @@
+{
+  "Moon": "https://science.nasa.gov/moon/",
+  "Phobos": "https://science.nasa.gov/mars/moons/phobos/",
+  "Deimos": "https://science.nasa.gov/photojournal/deimos/",
+  "Io": "https://science.nasa.gov/photojournal/global-image-of-io-true-color/",
+  "Europa": "https://science.nasa.gov/jupiter/jupiter-moons/europa/",
+  "Ganymede": "https://science.nasa.gov/photojournal/ganymede-global/",
+  "Callisto": "https://science.nasa.gov/photojournal/global-callisto-in-color/",
+  "Titan": "https://science.nasa.gov/saturn/moons/titan/",
+  "Enceladus": "https://science.nasa.gov/photojournal/the-saturnian-moon-enceladus/",
+  "Rhea": "https://science.nasa.gov/photojournal/regarding-rhea/",
+  "Iapetus": "https://science.nasa.gov/photojournal/iapetus/",
+  "Dione": "https://science.nasa.gov/photojournal/dione/",
+  "Tethys": "https://science.nasa.gov/photojournal/map-of-tethys/",
+  "Mimas": "https://science.nasa.gov/photojournal/saturns-moon-mimas/",
+  "Titania": "https://science.nasa.gov/uranus/moons/titania/",
+  "Oberon": "https://science.nasa.gov/uranus/moons/oberon/",
+  "Ariel": "https://science.nasa.gov/uranus/moons/ariel/",
+  "Umbriel": "https://science.nasa.gov/uranus/moons/umbriel/",
+  "Miranda": "https://science.nasa.gov/uranus/moons/miranda/",
+  "Triton": "https://science.nasa.gov/neptune/moons/",
+  "Charon": "https://science.nasa.gov/dwarf-planets/pluto/moons/charon/"
+}

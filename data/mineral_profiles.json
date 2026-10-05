@@ -1,0 +1,308 @@
+{
+  "Mercury": {
+    "Metals": 0.55,
+    "Water": 0.01,
+    "Rare Minerals": 0.12,
+    "Organics": 0.01,
+    "Silicates": 0.23,
+    "Volatiles": 0.01,
+    "Nuclear Fuel": 0.07
+  },
+  "Venus": {
+    "Metals": 0.2,
+    "Water": 0.01,
+    "Rare Minerals": 0.05,
+    "Organics": 0.01,
+    "Silicates": 0.36,
+    "Volatiles": 0.34,
+    "Nuclear Fuel": 0.03
+  },
+  "Earth": {
+    "Metals": 0.18,
+    "Water": 0.29,
+    "Rare Minerals": 0.07,
+    "Organics": 0.18,
+    "Silicates": 0.17,
+    "Volatiles": 0.08,
+    "Nuclear Fuel": 0.03
+  },
+  "Mars": {
+    "Metals": 0.23,
+    "Water": 0.15,
+    "Rare Minerals": 0.07,
+    "Organics": 0.04,
+    "Silicates": 0.28,
+    "Volatiles": 0.18,
+    "Nuclear Fuel": 0.05
+  },
+  "Jupiter": {
+    "Metals": 0.03,
+    "Water": 0.1,
+    "Rare Minerals": 0.05,
+    "Organics": 0.03,
+    "Silicates": 0.02,
+    "Volatiles": 0.67,
+    "Nuclear Fuel": 0.1
+  },
+  "Saturn": {
+    "Metals": 0.02,
+    "Water": 0.12,
+    "Rare Minerals": 0.04,
+    "Organics": 0.03,
+    "Silicates": 0.02,
+    "Volatiles": 0.67,
+    "Nuclear Fuel": 0.1
+  },
+  "Uranus": {
+    "Metals": 0.03,
+    "Water": 0.15,
+    "Rare Minerals": 0.05,
+    "Organics": 0.04,
+    "Silicates": 0.03,
+    "Volatiles": 0.62,
+    "Nuclear Fuel": 0.08
+  },
+  "Neptune": {
+    "Metals": 0.03,
+    "Water": 0.13,
+    "Rare Minerals": 0.04,
+    "Organics": 0.04,
+    "Silicates": 0.03,
+    "Volatiles": 0.65,
+    "Nuclear Fuel": 0.08
+  },
+  "Pluto": {
+    "Metals": 0.1,
+    "Water": 0.3,
+    "Rare Minerals": 0.1,
+    "Organics": 0.05,
+    "Silicates": 0.25,
+    "Volatiles": 0.18,
+    "Nuclear Fuel": 0.02
+  },
+  "Io": {
+    "Metals": 0.2,
+    "Water": 0.02,
+    "Rare Minerals": 0.06,
+    "Organics": 0.02,
+    "Silicates": 0.5,
+    "Volatiles": 0.18,
+    "Nuclear Fuel": 0.02
+  },
+  "Europa": {
+    "Metals": 0.07,
+    "Water": 0.48,
+    "Rare Minerals": 0.06,
+    "Organics": 0.02,
+    "Silicates": 0.25,
+    "Volatiles": 0.1,
+    "Nuclear Fuel": 0.02
+  },
+  "Ganymede": {
+    "Metals": 0.07,
+    "Water": 0.48,
+    "Rare Minerals": 0.06,
+    "Organics": 0.02,
+    "Silicates": 0.25,
+    "Volatiles": 0.1,
+    "Nuclear Fuel": 0.02
+  },
+  "Callisto": {
+    "Metals": 0.07,
+    "Water": 0.48,
+    "Rare Minerals": 0.06,
+    "Organics": 0.02,
+    "Silicates": 0.25,
+    "Volatiles": 0.1,
+    "Nuclear Fuel": 0.02
+  },
+  "Titan": {
+    "Metals": 0.1923,
+    "Water": 0.0192,
+    "Rare Minerals": 0.0577,
+    "Organics": 0.0577,
+    "Silicates": 0.4808,
+    "Volatiles": 0.1731,
+    "Nuclear Fuel": 0.0192
+  },
+  "Enceladus": {
+    "Metals": 0.07,
+    "Water": 0.48,
+    "Rare Minerals": 0.06,
+    "Organics": 0.02,
+    "Silicates": 0.25,
+    "Volatiles": 0.1,
+    "Nuclear Fuel": 0.02
+  },
+  "Rhea": {
+    "Metals": 0.07,
+    "Water": 0.48,
+    "Rare Minerals": 0.06,
+    "Organics": 0.02,
+    "Silicates": 0.25,
+    "Volatiles": 0.1,
+    "Nuclear Fuel": 0.02
+  },
+  "Iapetus": {
+    "Metals": 0.07,
+    "Water": 0.48,
+    "Rare Minerals": 0.06,
+    "Organics": 0.02,
+    "Silicates": 0.25,
+    "Volatiles": 0.1,
+    "Nuclear Fuel": 0.02
+  },
+  "Dione": {
+    "Metals": 0.07,
+    "Water": 0.48,
+    "Rare Minerals": 0.06,
+    "Organics": 0.02,
+    "Silicates": 0.25,
+    "Volatiles": 0.1,
+    "Nuclear Fuel": 0.02
+  },
+  "Tethys": {
+    "Metals": 0.07,
+    "Water": 0.48,
+    "Rare Minerals": 0.06,
+    "Organics": 0.02,
+    "Silicates": 0.25,
+    "Volatiles": 0.1,
+    "Nuclear Fuel": 0.02
+  },
+  "Mimas": {
+    "Metals": 0.07,
+    "Water": 0.48,
+    "Rare Minerals": 0.06,
+    "Organics": 0.02,
+    "Silicates": 0.25,
+    "Volatiles": 0.1,
+    "Nuclear Fuel": 0.02
+  },
+  "Titania": {
+    "Metals": 0.07,
+    "Water": 0.48,
+    "Rare Minerals": 0.06,
+    "Organics": 0.02,
+    "Silicates": 0.25,
+    "Volatiles": 0.1,
+    "Nuclear Fuel": 0.02
+  },
+  "Oberon": {
+    "Metals": 0.07,
+    "Water": 0.48,
+    "Rare Minerals": 0.06,
+    "Organics": 0.02,
+    "Silicates": 0.25,
+    "Volatiles": 0.1,
+    "Nuclear Fuel": 0.02
+  },
+  "Ariel": {
+    "Metals": 0.07,
+    "Water": 0.48,
+    "Rare Minerals": 0.06,
+    "Organics": 0.02,
+    "Silicates": 0.25,
+    "Volatiles": 0.1,
+    "Nuclear Fuel": 0.02
+  },
+  "Umbriel": {
+    "Metals": 0.07,
+    "Water": 0.48,
+    "Rare Minerals": 0.06,
+    "Organics": 0.02,
+    "Silicates": 0.25,
+    "Volatiles": 0.1,
+    "Nuclear Fuel": 0.02
+  },
+  "Miranda": {
+    "Metals": 0.07,
+    "Water": 0.48,
+    "Rare Minerals": 0.06,
+    "Organics": 0.02,
+    "Silicates": 0.25,
+    "Volatiles": 0.1,
+    "Nuclear Fuel": 0.02
+  },
+  "Triton": {
+    "Metals": 0.07,
+    "Water": 0.48,
+    "Rare Minerals": 0.06,
+    "Organics": 0.02,
+    "Silicates": 0.25,
+    "Volatiles": 0.1,
+    "Nuclear Fuel": 0.02
+  },
+  "Moon": {
+    "Metals": 0.2,
+    "Water": 0.02,
+    "Rare Minerals": 0.06,
+    "Organics": 0.02,
+    "Silicates": 0.5,
+    "Volatiles": 0.18,
+    "Nuclear Fuel": 0.02
+  },
+  "Phobos": {
+    "Metals": 0.2,
+    "Water": 0.02,
+    "Rare Minerals": 0.06,
+    "Organics": 0.02,
+    "Silicates": 0.5,
+    "Volatiles": 0.18,
+    "Nuclear Fuel": 0.02
+  },
+  "Deimos": {
+    "Metals": 0.2,
+    "Water": 0.02,
+    "Rare Minerals": 0.06,
+    "Organics": 0.02,
+    "Silicates": 0.5,
+    "Volatiles": 0.18,
+    "Nuclear Fuel": 0.02
+  },
+  "Charon": {
+    "Metals": 0.07,
+    "Water": 0.48,
+    "Rare Minerals": 0.06,
+    "Organics": 0.02,
+    "Silicates": 0.25,
+    "Volatiles": 0.1,
+    "Nuclear Fuel": 0.02
+  },
+  "Ceres": {
+    "Metals": 0.15,
+    "Water": 0.25,
+    "Rare Minerals": 0.1,
+    "Organics": 0.05,
+    "Silicates": 0.3,
+    "Volatiles": 0.12,
+    "Nuclear Fuel": 0.03
+  },
+  "Haumea": {
+    "Metals": 0.15,
+    "Water": 0.25,
+    "Rare Minerals": 0.1,
+    "Organics": 0.05,
+    "Silicates": 0.3,
+    "Volatiles": 0.12,
+    "Nuclear Fuel": 0.03
+  },
+  "Makemake": {
+    "Metals": 0.15,
+    "Water": 0.25,
+    "Rare Minerals": 0.1,
+    "Organics": 0.05,
+    "Silicates": 0.3,
+    "Volatiles": 0.12,
+    "Nuclear Fuel": 0.03
+  },
+  "Eris": {
+    "Metals": 0.15,
+    "Water": 0.25,
+    "Rare Minerals": 0.1,
+    "Organics": 0.05,
+    "Silicates": 0.3,
+    "Volatiles": 0.12,
+    "Nuclear Fuel": 0.03
+  }
+}

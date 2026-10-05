@@ -1,0 +1,2794 @@
+{
+  "version": "0.0.2-renderer-2",
+  "tile_size": 128,
+  "bodies": {
+    "mercury": {
+      "master": "assets/surface/mercury/mercury_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/mercury/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/mercury/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/mercury/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/mercury/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/mercury/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/mercury/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/mercury/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/mercury/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/mercury/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/mercury/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/mercury/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "venus": {
+      "master": "assets/surface/venus/venus_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/venus/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/venus/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/venus/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/venus/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/venus/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/venus/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/venus/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/venus/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/venus/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/venus/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/venus/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "earth": {
+      "master": "assets/surface/earth/earth_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/earth/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/earth/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/earth/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/earth/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/earth/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/earth/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/earth/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/earth/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/earth/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/earth/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/earth/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "mars": {
+      "master": "assets/surface/mars/mars_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/mars/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/mars/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/mars/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/mars/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/mars/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/mars/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/mars/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/mars/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/mars/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/mars/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/mars/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "jupiter": {
+      "master": "assets/surface/jupiter/jupiter_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/jupiter/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/jupiter/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/jupiter/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/jupiter/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/jupiter/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/jupiter/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/jupiter/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/jupiter/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/jupiter/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/jupiter/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/jupiter/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "saturn": {
+      "master": "assets/surface/saturn/saturn_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/saturn/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/saturn/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/saturn/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/saturn/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/saturn/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/saturn/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/saturn/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/saturn/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "uranus": {
+      "master": "assets/surface/uranus/uranus_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/uranus/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/uranus/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/uranus/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/uranus/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/uranus/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/uranus/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/uranus/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/uranus/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/uranus/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/uranus/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/uranus/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "neptune": {
+      "master": "assets/surface/neptune/neptune_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/neptune/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/neptune/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/neptune/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/neptune/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/neptune/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/neptune/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/neptune/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/neptune/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/neptune/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/neptune/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/neptune/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "pluto": {
+      "master": "assets/surface/pluto/pluto_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/pluto/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/pluto/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/pluto/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/pluto/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/pluto/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/pluto/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/pluto/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/pluto/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/pluto/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/pluto/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/pluto/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "jupiter:io": {
+      "master": "assets/surface/jupiter/moons/io/io_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/io/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/io/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/io/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/io/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/jupiter/moons/io/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/io/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/jupiter/moons/io/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/io/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/jupiter/moons/io/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/io/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/jupiter/moons/io/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "jupiter:europa": {
+      "master": "assets/surface/jupiter/moons/europa/europa_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/europa/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/europa/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/europa/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/europa/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/jupiter/moons/europa/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/europa/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/jupiter/moons/europa/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/europa/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/jupiter/moons/europa/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/europa/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/jupiter/moons/europa/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "jupiter:ganymede": {
+      "master": "assets/surface/jupiter/moons/ganymede/ganymede_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/ganymede/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/ganymede/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/ganymede/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/ganymede/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/jupiter/moons/ganymede/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/ganymede/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/jupiter/moons/ganymede/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/ganymede/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/jupiter/moons/ganymede/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/ganymede/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/jupiter/moons/ganymede/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "jupiter:callisto": {
+      "master": "assets/surface/jupiter/moons/callisto/callisto_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/callisto/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/callisto/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/callisto/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/callisto/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/jupiter/moons/callisto/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/callisto/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/jupiter/moons/callisto/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/callisto/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/jupiter/moons/callisto/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/jupiter/moons/callisto/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/jupiter/moons/callisto/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "saturn:titan": {
+      "master": "assets/surface/saturn/moons/titan/titan_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/titan/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/titan/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/titan/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/titan/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/titan/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/titan/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/titan/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/titan/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/titan/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/titan/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/titan/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "saturn:enceladus": {
+      "master": "assets/surface/saturn/moons/enceladus/enceladus_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/enceladus/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/enceladus/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/enceladus/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/enceladus/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/enceladus/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/enceladus/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/enceladus/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/enceladus/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/enceladus/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/enceladus/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/enceladus/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "saturn:rhea": {
+      "master": "assets/surface/saturn/moons/rhea/rhea_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/rhea/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/rhea/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/rhea/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/rhea/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/rhea/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/rhea/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/rhea/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/rhea/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/rhea/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/rhea/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/rhea/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "saturn:iapetus": {
+      "master": "assets/surface/saturn/moons/iapetus/iapetus_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/iapetus/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/iapetus/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/iapetus/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/iapetus/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/iapetus/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/iapetus/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/iapetus/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/iapetus/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/iapetus/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/iapetus/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/iapetus/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "saturn:dione": {
+      "master": "assets/surface/saturn/moons/dione/dione_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/dione/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/dione/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/dione/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/dione/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/dione/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/dione/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/dione/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/dione/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/dione/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/dione/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/dione/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "saturn:tethys": {
+      "master": "assets/surface/saturn/moons/tethys/tethys_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/tethys/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/tethys/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/tethys/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/tethys/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/tethys/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/tethys/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/tethys/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/tethys/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/tethys/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/tethys/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/tethys/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "saturn:mimas": {
+      "master": "assets/surface/saturn/moons/mimas/mimas_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/mimas/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/mimas/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/mimas/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/mimas/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/mimas/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/mimas/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/mimas/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/mimas/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/mimas/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/saturn/moons/mimas/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/saturn/moons/mimas/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "uranus:titania": {
+      "master": "assets/surface/uranus/moons/titania/titania_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/titania/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/titania/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/titania/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/titania/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/uranus/moons/titania/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/titania/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/uranus/moons/titania/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/titania/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/uranus/moons/titania/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/titania/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/uranus/moons/titania/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "uranus:oberon": {
+      "master": "assets/surface/uranus/moons/oberon/oberon_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/oberon/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/oberon/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/oberon/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/oberon/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/uranus/moons/oberon/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/oberon/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/uranus/moons/oberon/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/oberon/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/uranus/moons/oberon/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/oberon/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/uranus/moons/oberon/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "uranus:ariel": {
+      "master": "assets/surface/uranus/moons/ariel/ariel_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/ariel/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/ariel/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/ariel/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/ariel/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/uranus/moons/ariel/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/ariel/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/uranus/moons/ariel/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/ariel/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/uranus/moons/ariel/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/ariel/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/uranus/moons/ariel/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "uranus:umbriel": {
+      "master": "assets/surface/uranus/moons/umbriel/umbriel_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/umbriel/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/umbriel/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/umbriel/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/umbriel/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/uranus/moons/umbriel/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/umbriel/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/uranus/moons/umbriel/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/umbriel/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/uranus/moons/umbriel/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/umbriel/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/uranus/moons/umbriel/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "uranus:miranda": {
+      "master": "assets/surface/uranus/moons/miranda/miranda_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/miranda/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/miranda/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/miranda/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/miranda/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/uranus/moons/miranda/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/miranda/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/uranus/moons/miranda/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/miranda/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/uranus/moons/miranda/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/uranus/moons/miranda/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/uranus/moons/miranda/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "neptune:triton": {
+      "master": "assets/surface/neptune/moons/triton/triton_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/neptune/moons/triton/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/neptune/moons/triton/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/neptune/moons/triton/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/neptune/moons/triton/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/neptune/moons/triton/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/neptune/moons/triton/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/neptune/moons/triton/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/neptune/moons/triton/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/neptune/moons/triton/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/neptune/moons/triton/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/neptune/moons/triton/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "earth:moon": {
+      "master": "assets/surface/earth/moons/moon/moon_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/earth/moons/moon/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/earth/moons/moon/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/earth/moons/moon/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/earth/moons/moon/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/earth/moons/moon/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/earth/moons/moon/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/earth/moons/moon/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/earth/moons/moon/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/earth/moons/moon/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/earth/moons/moon/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/earth/moons/moon/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "mars:phobos": {
+      "master": "assets/surface/mars/moons/phobos/phobos_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/mars/moons/phobos/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/mars/moons/phobos/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/mars/moons/phobos/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/mars/moons/phobos/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/mars/moons/phobos/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/mars/moons/phobos/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/mars/moons/phobos/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/mars/moons/phobos/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/mars/moons/phobos/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/mars/moons/phobos/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/mars/moons/phobos/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "mars:deimos": {
+      "master": "assets/surface/mars/moons/deimos/deimos_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/mars/moons/deimos/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/mars/moons/deimos/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/mars/moons/deimos/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/mars/moons/deimos/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/mars/moons/deimos/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/mars/moons/deimos/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/mars/moons/deimos/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/mars/moons/deimos/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/mars/moons/deimos/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/mars/moons/deimos/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/mars/moons/deimos/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "pluto:charon": {
+      "master": "assets/surface/pluto/moons/charon/charon_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/pluto/moons/charon/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/pluto/moons/charon/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/pluto/moons/charon/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/pluto/moons/charon/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/pluto/moons/charon/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/pluto/moons/charon/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/pluto/moons/charon/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/pluto/moons/charon/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/pluto/moons/charon/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/pluto/moons/charon/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/pluto/moons/charon/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "ceres": {
+      "master": "assets/surface/ceres/ceres_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/ceres/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/ceres/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/ceres/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/ceres/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/ceres/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/ceres/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/ceres/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/ceres/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/ceres/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/ceres/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/ceres/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "haumea": {
+      "master": "assets/surface/haumea/haumea_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/haumea/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/haumea/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/haumea/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/haumea/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/haumea/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/haumea/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/haumea/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/haumea/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/haumea/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/haumea/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/haumea/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "makemake": {
+      "master": "assets/surface/makemake/makemake_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/makemake/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/makemake/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/makemake/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/makemake/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/makemake/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/makemake/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/makemake/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/makemake/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/makemake/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/makemake/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/makemake/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    },
+    "eris": {
+      "master": "assets/surface/eris/eris_surface.png",
+      "levels": {
+        "0": {
+          "tiles_x": 1,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/eris/z0/x0_y0.png"
+            }
+          ]
+        },
+        "1": {
+          "tiles_x": 2,
+          "tiles_y": 1,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/eris/z1/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/eris/z1/x1_y0.png"
+            }
+          ]
+        },
+        "2": {
+          "tiles_x": 4,
+          "tiles_y": 2,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/eris/z2/x0_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/eris/z2/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/eris/z2/x1_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/eris/z2/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/eris/z2/x2_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/eris/z2/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/eris/z2/x3_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/eris/z2/x3_y1.png"
+            }
+          ]
+        }
+      },
+      "wrap_x": true,
+      "wrap_y": false,
+      "master_width": 512,
+      "master_height": 256
+    }
+  }
+}

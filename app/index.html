@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#06090d">
+  <title>EXOLINE v0.0.2 — Solar System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <canvas id="scene" aria-label="EXOLINE Solar System"></canvas>
+    <canvas id="mapCanvas" class="hidden" aria-label="EXOLINE Planet Map"></canvas>
+
+    <header class="topbar">
+      <div class="brand-block top-left">
+        <div class="utility-actions">
+          <button class="small-btn" id="homeBtn" title="Open orbital view">◉ <span>ORBIT</span></button>
+          <button class="small-btn" id="resetBtn" title="Reset view">↻ <span>RESET</span></button>
+        </div>
+      </div>
+      <div class="top-center">
+        <div class="system-name" id="systemName">EARTH</div>
+        <div class="sim-date" id="simDate">—</div>
+      </div>
+    </header>
+
+    <div class="map-topbar hidden" id="mapTopbar">
+      <button class="small-btn" id="backBtn">← SYSTEM</button>
+      <div class="map-title">
+        <strong id="mapBodyName">PLANET</strong>
+        <span id="mapReadout">MAP · 1.0×</span>
+      </div>
+      <div class="map-actions">
+        <button class="icon-btn" id="mapResetBtn">⌂</button>
+      </div>
+    </div>
+
+    <div class="warp-panel">
+      <button class="round-btn" id="slower" aria-label="Slower">‹‹</button>
+      <button class="warp-btn" id="warpBtn">1×</button>
+      <button class="round-btn" id="faster" aria-label="Faster">››</button>
+    </div>
+
+    <div class="zoom-rail" aria-label="Map zoom controls">
+      <button class="icon-btn" id="mapZoomIn" title="Zoom in">+</button>
+      <div class="zoom-level"><span>+</span><span>−</span></div>
+      <button class="icon-btn" id="mapZoomOut" title="Zoom out">−</button>
+    </div>
+
+    <aside class="detail-panel hidden" id="detailPanel">
+      <button class="detail-close" id="closeDetail">×</button>
+      <div class="detail-kicker" id="detailKicker">CELESTIAL BODY</div>
+      <h1 id="detailName">—</h1>
+      <div class="detail-sub" id="detailSub">—</div>
+      <div class="detail-actions">
+        <button class="primary-btn full" id="openMapBtn">OPEN PLANET MAP</button>
+      </div>
+      <div class="stat-grid">
+        <div><span>TYPE</span><b id="detailType">—</b></div>
+        <div><span>ORBIT</span><b id="detailOrbit">—</b></div>
+        <div><span>PERIOD</span><b id="detailPeriod">—</b></div>
+        <div><span>SEED</span><b id="detailSeed">—</b></div>
+      </div>
+      <div class="panel-section">
+        <div class="section-title">MINERAL PROFILE</div>
+        <div id="minerals"></div>
+      </div>
+      <div class="panel-section hidden" id="moonSection">
+        <div class="section-title">MAJOR MOONS</div>
+        <div class="moon-list" id="moonList"></div>
+      </div>
+      <div class="panel-section">
+        <div class="section-title">WORLD NOTE</div>
+        <p id="detailNote" class="note">—</p>
+      </div>
+    </aside>
+
+    <div class="loading hidden" id="loading">
+      <div class="spinner"></div>
+      <span id="loadingText">LOADING DATA</span>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <div class="intro-screen" id="introScreen" aria-label="Loading EXOLINE">
+      <div class="intro-word">EXOLINE</div>
+    </div>
+    <section class="mission-screen hidden" id="missionScreen" aria-label="EXOLINE mission menu">
+      <div class="mission-copy">
+        <div class="mission-kicker">EXOLINE // SOL SYSTEM</div>
+        <h1>EARTH</h1>
+        <div class="mission-rule"></div>
+        <button class="mission-option" id="exploreSolBtn">EXPLORE SOL</button>
+        <button class="mission-option" id="continueMissionBtn">CONTINUE MISSION</button>
+        <button class="mission-option" id="newCampaignBtn">NEW CAMPAIGN</button>
+        <div class="mission-divider"></div>
+        <div class="mission-mode">EXPLORATION MODE</div>
+        <ul class="mission-meta">
+          <li>SOL SYSTEM</li>
+          <li>9 PLANETS</li>
+          <li>MAJOR MOONS</li>
+        </ul>
+        <button class="mission-enter" id="missionEnter">ENTER</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="orbit-engine.js"></script>
+  <script src="map-renderer.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

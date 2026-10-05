@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "planets": 13,
+  "major_moons": 21,
+  "dwarf_planets_included": 4,
+  "orbital_png_count": 35,
+  "surface_png_count": 34,
+  "terrain_tile_count": 374,
+  "flat_surface_lighting": true,
+  "pixel_map_zoom": true,
+  "checksums": 443
+}

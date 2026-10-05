@@ -1,0 +1,4432 @@
+[
+  {
+    "path": "assets/orbital/ceres/ceres_orbital.png",
+    "bytes": 259622,
+    "sha256": "c28560041736c7d3553b3b9be97deda4932efe2bcd92c28f2ec3241ed2d0d637",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/earth/earth_orbital.png",
+    "bytes": 329125,
+    "sha256": "6af0a842be695953834de096016582559574d3cb44cfd85e2296e37ee941c231",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/earth/moons/moon/moon_orbital.png",
+    "bytes": 261116,
+    "sha256": "387d4bcee66640896e6514a097257bc1ee67815fb67700a4494a0245a536f66f",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/eris/eris_orbital.png",
+    "bytes": 259636,
+    "sha256": "4249a3d50eaf7f0183db5a56e4df55323af52cd48c6ed4578e34434d6969a203",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/haumea/haumea_orbital.png",
+    "bytes": 258903,
+    "sha256": "328522855052e37d730eb632a4ce10fc5fa27ba9a1b950bf36b673070b26506f",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/jupiter/jupiter_orbital.png",
+    "bytes": 213720,
+    "sha256": "cea5e20d34fb6fc1e82105a889bd6f76091ba4816d6e54819e4126baa9f63956",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/jupiter/moons/callisto/callisto_orbital.png",
+    "bytes": 259536,
+    "sha256": "7df72493bc96ed9fc64e85db3798b7e2a3c32cc820efb9bbc8912e1aa8888707",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/jupiter/moons/europa/europa_orbital.png",
+    "bytes": 258257,
+    "sha256": "a57f2faf8e417fbb0c1c17b9527989205820646f6b0c81c52c85a501203225b9",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/jupiter/moons/ganymede/ganymede_orbital.png",
+    "bytes": 258746,
+    "sha256": "95077a4fe416f5ea27b424c454388c87ead357f74f3f99efa7ac818bf22706b6",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/jupiter/moons/io/io_orbital.png",
+    "bytes": 219541,
+    "sha256": "a78a3c157f1cffc0357a1dacfa565ff0a9a47084fc255f06060e3deac575eefb",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/makemake/makemake_orbital.png",
+    "bytes": 259072,
+    "sha256": "787c94a1a6378c7d205ba76a16437e1b5a9c256d2054f03a0e2bc1c91fbbd953",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/mars/mars_orbital.png",
+    "bytes": 315786,
+    "sha256": "8158619d3e388fbd08ab579d6d417a3d32b9283d95b55b1a224b2f7160063146",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/mars/moons/deimos/deimos_orbital.png",
+    "bytes": 259035,
+    "sha256": "917c34738725ded6bce89cf1d0ebf00283aae0546049587799150d8ea9def244",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/mars/moons/phobos/phobos_orbital.png",
+    "bytes": 259204,
+    "sha256": "77ddec2edea4ec76c586455cbd05ad6aa531b3bbccfbba15f3d226b3334ed85d",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/mercury/mercury_orbital.png",
+    "bytes": 272961,
+    "sha256": "80b5d42d08225fa81f8463a88eab286994c0306a939c8a4f79b5d687bb84aeb5",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/neptune/moons/triton/triton_orbital.png",
+    "bytes": 259526,
+    "sha256": "7f8aaa2911b1c60ecc33d46af91d016cc6847c36a53b26a24ee74a222e7cfcdb",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/neptune/neptune_orbital.png",
+    "bytes": 139531,
+    "sha256": "ba4b08cc711ce05c843a772a1da8ab602aeca94a21d3a8738577b43eefe008f6",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/pluto/moons/charon/charon_orbital.png",
+    "bytes": 258901,
+    "sha256": "8bfec4d133b5f27196a83f5140a3bfdccc9bf112a0b002f24b0893bee9a83af6",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/pluto/pluto_orbital.png",
+    "bytes": 258978,
+    "sha256": "700ae7fdd92591bc4338cea5629a86db302e540d6999134789ffae48c40a611c",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/saturn/moons/dione/dione_orbital.png",
+    "bytes": 259188,
+    "sha256": "24db131d317aa76b260d13e88039532a065c9397a708e91558c90671afdd39c1",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/saturn/moons/enceladus/enceladus_orbital.png",
+    "bytes": 259272,
+    "sha256": "db74d2a5fd5fbff8649904a2e5de3de725d75e4ea17539e9f2201d5add13a951",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/saturn/moons/iapetus/iapetus_orbital.png",
+    "bytes": 259031,
+    "sha256": "b30b6c600380e3152c977df6fa069182d4ade1560db5f6c03dcd96512de45943",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/saturn/moons/mimas/mimas_orbital.png",
+    "bytes": 259131,
+    "sha256": "ba3cc2cf9d344c697cd706404540e795ee34da10acd1632cfabe5ef6771b8c16",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/saturn/moons/rhea/rhea_orbital.png",
+    "bytes": 259218,
+    "sha256": "c6b8e059e58f47d20d9a53e5b5770567811d86f5249fd93ae9522168eea15b6b",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/saturn/moons/tethys/tethys_orbital.png",
+    "bytes": 257895,
+    "sha256": "becb91ae8661f042b7c394ccc569c072ec5f3485526883e003ca363574a7b336",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/saturn/moons/titan/titan_orbital.png",
+    "bytes": 256131,
+    "sha256": "b16c56ca029a93a6cab47bd356e2d82580de751ccfc84a230009f3025b08c330",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/saturn/saturn_orbital.png",
+    "bytes": 214703,
+    "sha256": "358b6bc88a6e4325a79878adae2eef8f90f8936d8348b62ba0553ad577a0b0f5",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/sun/sun_orbital.png",
+    "bytes": 47218,
+    "sha256": "33a9ec6ef9c77be6038d27e2fc465a0ca6babc9e658a7f1250e9bed33f7ed1a6",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/uranus/moons/ariel/ariel_orbital.png",
+    "bytes": 258022,
+    "sha256": "a7e226a7d94f5fd41097ba6a7e471d61fc32579083c7f27398848334d3fefbc6",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/uranus/moons/miranda/miranda_orbital.png",
+    "bytes": 257364,
+    "sha256": "ccb0ac8101468379eeb964445aa139ffb79b2fe851ab2b242a45eca21b623878",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/uranus/moons/oberon/oberon_orbital.png",
+    "bytes": 258341,
+    "sha256": "f85e4c47abf0a7247a12d0d5d2ebe487fbec2970ea1bf82d86e81ec53a9d1cbd",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/uranus/moons/titania/titania_orbital.png",
+    "bytes": 259143,
+    "sha256": "3094c222f8732a050d23cf9c016a5bb409d4c5372d7b6a36e723d6548b83f7ed",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/uranus/moons/umbriel/umbriel_orbital.png",
+    "bytes": 257730,
+    "sha256": "e1c18866ee4755b462730f8e0f06cbacb2f57df8f0a5d41ecb6dc3d88b077226",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/uranus/uranus_orbital.png",
+    "bytes": 143448,
+    "sha256": "26ebc4ce8994c437731fb5a4ee8a2fdd9b86b91ac8a85aca5a1f732946e65dda",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/orbital/venus/venus_orbital.png",
+    "bytes": 311240,
+    "sha256": "ec57bbd258798a5642f323654bfb5279dda209e9a1a3c0c54798e86cf3cf8ffe",
+    "dimensions": [
+      512,
+      512
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/ceres/ceres_surface.png",
+    "bytes": 190924,
+    "sha256": "0099b18a95127bc9a3a8b666d955d09feed126cc3b2289fc613478e72360de77",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/earth/earth_surface.png",
+    "bytes": 178199,
+    "sha256": "39d2229489db31c27609acbff725e9b36202ee346c517f01624facd6432bc7e4",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/earth/moons/moon/moon_surface.png",
+    "bytes": 191227,
+    "sha256": "f8a3eb856a2e5f3740ed7efac2bbd07af767ada3fa074a87447dfc7930303204",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/eris/eris_surface.png",
+    "bytes": 185486,
+    "sha256": "e6360e14aedef3aa91cfc0c7fb284423f647bd2b09a061149f914700c2130ba2",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/haumea/haumea_surface.png",
+    "bytes": 184644,
+    "sha256": "2e278c2df43a059c412a4c03af40b060c6b3efc0c2440619962af9380f6912f7",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/jupiter/jupiter_surface.png",
+    "bytes": 171351,
+    "sha256": "af338f89009bb0451ff187226fe0968b51354e81b3a35706cd718b593aacde5e",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/jupiter/moons/callisto/callisto_surface.png",
+    "bytes": 184317,
+    "sha256": "1b2b0512ce30267366bdf26b4589cc0b87d567d7164583b982e6d6f72d5b17d6",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/jupiter/moons/europa/europa_surface.png",
+    "bytes": 185005,
+    "sha256": "68cf3cbf16c8a058d5324918bd06b8c932758e93ad4aea84e71b72e86ff8e6f7",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/jupiter/moons/ganymede/ganymede_surface.png",
+    "bytes": 184517,
+    "sha256": "0a856a22de8fadb7251033891e4b27515d166550e20a053cd35488ed234b3744",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/jupiter/moons/io/io_surface.png",
+    "bytes": 186011,
+    "sha256": "d6585593eb9af9c0e2e7154bc27d699460a854a84d246d6612693d15bb87f2cd",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/makemake/makemake_surface.png",
+    "bytes": 184822,
+    "sha256": "2d55b6d1ba1b17d841cecab2c694d077a9b9b547ae18b89d7a98d257b26a53aa",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/mars/mars_surface.png",
+    "bytes": 189797,
+    "sha256": "6f099ed18970426a47c6879f84a979e134f548e2bd441b13e825c263a2c8e5c7",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/mars/moons/deimos/deimos_surface.png",
+    "bytes": 191300,
+    "sha256": "c3f348f1cfdd0b0589abcc56ed072a6b6187723f522b493f90434ba763b579e6",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/mars/moons/phobos/phobos_surface.png",
+    "bytes": 191486,
+    "sha256": "9e91ec907735702cadaf3097e7104d6ae16876ced08f888732f868ce953ad5f7",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/mercury/mercury_surface.png",
+    "bytes": 193611,
+    "sha256": "ba52f8f626fdbdfd6abbb9ed2601b67cfcd163faffd87484dbb69b26bff62bdf",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/neptune/moons/triton/triton_surface.png",
+    "bytes": 184383,
+    "sha256": "713951e317081da4f81e9146032d0a01150cec07a2d5ac43933be04fdfe27ac1",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/neptune/neptune_surface.png",
+    "bytes": 195326,
+    "sha256": "f32b3bcf02b5f43392a39bcc3c1b2364e001b7ed4dc7f211f92355044e956b04",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/pluto/moons/charon/charon_surface.png",
+    "bytes": 184450,
+    "sha256": "ccf09f7e81f4bb426a42827b01ff02d4c39edd1067341ad458713556a8ac14cf",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/pluto/pluto_surface.png",
+    "bytes": 185209,
+    "sha256": "25533b5ced17117abcb0ab589feeb538397e147482adab144a2c003e935854e3",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/saturn/moons/dione/dione_surface.png",
+    "bytes": 184492,
+    "sha256": "660a03c7714c2e7e41f7efe13b2ef18cc7e558c24e46f520c6f2b2652fd02bb6",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/saturn/moons/enceladus/enceladus_surface.png",
+    "bytes": 184810,
+    "sha256": "a430ef92522e16e7cb4f655072193cea69d05c25b154577663476dc90b0c9beb",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/saturn/moons/iapetus/iapetus_surface.png",
+    "bytes": 184418,
+    "sha256": "a3a8aa900b6fd68de2342f5dbe3c5f6782c9aa53226debaa411b7f2aabb3a9dd",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/saturn/moons/mimas/mimas_surface.png",
+    "bytes": 184339,
+    "sha256": "416426eb616e5aeb5ff9669eac6c43dd028d8c0f89fe8e0e074f451cc3892b04",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/saturn/moons/rhea/rhea_surface.png",
+    "bytes": 184553,
+    "sha256": "f77601fdb4055a1cda1678f2fc232299475ab69d37352d8535f45498c296222d",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/saturn/moons/tethys/tethys_surface.png",
+    "bytes": 184229,
+    "sha256": "39c53529dd20bb9b231bbd8ca351d78a820a54aa949754d20d3e020563195105",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/saturn/moons/titan/titan_surface.png",
+    "bytes": 193344,
+    "sha256": "06e556e4f4b1428706b5f5642cc452f376510423fc4fb16ca09e8902d84d191c",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/saturn/saturn_surface.png",
+    "bytes": 171666,
+    "sha256": "dc140d660808ad368fbd147ffd14bb56c5493d691c4d3db9bf589b2828bcf10a",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/uranus/moons/ariel/ariel_surface.png",
+    "bytes": 184205,
+    "sha256": "d2763d488b2af0d2616b2fe4322fd6ff43a556c8439a894105172a230b111edf",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/uranus/moons/miranda/miranda_surface.png",
+    "bytes": 184665,
+    "sha256": "025408cdb1b6d1de11002652453e2b2b7b069726a4354a7eb40d9d324424b931",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/uranus/moons/oberon/oberon_surface.png",
+    "bytes": 184190,
+    "sha256": "a38cde8d9564a13e0764a92b8acfc3dd17f3c03f6d9702004eabe2ea17f20638",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/uranus/moons/titania/titania_surface.png",
+    "bytes": 184230,
+    "sha256": "4cbe7b8eedfa6ddc975b37f0efefa2edb59bd25bdf99e4d04300c17652c3baf1",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/uranus/moons/umbriel/umbriel_surface.png",
+    "bytes": 184415,
+    "sha256": "bb057b6a1280d417aab4e2289ca22f487344884ce30ce86abb45f8fc795a2cad",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/uranus/uranus_surface.png",
+    "bytes": 195774,
+    "sha256": "4b26ca112b132f3a26c9db424d39e82e21ebfa37b3a81cabe1464493cee32dc1",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/surface/venus/venus_surface.png",
+    "bytes": 194335,
+    "sha256": "abc28a4f8bfcf6615c927d2b558685c6621330cbc616cd00cd169bde6a69aa06",
+    "dimensions": [
+      512,
+      256
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/ceres/z0/x0_y0.png",
+    "bytes": 25299,
+    "sha256": "01ca79af04a1679640bdefcbcbb81db457d1b14bb1c8de6f3894de9f417f2a9c",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/ceres/z1/x0_y0.png",
+    "bytes": 25530,
+    "sha256": "f560ed858f11525d93a8f97c697677f6492988b64853452ac7cb27fce8fa594b",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/ceres/z1/x1_y0.png",
+    "bytes": 25513,
+    "sha256": "304afdc2654e98ecee09962b045a42f1dc723f01de045e32e3f6cfbbbe75b187",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/ceres/z2/x0_y0.png",
+    "bytes": 24138,
+    "sha256": "9e1ff6a6930c7161a06ddcc534ed514f8d541732634ff28873fcb8f12a3a098b",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/ceres/z2/x0_y1.png",
+    "bytes": 24288,
+    "sha256": "47db98c7a0c1feb6b60ebe5600eff4f642eb742b5442c61ad75058657071f96d",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/ceres/z2/x1_y0.png",
+    "bytes": 24286,
+    "sha256": "50b83c9a23a4a59723338e993d23af139f86468fed939ac754d6c3240d6f475e",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/ceres/z2/x1_y1.png",
+    "bytes": 24383,
+    "sha256": "27c9a3d50325c9037648227df8dc7fed382cede0ae976facd647858b89ff7148",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/ceres/z2/x2_y0.png",
+    "bytes": 24157,
+    "sha256": "48d33e423b69b774044898430c0e760ab5aee3d3bbb88ae53f24c0f64cd8eb2e",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/ceres/z2/x2_y1.png",
+    "bytes": 24214,
+    "sha256": "8b203f821e6822c7934b44687b5b39e6d861b2b6b9497e713960f7441be7a36c",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/ceres/z2/x3_y0.png",
+    "bytes": 24200,
+    "sha256": "2a8a58a9b38ca922bd2373058336c787f0af30e1aa2888f1a1ff29de5ff94c13",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/ceres/z2/x3_y1.png",
+    "bytes": 24145,
+    "sha256": "9ba73b649fec8d5f816f24ddc112f003aa3a7c83f7e394fdc292a75317438d21",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/earth/moons/moon/z0/x0_y0.png",
+    "bytes": 25237,
+    "sha256": "f470f01a5ac837cde558b800ecdb38a01976006554803d7eb4ad5504f219f5cf",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/earth/moons/moon/z1/x0_y0.png",
+    "bytes": 25669,
+    "sha256": "3f23d7e247cc6354761fd4f6281e8681a6a73abefe0f3086e114ad91827e7a89",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/earth/moons/moon/z1/x1_y0.png",
+    "bytes": 25523,
+    "sha256": "43808e8a1cd27309a2d01d6bf19236d11959943f6a2772159fa66f77c1b9c2c1",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/earth/moons/moon/z2/x0_y0.png",
+    "bytes": 24292,
+    "sha256": "5218eb806423ee50b2ebf2e2f87d5e7fdf0263ac0d5a7cacf7f55c416d9ad377",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/earth/moons/moon/z2/x0_y1.png",
+    "bytes": 24323,
+    "sha256": "66597314310d1369e53b6810010eaf93d55e0d7fc1749bbe99dc8d1019a325fe",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/earth/moons/moon/z2/x1_y0.png",
+    "bytes": 24253,
+    "sha256": "044524bbe279ac88eb8308cac21e5f77aedd4e7b039987ca1b368000d75517e2",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/earth/moons/moon/z2/x1_y1.png",
+    "bytes": 24124,
+    "sha256": "613b557cc06803616dc6eecc26a3d659eb76a65adad74a0335acb2e9d75e89b3",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/earth/moons/moon/z2/x2_y0.png",
+    "bytes": 24221,
+    "sha256": "0ce0094ae3a4bd72414e9cf3f4360f8747a4b664c3dbb670d6bc6be17388d6ce",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/earth/moons/moon/z2/x2_y1.png",
+    "bytes": 24285,
+    "sha256": "1a03d07741afe94bb03c5a9b74d0f6aeb14bbf6d8feda21ec84a70c37757cf44",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/earth/moons/moon/z2/x3_y0.png",
+    "bytes": 24275,
+    "sha256": "8e33e9ec943feff07cd037182b1585305e8c42c72c80128dd6e80434655ce13d",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/earth/moons/moon/z2/x3_y1.png",
+    "bytes": 24207,
+    "sha256": "6fd50f66a4d63c5b7f84fb7b833011a0eedeab5fb4404cea8286ff0148093ddf",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/earth/z0/x0_y0.png",
+    "bytes": 25458,
+    "sha256": "3f43caadd319303fdd8141e32bd331c3e07f4974878130876f8d5267839cb379",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/earth/z1/x0_y0.png",
+    "bytes": 24462,
+    "sha256": "9d982cef14821d7a7aafa127af9c65c050ec82b6b7168ac7f907d187c9d748af",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/earth/z1/x1_y0.png",
+    "bytes": 25563,
+    "sha256": "e417f22f06e0baa582e3cb8502f27a046ca1b80df6f3a33ff6c395dbb5788d55",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/earth/z2/x0_y0.png",
+    "bytes": 22577,
+    "sha256": "5043b0393b4b7a4b1c9eaf41b8983878301106c40f5a79539e09a483f195e77f",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/earth/z2/x0_y1.png",
+    "bytes": 22142,
+    "sha256": "a76557adc27491f89674bea32860bf7b3418ef522269226f362311837c058887",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/earth/z2/x1_y0.png",
+    "bytes": 22489,
+    "sha256": "46d182158ad68a876e8328d7c2253e3a1caa5b0e5b8ad585f8f9c5be5c3a9760",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/earth/z2/x1_y1.png",
+    "bytes": 22851,
+    "sha256": "0994ade26b0c72066283291c94d4fe1ecc404fcf288affa0d249290670a082e0",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/earth/z2/x2_y0.png",
+    "bytes": 23426,
+    "sha256": "25032c09e1274ca9fe13d045cb9630672df282ca2468f221242dc5f83431fec1",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/earth/z2/x2_y1.png",
+    "bytes": 22960,
+    "sha256": "75f623601d81dcef6243c56a811487a7f6ddf692107c7f95a4e25a0f117f51ca",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/earth/z2/x3_y0.png",
+    "bytes": 23534,
+    "sha256": "1cbbb79bc01eef0010687abfa0b58656d8372a57911c012fb34c97e5fa969f01",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/earth/z2/x3_y1.png",
+    "bytes": 23051,
+    "sha256": "7d2eda937596deea65bf91049773d89f3771ad1da21a915ff59e2746ca2ccd98",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/eris/z0/x0_y0.png",
+    "bytes": 24489,
+    "sha256": "503dbb7542486355c06dbbf31b499dc0f5a9a5278fa4225e1299f31775e91874",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/eris/z1/x0_y0.png",
+    "bytes": 24847,
+    "sha256": "a6fb6060a26a0595926e452bd7d63c153bc32aed17009c89b8a80ecf350d9bbc",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/eris/z1/x1_y0.png",
+    "bytes": 24928,
+    "sha256": "2141e012333cd05038b7edce5f6f85ad3ddfcabbf9d5524343e05ec9aac6144f",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/eris/z2/x0_y0.png",
+    "bytes": 23385,
+    "sha256": "f454a26e55ccddff8eaebc67b1965f35c31f735deb9583ed42737734c31549f1",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/eris/z2/x0_y1.png",
+    "bytes": 23382,
+    "sha256": "f104d6435824259d588efb7f78e42ea37478e2293c7107967a09ffa7a51e4a8f",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/eris/z2/x1_y0.png",
+    "bytes": 23312,
+    "sha256": "fc7fb45c60dcd9977720ed8b8f8bb1d417a357b8644ad3ca74ecf3af8f5bf2b1",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/eris/z2/x1_y1.png",
+    "bytes": 23296,
+    "sha256": "659d139ea04dde03dc01ab6cb5814a24f3c51260b4494db97f23adbf4b5b5045",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/eris/z2/x2_y0.png",
+    "bytes": 23533,
+    "sha256": "f3c85ad3da78393c4463ef7edc85c73ca2c666179dd081dccdd0f5abea9414ff",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/eris/z2/x2_y1.png",
+    "bytes": 23385,
+    "sha256": "a271586d60f87b5cba142e817103a822a5541cb30cc2f8df49f8b0d974e7492a",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/eris/z2/x3_y0.png",
+    "bytes": 23285,
+    "sha256": "938f168457b7fdcfc8109c81c5f59878ec77bc8757866ac84bb90041724adc10",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/eris/z2/x3_y1.png",
+    "bytes": 23404,
+    "sha256": "34cd104eddf434795e0236a815a341ccaa86fa9cd43fe271e6aa34e3fe1fc991",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/haumea/z0/x0_y0.png",
+    "bytes": 24537,
+    "sha256": "e1927d6f8d2a065ebfe155ce53b87aafbab4846daac476626c019a5cb39501da",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/haumea/z1/x0_y0.png",
+    "bytes": 24841,
+    "sha256": "f369c6aef58d19185613b5804a8f0c0fb8fcdc53c429fcc8882845a2f902964e",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/haumea/z1/x1_y0.png",
+    "bytes": 24905,
+    "sha256": "43fe8ef7247cc2767aa1a6e980f0a3de344847fe4ee1bbd6ec6c669891f24621",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/haumea/z2/x0_y0.png",
+    "bytes": 23144,
+    "sha256": "8bf84f0ff0e51443aba0227e87f5819dd0b07cec044f04dfe5bafd0f3ba186db",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/haumea/z2/x0_y1.png",
+    "bytes": 23395,
+    "sha256": "d57ba87b9fe61c785e842f70e4543f339c9ef7bf0e2fddc63f5619a63d183dad",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/haumea/z2/x1_y0.png",
+    "bytes": 23219,
+    "sha256": "d16f72400b761b1864cb7333d1b77e2a3e971a07db9b98cbab68e9c99ef5741d",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/haumea/z2/x1_y1.png",
+    "bytes": 23430,
+    "sha256": "4a8b8c09c24d3642913e82894ac33ac3ac53ac20a46d66d395f5e45902d82c63",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/haumea/z2/x2_y0.png",
+    "bytes": 23347,
+    "sha256": "aed09ce042ea52ee342368cd76f85fe60178acefb63500be310563e011b25915",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/haumea/z2/x2_y1.png",
+    "bytes": 23084,
+    "sha256": "1800f4a1b32503754bba829b810b6bfce0138566776515ff552a897b127a95f5",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/haumea/z2/x3_y0.png",
+    "bytes": 23248,
+    "sha256": "040cc2a78efa8c442464968ab5e90b09c520ca3affa5f631f750c05e61d29b60",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/haumea/z2/x3_y1.png",
+    "bytes": 23284,
+    "sha256": "83e2d884b6562dab3b5ff5b8c10452f1307be929488ed6b8cde66ee1c4a0b5b3",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/callisto/z0/x0_y0.png",
+    "bytes": 24537,
+    "sha256": "87c2291caa510beaaa2c13d1624d801731916beefc0517545ecf0baf47c344bd",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/callisto/z1/x0_y0.png",
+    "bytes": 24830,
+    "sha256": "a67eb4ab966076c9456ae58ae2e185e90991f5fbef612ee6e24ea24c4384b0ee",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/callisto/z1/x1_y0.png",
+    "bytes": 24814,
+    "sha256": "266a4eec04591396b1f0d2d5f5879c22ef7d8d7e50ae8e091aa8004107197265",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/callisto/z2/x0_y0.png",
+    "bytes": 23494,
+    "sha256": "67664952ad8b84325d6a68a7e78d9099fbdd52e27dc71d0a86a0e92ca8ae6b9e",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/callisto/z2/x0_y1.png",
+    "bytes": 23317,
+    "sha256": "6618e8a03ce326f71632d918a68bab2463d38933fc019f12a047d3cbdb18dbdf",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/callisto/z2/x1_y0.png",
+    "bytes": 23190,
+    "sha256": "b1ac1469bdcba8fbc08055539e6d14ce42437485cb2c707dd441175bdc6b2ca9",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/callisto/z2/x1_y1.png",
+    "bytes": 23134,
+    "sha256": "44084a790d2c540edcb5b76337129b4523dde251dfbe9a5132bac8a35a46a03b",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/callisto/z2/x2_y0.png",
+    "bytes": 23326,
+    "sha256": "d448e41ea26fe50d7114723d930d20ef04eee9b13d6a11f28509224a93b0b143",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/callisto/z2/x2_y1.png",
+    "bytes": 23342,
+    "sha256": "d465e9d960d9482dbbb03ef4cdb74889115efac8a6df087433345b7ccaa1f282",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/callisto/z2/x3_y0.png",
+    "bytes": 23130,
+    "sha256": "23079e10201f4a0580da49839bfa009f695b5bf4115b76594109b81144f79050",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/callisto/z2/x3_y1.png",
+    "bytes": 23251,
+    "sha256": "b3bd26f19fb4fa89446f79d62bd66c53ce73c719e3e53bc1a65066f12eb9fa51",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/europa/z0/x0_y0.png",
+    "bytes": 24602,
+    "sha256": "3fb46e02983a983337dde1f034d5984e42f131930499602adf825e3105e90196",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/europa/z1/x0_y0.png",
+    "bytes": 24815,
+    "sha256": "6cbdfe41c9d9c091dde6352aa1fcc724fe99edbc62be7383c67d09881e352ace",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/europa/z1/x1_y0.png",
+    "bytes": 24910,
+    "sha256": "af9c3c69671b24a944d616355bdfeadded972aa3b7b78135cc30c773088ca852",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/europa/z2/x0_y0.png",
+    "bytes": 23251,
+    "sha256": "eca9ad1a8a031a52273b2dabdac30e1c4e5400e2bb3f226595c9d1739ec91078",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/europa/z2/x0_y1.png",
+    "bytes": 23199,
+    "sha256": "3c8f06a6d8128c08204650a9615a2e59e17901a44452703022b66ff59c095eb7",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/europa/z2/x1_y0.png",
+    "bytes": 23453,
+    "sha256": "674689851e0cfabf2b3e32b8b9d061a11cf8fa25c0fb00bc7a82fee4371a53a9",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/europa/z2/x1_y1.png",
+    "bytes": 23421,
+    "sha256": "0f82e8f22482f2b75cac32bdd27cdc707fa6a9a8bf7e3b13991b3d41ab42c666",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/europa/z2/x2_y0.png",
+    "bytes": 23342,
+    "sha256": "caa0963b897cfb228f09f482e0ca84c80d1c48d4248a2de69c428801564ce4cf",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/europa/z2/x2_y1.png",
+    "bytes": 23320,
+    "sha256": "d6a2cc4f4accc560fd45267a0b170868d9c4b657068a074af4a337ed6838537c",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/europa/z2/x3_y0.png",
+    "bytes": 23486,
+    "sha256": "4f130cb5ebdb6596262ee4b4b25fb8c14eb387d58273c54973d4bb312e62eb67",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/europa/z2/x3_y1.png",
+    "bytes": 23354,
+    "sha256": "49b64c53a6a3c238e6e485d3bb6f07ef20259a6b4c1d438c0dc159dff107f7ea",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/ganymede/z0/x0_y0.png",
+    "bytes": 24524,
+    "sha256": "d2e9b7f49302486ad38a60f9eb5c95289b877ba18c1f46c218c372b868f620e3",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/ganymede/z1/x0_y0.png",
+    "bytes": 24809,
+    "sha256": "79f72943f36e1049cc575e4663ba381b07e2b37c9eec688c36c1b86d13070a0e",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/ganymede/z1/x1_y0.png",
+    "bytes": 24859,
+    "sha256": "c2a419e6ba348caebe50e9c92cff313e09e2539ded520729a1070826f106a722",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/ganymede/z2/x0_y0.png",
+    "bytes": 23327,
+    "sha256": "026a0242613a48a520ed1793542cea2362fb874d30f85a9385bf74251af5a6dc",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/ganymede/z2/x0_y1.png",
+    "bytes": 23234,
+    "sha256": "30097c673be10d35381c9db5f9266e5b5421344e4d42c50f7b85197c7d7dca2b",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/ganymede/z2/x1_y0.png",
+    "bytes": 23121,
+    "sha256": "347b30b89bfdecf5f3d9025e89435946ea437d4fd3f00b9d2632773a5adfd4e2",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/ganymede/z2/x1_y1.png",
+    "bytes": 23400,
+    "sha256": "f59b7f608aa13f27a12dc9b6b03074a78b854caf28234527dbf9a7ee90e95793",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/ganymede/z2/x2_y0.png",
+    "bytes": 23519,
+    "sha256": "39583f8ad95ac4ad31eaf5f8fed18150179ebe48f4a4819ccf75ffc2903d7cab",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/ganymede/z2/x2_y1.png",
+    "bytes": 23348,
+    "sha256": "6edd497c1e1541ebc23705b1aaf83bb2e083d706d90101f4541192a6e48edc70",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/ganymede/z2/x3_y0.png",
+    "bytes": 23283,
+    "sha256": "d03615138da4e9c5f3545793b9faf11d5e4e4836aed01a8bf1644046db1f1255",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/ganymede/z2/x3_y1.png",
+    "bytes": 23298,
+    "sha256": "6372b6b57b4e9e0a59febf00afbaca3318823bac0423ed9a471d0d4488e1d90b",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/io/z0/x0_y0.png",
+    "bytes": 24926,
+    "sha256": "f9d57433dfd8e14c661d35a1ee443bc4da810e729234e364555147a9ee79bcef",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/io/z1/x0_y0.png",
+    "bytes": 25411,
+    "sha256": "67085302b18dcf244bcdcd87f5619e1d0aff9a73c30f738e640245e964c745b7",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/io/z1/x1_y0.png",
+    "bytes": 25411,
+    "sha256": "88634193d784ee6f5ec538073ba26076ccd3ba8bbc68c0f13020ec1748807acc",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/io/z2/x0_y0.png",
+    "bytes": 23477,
+    "sha256": "8b3fdcebdaf63488b433af97ba48df8dd4017f5f5d7c956278dd817139ea3ef7",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/io/z2/x0_y1.png",
+    "bytes": 23263,
+    "sha256": "68967c561d011b953d1982068ca56594c0add6601df8eef79b856d292ae874b8",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/io/z2/x1_y0.png",
+    "bytes": 23604,
+    "sha256": "7c8bbc06a163f3c4737cfd0372aac78cc1d8d1fe84389e1c754b886485f08e8a",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/io/z2/x1_y1.png",
+    "bytes": 23192,
+    "sha256": "2d3ed219b00dbbc81ed6eafe9948edc6e7e4570bd1177183614273d87481414f",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/io/z2/x2_y0.png",
+    "bytes": 23590,
+    "sha256": "816f59ec77051f73c7908b0522ed26764456a4678c04b25f204ab9a503299972",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/io/z2/x2_y1.png",
+    "bytes": 23314,
+    "sha256": "d2ff37ce04f4e250b016a717eea63eb564fee02bbef723ad915ce89f2023808d",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/io/z2/x3_y0.png",
+    "bytes": 23388,
+    "sha256": "8af425294f3760edaf3c95ecba70e941e9676805ad3997271abfa1c8e96815e3",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/moons/io/z2/x3_y1.png",
+    "bytes": 23386,
+    "sha256": "efad2e52420a25580d24bf749763f71928afb34c05af20320897474e4ec99558",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/z0/x0_y0.png",
+    "bytes": 25244,
+    "sha256": "d9484471ce6f7eef1297fdc311dcc921b6fb878c48c8136fd42d9a793f217572",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/z1/x0_y0.png",
+    "bytes": 24319,
+    "sha256": "bf6af7f2935ead7c425fa4ce182e236139e5b8752e63d6b6523ff5c04849b0da",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/z1/x1_y0.png",
+    "bytes": 24281,
+    "sha256": "9ec4589a845e277cc37068b2f15a118f461da41d929476f55fc763758731f266",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/z2/x0_y0.png",
+    "bytes": 22284,
+    "sha256": "43f9d5740d730a498e373e2ec0bf96fae83cdfcd40329df9ec8a34dd0156e1b4",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/z2/x0_y1.png",
+    "bytes": 22323,
+    "sha256": "759eb86dba8d38cd72c6b95420db6aaba4f55b00a555fae066c1cb115fc101ce",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/z2/x1_y0.png",
+    "bytes": 22257,
+    "sha256": "85fd2789cb3843d6dfa1d532711735a31ff7d0ebd9a16e2a100677262d6cf530",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/z2/x1_y1.png",
+    "bytes": 22358,
+    "sha256": "f7b7f6fdc5c9f678270f2b90b7040c69e8395d549e3323b0ce312dcbbcda9e2f",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/z2/x2_y0.png",
+    "bytes": 22137,
+    "sha256": "a478bddc9c25b9db3952f96835c13d47724b6582236cdc9ec55287c77086903c",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/z2/x2_y1.png",
+    "bytes": 22220,
+    "sha256": "47e6a95988a201879e89ca8aa0a71747def602e5abd2bf98c5bb662868fc5cae",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/z2/x3_y0.png",
+    "bytes": 22254,
+    "sha256": "c01b75166649e1fa727380e5918a21072ba8bfca77d9b55b790a262a5ce1832a",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/jupiter/z2/x3_y1.png",
+    "bytes": 22431,
+    "sha256": "de3c0bc532677936186e1aeaa12e8a45f465c91a0af2a2e56ea3891158841b10",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/makemake/z0/x0_y0.png",
+    "bytes": 24506,
+    "sha256": "31551f51e30aa5cefc2f29b3a7df762303b33eed41ebc8a630be6dfe1287a876",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/makemake/z1/x0_y0.png",
+    "bytes": 24866,
+    "sha256": "01df2fc081115dc44995f3de0988f5076b1b87870389036a7e05e1abea54b924",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/makemake/z1/x1_y0.png",
+    "bytes": 24920,
+    "sha256": "78901d234842c647ca9e544754e2dd14289fc79236ebb335f0572f19cb7e83d7",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/makemake/z2/x0_y0.png",
+    "bytes": 23375,
+    "sha256": "dd8f35079402e43bcab266c16850f1b99d62323cacdff7f2ec17828897174ca9",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/makemake/z2/x0_y1.png",
+    "bytes": 23468,
+    "sha256": "1d777bc4fa3eba6d2ba51a6572b16e50ba3935508c61aa842244d8094e6c2fc9",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/makemake/z2/x1_y0.png",
+    "bytes": 23141,
+    "sha256": "ae7157dcad8e72fe7802864d4f988f37616d9d681c545780658ebea8b1360a25",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/makemake/z2/x1_y1.png",
+    "bytes": 23353,
+    "sha256": "6548aaa6577a8334dd79a4ad803f14b08b63dcd587a7c98f9aa4feb4f61684d1",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/makemake/z2/x2_y0.png",
+    "bytes": 23426,
+    "sha256": "ddae8ae67add77f0fd98ad077ab422ce5a1c4af17d467537705bb0637b7e8ee7",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/makemake/z2/x2_y1.png",
+    "bytes": 23423,
+    "sha256": "365d9d3c21143b66d2a895ed0caad8dd1eb894bde237bcd12b975214cac6859e",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/makemake/z2/x3_y0.png",
+    "bytes": 23300,
+    "sha256": "2702f168290f7c69890767d839b0b6b2bb5ecb565f1c50ae2ceefd1bc2e472fb",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/makemake/z2/x3_y1.png",
+    "bytes": 23283,
+    "sha256": "a3d4192cf62d3c2311d6c0455e0cc942a900948a6604a3785966b5977d0df6ea",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/moons/deimos/z0/x0_y0.png",
+    "bytes": 25264,
+    "sha256": "ffc41d9a193e2c3510e97c34b3373889ffbba2c33eae84c2f8790710190e83f8",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/moons/deimos/z1/x0_y0.png",
+    "bytes": 25552,
+    "sha256": "b3cd84b09afa6c7d56e4356ac4e61eda3ffa8b52c791116157d837c17b59ce71",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/moons/deimos/z1/x1_y0.png",
+    "bytes": 25537,
+    "sha256": "18a3d0ee3d6a27dfed4540c2f63863967dce708834064ab01bd196bb1eed983b",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/moons/deimos/z2/x0_y0.png",
+    "bytes": 24387,
+    "sha256": "77ae4e3dcfe7345cc55b5e7c4c7e361386c438ac6892d6e7aa67c94522ccd395",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/moons/deimos/z2/x0_y1.png",
+    "bytes": 24210,
+    "sha256": "0d74c00c2cf0f7508068937eb870fce39931450eb81ae023b989740d9ba9e7c5",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/moons/deimos/z2/x1_y0.png",
+    "bytes": 24188,
+    "sha256": "c9cacf34e8f86c7a28cae39e1eb33f630be683e86ec5045eaff96d32aeaa5cd2",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/moons/deimos/z2/x1_y1.png",
+    "bytes": 24127,
+    "sha256": "cfed1dc31187fb8ab3e9ba93700b6f89080c45c64776370f6cf46c3f2bbe1414",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/moons/deimos/z2/x2_y0.png",
+    "bytes": 24389,
+    "sha256": "241a954da096e6cfc8858383a8af98d17e12274d76821492005e37770a2d6c8c",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/moons/deimos/z2/x2_y1.png",
+    "bytes": 24240,
+    "sha256": "e9101d64afbdcc81925b9f8e032b4ad98202d8737bc026e33662885374436f18",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/moons/deimos/z2/x3_y0.png",
+    "bytes": 24374,
+    "sha256": "a9c5a4a0792b79aaf18da26e8b936f7b6210f1e0ac413bd18dc111b2ba2661ea",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/moons/deimos/z2/x3_y1.png",
+    "bytes": 24125,
+    "sha256": "1344bfb72a379379da20a45fe296ccdfbae45c8969fd5031b7b01100d66d6f64",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/moons/phobos/z0/x0_y0.png",
+    "bytes": 25284,
+    "sha256": "ff4ed6464df4e10fca129daa77a4bcd91bf7269a8dc6a71dfac29af8a0716155",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/moons/phobos/z1/x0_y0.png",
+    "bytes": 25640,
+    "sha256": "994bae3078832e5b57ceddf80527dea7638df99b743279fc0ee2f7db2790aab4",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/moons/phobos/z1/x1_y0.png",
+    "bytes": 25523,
+    "sha256": "6681805e00f900516c4ada415f44be9bc77ec4be414a6a58b9a10c00b46e67d2",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/moons/phobos/z2/x0_y0.png",
+    "bytes": 24362,
+    "sha256": "dfb8d7b46b765f052b080df4c81cf5fcbfe233827a1c7392258adf106792db94",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/moons/phobos/z2/x0_y1.png",
+    "bytes": 24301,
+    "sha256": "bf0771d5fe787f86215972b8091e437d97ffab93e74cc3e962fa1625d2af350f",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/moons/phobos/z2/x1_y0.png",
+    "bytes": 24170,
+    "sha256": "27b6295f3f54e15f51873803d7da629ce57da50e2d37d6e88466f74fbc215886",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/moons/phobos/z2/x1_y1.png",
+    "bytes": 24184,
+    "sha256": "8c9b3d0aeb2ec20ab5628c5a66ae67a2adbcb3768204b0eb0fdee54f203dec71",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/moons/phobos/z2/x2_y0.png",
+    "bytes": 24371,
+    "sha256": "3a9ea3f3063ef398741c0a5d0ab60aa67fe61f96acab95cad0aed3370a2a9d31",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/moons/phobos/z2/x2_y1.png",
+    "bytes": 24062,
+    "sha256": "2c3088fb35abe89b08737fc419a0b4de1381116177f982880fdcab958acc92d1",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/moons/phobos/z2/x3_y0.png",
+    "bytes": 24293,
+    "sha256": "8023c34be4ba160810e54c14a9f1f3b1d9fa739512fba64e2ee3d59b93e73623",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/moons/phobos/z2/x3_y1.png",
+    "bytes": 24219,
+    "sha256": "d60bb151405b1a21e963a549284ae88c0be6dbf9385204bd1a8622c6fe5f3cb9",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/z0/x0_y0.png",
+    "bytes": 24897,
+    "sha256": "78cfcfc2d9004b5a77b7afb79567f4a16d53407486448d12fce7b2c35ec63112",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/z1/x0_y0.png",
+    "bytes": 25465,
+    "sha256": "6a68f1bcb9d4beac172e395ab4dac378b20492332d592b304a9f0f55dfd63d00",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/z1/x1_y0.png",
+    "bytes": 25530,
+    "sha256": "cb2483a7ea1d72d9fbddb02d9f4c5834d6adcb3a2e7274de4630556ac1c5777f",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/z2/x0_y0.png",
+    "bytes": 23896,
+    "sha256": "9f6f7fa627bb2123f1843d8f304ca0150743bb5ccf0f0ec20a04a97e34c4ff92",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/z2/x0_y1.png",
+    "bytes": 23842,
+    "sha256": "cd5f397d258b57802b6cef930fbfb4b33fae7ee81971347d09e7b510b00f1d64",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/z2/x1_y0.png",
+    "bytes": 23956,
+    "sha256": "f21b419f2b9f24f5251eef4da84099f5858f4f22edc868cfd56e1a2bd4e32f2f",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/z2/x1_y1.png",
+    "bytes": 23961,
+    "sha256": "1bb9f3fd3c46db1b9637599e99e1b2243cbf7e5da16ce84f515a6c847a03c7c5",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/z2/x2_y0.png",
+    "bytes": 23930,
+    "sha256": "d1ef16d36ce22f7f9cf35c770681c49336bdbf1ca34f2294612c4f6b7e44e752",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/z2/x2_y1.png",
+    "bytes": 24101,
+    "sha256": "cdb3e2ea215d7ac8dd7511029388b311bb907b475681c02aa19f187dc644309d",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/z2/x3_y0.png",
+    "bytes": 23979,
+    "sha256": "98b5a002efc8e87dfef47f311eb207dce4efa4eb82899b54983bd552804d81f4",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mars/z2/x3_y1.png",
+    "bytes": 23779,
+    "sha256": "05cd85df2434c718887e66e4afc9f61f7bd16b7ec0652ebc42c54cf4fccdf023",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mercury/z0/x0_y0.png",
+    "bytes": 25696,
+    "sha256": "a41a1fd01fcead0f5f0b8880c8f2a13469b6df1338f0f0c71b676e70f7d27cf3",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mercury/z1/x0_y0.png",
+    "bytes": 26021,
+    "sha256": "5aab6d5a4fe61027ae78800357a75f699231c3428f70cd2f555421ea5410fae1",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mercury/z1/x1_y0.png",
+    "bytes": 25917,
+    "sha256": "c4aedbd3998154e0d098c06b253b4c0e4a9421428c1d70a9927f29a419163554",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mercury/z2/x0_y0.png",
+    "bytes": 24380,
+    "sha256": "5d86e9cc6769c58ca3223ba4cd248b4e53d1dae5da39cb05ab700828781df13e",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mercury/z2/x0_y1.png",
+    "bytes": 24601,
+    "sha256": "5d600aca7b73b0997805d47ad4d338d4520d6a565ff334ef194b4027ed5069e2",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mercury/z2/x1_y0.png",
+    "bytes": 24621,
+    "sha256": "691196cd4f5b09a5449ba7fe6f5fd4fa700391a7738ffa4b02e96a8a1d81b393",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mercury/z2/x1_y1.png",
+    "bytes": 24736,
+    "sha256": "d2c24e15169d37bf85379136e271f415715ef28347996a668a1964a9e5f017fc",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mercury/z2/x2_y0.png",
+    "bytes": 24475,
+    "sha256": "af15244489484d2e80fe1e32920b51677c89628ba50160feebd561ecdda3a9dc",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mercury/z2/x2_y1.png",
+    "bytes": 24615,
+    "sha256": "55703a54409ee28d7363a07aea32a697386c2758f2376909a94429d82c1ddff5",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mercury/z2/x3_y0.png",
+    "bytes": 24461,
+    "sha256": "29b890f76603b3856c8e79e0754bc321f091ffec6fc8f6cd1030a879bb9d1714",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/mercury/z2/x3_y1.png",
+    "bytes": 24557,
+    "sha256": "09d28fdf5c0ce64bfef489c3abad5adec242719cbefbde556cb5328d50e39402",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/neptune/moons/triton/z0/x0_y0.png",
+    "bytes": 24473,
+    "sha256": "cbb8c2025823b9cce58dd27102fabfe5d1e7f16c21ac079b92eb964bd5802ac3",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/neptune/moons/triton/z1/x0_y0.png",
+    "bytes": 24819,
+    "sha256": "bbfcd93025d82e3aab736ab4a44e55355f07bc4762b0ea00308dc3a9d1ac44f8",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/neptune/moons/triton/z1/x1_y0.png",
+    "bytes": 24813,
+    "sha256": "6f7667bd4070c178fc88a4e3941d8b58ecd613daf8b82f9609be9702e010da07",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/neptune/moons/triton/z2/x0_y0.png",
+    "bytes": 23327,
+    "sha256": "b957907e495ea18be66c794fc418ce0a277469c89ed975e1989831dde013880c",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/neptune/moons/triton/z2/x0_y1.png",
+    "bytes": 23289,
+    "sha256": "0f714ed56af5cae2932ab7bc673ee6b3f43cae2de3774e5c4e537172e44fc44e",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/neptune/moons/triton/z2/x1_y0.png",
+    "bytes": 23300,
+    "sha256": "2a4e5e8e60fcc40c047e80b616bd07880485fb88c879d959bbbde9b58da82870",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/neptune/moons/triton/z2/x1_y1.png",
+    "bytes": 23238,
+    "sha256": "9cf4ce16bae45b6a2dc2bcc6d2e578b992a349e3666cd761caf7695fadbcc0d9",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/neptune/moons/triton/z2/x2_y0.png",
+    "bytes": 23371,
+    "sha256": "709c929f5e29ab4e6931a547e3e63013d8a921e1fa6893f865aee3e790e541f3",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/neptune/moons/triton/z2/x2_y1.png",
+    "bytes": 23160,
+    "sha256": "ea7eda953997c8f7a1f3da6c0f59190a74b32f05b25bee5831b8a240866d6703",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/neptune/moons/triton/z2/x3_y0.png",
+    "bytes": 23314,
+    "sha256": "4b05fb6de4d09ad5637e0ded323b252f7861afc2c986e214f9a3d7bb9018c532",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/neptune/moons/triton/z2/x3_y1.png",
+    "bytes": 23253,
+    "sha256": "24711616d9b5be5e82f4752d9c6c297fba0585dc473a386ee74e0f5f62609bc9",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/neptune/z0/x0_y0.png",
+    "bytes": 25985,
+    "sha256": "a9d7d4c85ee2fd88c639f0bf02f8cb1fb0c3aca76b1dac1a516cabe250ad2295",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/neptune/z1/x0_y0.png",
+    "bytes": 26260,
+    "sha256": "c81a0277c2b728b8f056bd5e481b5422490d4b76ee14c0cc44c162ebbcc10d67",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/neptune/z1/x1_y0.png",
+    "bytes": 26198,
+    "sha256": "6f2f3d9e284bc3ec1de94b87cf9f756f950b908422bcf7d7d42899b12fae55bf",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/neptune/z2/x0_y0.png",
+    "bytes": 24762,
+    "sha256": "911115c66f816a2d308953dcbb1eddbfbc33be68a0bbbfaced1de522ece7e115",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/neptune/z2/x0_y1.png",
+    "bytes": 24756,
+    "sha256": "5df22f26cdf144951cf01b26b8d9e6701fe80c9b49f5c414d2c2d4dc09191e56",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/neptune/z2/x1_y0.png",
+    "bytes": 24641,
+    "sha256": "1f4f9b881dfc2b436a4372cf9cc3595367c243bd0f9c3189b738d5da48e069a5",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/neptune/z2/x1_y1.png",
+    "bytes": 24804,
+    "sha256": "ea7735a3055eaf9b6791298ec89eef1036a49b69549ec520480899c262b159cf",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/neptune/z2/x2_y0.png",
+    "bytes": 24696,
+    "sha256": "6869d66e1f4ff180493c11a4e36e1964bf9d9224c87d1b7994a1ac3a8df89958",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/neptune/z2/x2_y1.png",
+    "bytes": 24681,
+    "sha256": "cdce45fdf68f978f1ce3846a17591b513e730d43620ad8b3fc6f94002af9d399",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/neptune/z2/x3_y0.png",
+    "bytes": 24580,
+    "sha256": "b1e8c72ef95898f6144008f009ed3a5077ea767df21487da0369994c58c5a51b",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/neptune/z2/x3_y1.png",
+    "bytes": 24507,
+    "sha256": "bd775fd14e9de733e51196aa5248763c6e93fef75a34084ae45604c976c2de01",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/pluto/moons/charon/z0/x0_y0.png",
+    "bytes": 24536,
+    "sha256": "949fc015d44d986bbb0e45c191e8a4f86c99fe3054edb6638e4e9fd2d049dac1",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/pluto/moons/charon/z1/x0_y0.png",
+    "bytes": 24843,
+    "sha256": "19c6ebdfc320c6db983831adb3974e8ac90ffd68490d793120303bf606d7fa12",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/pluto/moons/charon/z1/x1_y0.png",
+    "bytes": 24827,
+    "sha256": "ae37e1fa3a728c02516c92350d9ffd966c7642a05c7294fb331cab9402d9afb3",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/pluto/moons/charon/z2/x0_y0.png",
+    "bytes": 23132,
+    "sha256": "e82db2c73483153d99ab6e1db2c0e7938d25dfb4b7c7263c507a3424b15d6553",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/pluto/moons/charon/z2/x0_y1.png",
+    "bytes": 23265,
+    "sha256": "70f1a152137cc82080a46d5375bbea5ea869fb02b2376948c22ef3144a292817",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/pluto/moons/charon/z2/x1_y0.png",
+    "bytes": 23286,
+    "sha256": "876a21eb0de2f1b7681243742117f394e6f04c06a25d1709dfbd6776b8c4432a",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/pluto/moons/charon/z2/x1_y1.png",
+    "bytes": 23312,
+    "sha256": "8862ae093cd61c7f9a9b6abcedc8e2f4c22f94d32ac18cb67a8e8288a957f4c6",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/pluto/moons/charon/z2/x2_y0.png",
+    "bytes": 23447,
+    "sha256": "0347b333bb89a5baf72a00d6f8a18a9694c085c32b07bebc6f6687e774b0cc0b",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/pluto/moons/charon/z2/x2_y1.png",
+    "bytes": 23219,
+    "sha256": "ba3eb62f4991d070ae7a04f1d4b58dfa56080f8187f717cf0efbb958988948e4",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/pluto/moons/charon/z2/x3_y0.png",
+    "bytes": 23497,
+    "sha256": "7972cef4074dfb7c1851082eb5da57a407ccd75fdd78045992f2551b79c1411f",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/pluto/moons/charon/z2/x3_y1.png",
+    "bytes": 23284,
+    "sha256": "620960b884a74ce3e6d6110dd770458e41996656c04ab4ff82960682f51e79a0",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/pluto/z0/x0_y0.png",
+    "bytes": 24556,
+    "sha256": "dace8c78e9a5aa9c75d86e52071aa5d3a46c30a78e7c732de047716f0afb4f19",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/pluto/z1/x0_y0.png",
+    "bytes": 24979,
+    "sha256": "405c0ed06dca5ebaf7dbe8f4e9b965483ad852f15e3ea2d2c2927043617ed40e",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/pluto/z1/x1_y0.png",
+    "bytes": 24952,
+    "sha256": "c41af8eb60714e087abbf6a47d932b5a61b0488edacbc46d66ce1447d133e8ba",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/pluto/z2/x0_y0.png",
+    "bytes": 23289,
+    "sha256": "0e7566aa224ff023c35a9c3649a28f2978f99d624d39b5f5ca291c70bb94cc87",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/pluto/z2/x0_y1.png",
+    "bytes": 23350,
+    "sha256": "b681aea472438af0721a3038032bec55eea5e44d11297c2f170868b60e612a2b",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/pluto/z2/x1_y0.png",
+    "bytes": 23347,
+    "sha256": "a3626ca3f28b1c10dfd1a369e5a35b923405d2ac31f6b75ea3764bc1f866a67a",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/pluto/z2/x1_y1.png",
+    "bytes": 23398,
+    "sha256": "36dd1d6604275b4317c5316b2830047e923ffb50ee6bda7fecc17db07cae3f5e",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/pluto/z2/x2_y0.png",
+    "bytes": 23327,
+    "sha256": "4dc2d120047b4226a2f0d9e5cefd2f0542b9afc04fe459bc711e1990df450d6c",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/pluto/z2/x2_y1.png",
+    "bytes": 23388,
+    "sha256": "3788b01d252c88b56dc54c7441ef9f2c845b7e8d74f5712bd5c63af91259d17b",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/pluto/z2/x3_y0.png",
+    "bytes": 23470,
+    "sha256": "112df93cd0d06e2d2483ff38629eae9145a1e72907c5c2e921d737bf7cbfc470",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/pluto/z2/x3_y1.png",
+    "bytes": 23275,
+    "sha256": "8a7af0b953c44b308cc3a15ea5f582b656690f1cbd2eba49ccf0b4cbb44b4040",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/dione/z0/x0_y0.png",
+    "bytes": 24533,
+    "sha256": "4ea0cd5a137e42c8692d824842c307e5a363c2298fbc11d193d6bb7fac5fbfcc",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/dione/z1/x0_y0.png",
+    "bytes": 24943,
+    "sha256": "fdef7b8985a88ecf5aab7f1737a172f576e2b42e6d028755d7cb762c4aaf9256",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/dione/z1/x1_y0.png",
+    "bytes": 24836,
+    "sha256": "c32c501218d65a9e3778c870bbf4f161be53e651870f689c9a11c3a02aceae7a",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/dione/z2/x0_y0.png",
+    "bytes": 23477,
+    "sha256": "de7a3b53b7836f68cdb31afa201c8e2de4ef8bd4218ad3234697429435e73390",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/dione/z2/x0_y1.png",
+    "bytes": 23294,
+    "sha256": "3a0ad238534f4688db72c12512759d0094c7cd29ca8c6e46362f6719305aeab6",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/dione/z2/x1_y0.png",
+    "bytes": 23253,
+    "sha256": "a74087c9a3730a68ccf89b9065036bc3255e3fdd7833055fd4eed17ac4496efc",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/dione/z2/x1_y1.png",
+    "bytes": 23377,
+    "sha256": "d7711e802dba0ab6797f792a17cdde26476747aa30ca3cb90e6bae98cc7fc684",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/dione/z2/x2_y0.png",
+    "bytes": 23337,
+    "sha256": "23a10c93c55c76546e3ddd0a69eecf48889c1de6b1e2d3698808a7935ffbc980",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/dione/z2/x2_y1.png",
+    "bytes": 23341,
+    "sha256": "b5d74e6acbdd82e25e2e414487617f5f8133dc8b7c479270692d18d930fe386d",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/dione/z2/x3_y0.png",
+    "bytes": 23360,
+    "sha256": "1f22c9898e35f3295d1ba0c1503a749f3b9150de32e123607aabe7ef702e7e08",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/dione/z2/x3_y1.png",
+    "bytes": 23141,
+    "sha256": "a811b34f4b3de10ae36858167b553a81d107aaae624545619c824ccaad087397",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/enceladus/z0/x0_y0.png",
+    "bytes": 24602,
+    "sha256": "382b7988b9e21c86d2ec9b0295156788855f33f20d2b306ae447ceac89902ff6",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/enceladus/z1/x0_y0.png",
+    "bytes": 24796,
+    "sha256": "70abfee763838b1c3aa0d69241644c9b1677805506669274d88d2e8e6b38395d",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/enceladus/z1/x1_y0.png",
+    "bytes": 24966,
+    "sha256": "24395dee714c3988cb5cf33135ab83b9490f11e00ba02f5b38e448b326099947",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/enceladus/z2/x0_y0.png",
+    "bytes": 23444,
+    "sha256": "7711cc28ebdb236f5b580691d0f9044a380750d69f6b9c9ec6e455c5a7790fb9",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/enceladus/z2/x0_y1.png",
+    "bytes": 23396,
+    "sha256": "659694bb2729e3f38ac13b1eba4ef9f3d28f01b50a28da5b35fc1620391c1462",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/enceladus/z2/x1_y0.png",
+    "bytes": 23208,
+    "sha256": "cc9d89b17455f103fb1a7ada4fce159060e9f6106a5fff63c7c32a4a5cf0407a",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/enceladus/z2/x1_y1.png",
+    "bytes": 23392,
+    "sha256": "a7f8f0eab5b791326d8bb6b5a9af36949cb246fceba0f9b5aa120aa12b1cb98e",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/enceladus/z2/x2_y0.png",
+    "bytes": 23361,
+    "sha256": "d0cc7809c6195224fd18cd58bf2cd36300e698fb9f48bb24cd0391ef059e2f1d",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/enceladus/z2/x2_y1.png",
+    "bytes": 23299,
+    "sha256": "dc50683fd42b57ec76a9002105f980a9fddc2a5912e99d00f32bee54612b087d",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/enceladus/z2/x3_y0.png",
+    "bytes": 23474,
+    "sha256": "7dae083ebe5190e15f4cdbda28e6c8dcff9090b02bf6523de817697298a3c295",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/enceladus/z2/x3_y1.png",
+    "bytes": 23199,
+    "sha256": "b91bf8703b8ebda27b5c144656c2956d029e34d6f13da1498aa9209da379546b",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/iapetus/z0/x0_y0.png",
+    "bytes": 24617,
+    "sha256": "7dd44ad6e0c3958de179ca1b8aaf41d356ec8a5eccd8ae6477bee3722bcb31e5",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/iapetus/z1/x0_y0.png",
+    "bytes": 24796,
+    "sha256": "f18e00acc82bcf96b271296907368ff893547f0fe8e4f10f644acf084fa89c5f",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/iapetus/z1/x1_y0.png",
+    "bytes": 24858,
+    "sha256": "5ff2db8ac41b9f88263482cc621607700d498b9d99f3b77bee1a5089833f56c4",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/iapetus/z2/x0_y0.png",
+    "bytes": 23158,
+    "sha256": "ca348497b9aed2e029ab655c29635514ecaa864f690d74ce45e740c3df326605",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/iapetus/z2/x0_y1.png",
+    "bytes": 23228,
+    "sha256": "b209ad609e1e990a470629a8fb1aa17d80d281d4efcdd5d80778d067d057cb34",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/iapetus/z2/x1_y0.png",
+    "bytes": 23226,
+    "sha256": "59dd2d470edf724816e370e66c8e9ab6b98e234711f85bdc8b58c296423e4d8d",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/iapetus/z2/x1_y1.png",
+    "bytes": 23289,
+    "sha256": "847a21f67f44ce6250a1617d28cfb42f2fe9af11b1bc58d73fe5d5933608bed3",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/iapetus/z2/x2_y0.png",
+    "bytes": 23471,
+    "sha256": "1b20fd77b25d8bd8a4a482c11d7e03b7cbb5f9bc7f1218e7c6e7659e4c74a74b",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/iapetus/z2/x2_y1.png",
+    "bytes": 23332,
+    "sha256": "5ddcb9bb8f474f7ae9442436d0a3432e1eed8fcd354aa98a885b17c81cce8d99",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/iapetus/z2/x3_y0.png",
+    "bytes": 23307,
+    "sha256": "92b915a88594e1df2ac34771c2a4f24b93b8aaa532032c5e9b2596437ddde5bc",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/iapetus/z2/x3_y1.png",
+    "bytes": 23368,
+    "sha256": "66bc8496e6bbd57b577baac42d14c9c8d76605b4b3c4e1489c5fd30e20110cbc",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/mimas/z0/x0_y0.png",
+    "bytes": 24448,
+    "sha256": "34383f7fe9b229bfe174d7b90a4872308bacae19e4dd4be12a2e6e759943443c",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/mimas/z1/x0_y0.png",
+    "bytes": 24824,
+    "sha256": "1e865eba762171fa9b2e05de080428cf4c8434260d0062c6265834d7d2c469d7",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/mimas/z1/x1_y0.png",
+    "bytes": 24709,
+    "sha256": "7e1e8b11acdd3fd6621cee91ea739e9d47595e74becbc725c3aee30518585f99",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/mimas/z2/x0_y0.png",
+    "bytes": 23236,
+    "sha256": "8149b9f90622141620b313b1762a97475a3671ccc1a4fe2c7b931b28269ee6ed",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/mimas/z2/x0_y1.png",
+    "bytes": 23418,
+    "sha256": "09c07f9dd1c9d9f0a043a75fbe68db6766cf5ea7c73de3cf6957afe86ae8931c",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/mimas/z2/x1_y0.png",
+    "bytes": 23223,
+    "sha256": "a064ce827c0ad6b3acda7bcfc94d0439fc0dac6cc597b9cf9bb2ce15dbcd2355",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/mimas/z2/x1_y1.png",
+    "bytes": 23276,
+    "sha256": "c7bb44aa68a04946243bd754ac7f4ed7429d53aedade02a8f7b3be29e64337c2",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/mimas/z2/x2_y0.png",
+    "bytes": 23221,
+    "sha256": "a2b904d92e8dc6b9e9b9e7f8b4411a129c043894b9425a2848e99a110580d110",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/mimas/z2/x2_y1.png",
+    "bytes": 23330,
+    "sha256": "3ebef84920f2661d2c66365e6a9ee13662ea1e25cd18f2d219b1a50f243b4885",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/mimas/z2/x3_y0.png",
+    "bytes": 23272,
+    "sha256": "a58ec1f7bf4d70e6ffea0335fb6482905cc2570a21fa261ca83bc989c9d00711",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/mimas/z2/x3_y1.png",
+    "bytes": 23118,
+    "sha256": "8592d166d065febf5969877a8adeab7035fb995a2a828f7f26cd67f20b2a1a6c",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/rhea/z0/x0_y0.png",
+    "bytes": 24619,
+    "sha256": "6e90a4d328a314da9516f66a0d365a24a3ddc7aa1a11880ab97a739f4706e612",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/rhea/z1/x0_y0.png",
+    "bytes": 24734,
+    "sha256": "12f1b6c593fef4e33ef95b2b82e00929743669b81a784ce3940798d8128e1972",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/rhea/z1/x1_y0.png",
+    "bytes": 24897,
+    "sha256": "162ccb2a1c467d658c1abf3b63b6f059906df97cf1be009331e6d60b9249721f",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/rhea/z2/x0_y0.png",
+    "bytes": 23266,
+    "sha256": "1bf9bbc473903cbb7a3a478f871c967a55c9c13f23c7edc06239e901977d022a",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/rhea/z2/x0_y1.png",
+    "bytes": 23317,
+    "sha256": "cf6cb19b23d58356e54aa0b8e11cb9a5b7313e7cf425aa6bf659a9c9910c982e",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/rhea/z2/x1_y0.png",
+    "bytes": 23281,
+    "sha256": "bd05ad9672c76c58b180db0ffdcd06be6a260b9475b53172b39920f9af10575e",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/rhea/z2/x1_y1.png",
+    "bytes": 23223,
+    "sha256": "479a6a07f13e65993960da6e74f46bb7d5c03cbe49d259474093faefcb6439ed",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/rhea/z2/x2_y0.png",
+    "bytes": 23356,
+    "sha256": "98c0fab0707fb8957c525e0695d10a4d6d22f85c38297203758e5b5022eff498",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/rhea/z2/x2_y1.png",
+    "bytes": 23366,
+    "sha256": "0ed0828ec135fede8de04b9dcca0c2d532755e0650377578677882b58d8eab05",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/rhea/z2/x3_y0.png",
+    "bytes": 23315,
+    "sha256": "e4133074dcb5400f11719ca52bd3788cdc49c3abfdea5af5a38ecdb514d528dd",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/rhea/z2/x3_y1.png",
+    "bytes": 23373,
+    "sha256": "4d8d327b8a0be9b99a70c0f27aaf5382d53622de0c96377163cf310035f40e39",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/tethys/z0/x0_y0.png",
+    "bytes": 24602,
+    "sha256": "8d88b13906bb1c0eddf116993f6e02be86069d9a94a2fb3ad002362a73c987cc",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/tethys/z1/x0_y0.png",
+    "bytes": 24836,
+    "sha256": "c7b0aec40a9e2f1c045f2487fec1138f2eb190b2cf97406da7e755ca41b485c5",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/tethys/z1/x1_y0.png",
+    "bytes": 24875,
+    "sha256": "704134309475daca735dbcc6da62fdb05284a5bed74cb63252b27403c7d3a376",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/tethys/z2/x0_y0.png",
+    "bytes": 23346,
+    "sha256": "bfc06ce2f739e8ff51c4b8c2fcceeecc7ccb1e388eb59e55dc754754b5f997d0",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/tethys/z2/x0_y1.png",
+    "bytes": 23116,
+    "sha256": "8445cb15e200191210b3895527874f36700cfb631e3468f317b5841906452a6b",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/tethys/z2/x1_y0.png",
+    "bytes": 23095,
+    "sha256": "7272231af85556013948fb97831f38490920e1fc243feeea5b3fd758c76f6d5c",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/tethys/z2/x1_y1.png",
+    "bytes": 23261,
+    "sha256": "a72f775cc1ee172fedd5db447cfdf76fa65de5744e3a5619a59e0fbdd64dcecb",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/tethys/z2/x2_y0.png",
+    "bytes": 23364,
+    "sha256": "e7ed7613f9503c7fd8f736884034a20925afd24456a7c772399c6d61e16a5d53",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/tethys/z2/x2_y1.png",
+    "bytes": 23448,
+    "sha256": "0e57326d8c856b819d37d2f7efe0c21b8e50b6c5eb5d6917b0768c82ac523a56",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/tethys/z2/x3_y0.png",
+    "bytes": 23278,
+    "sha256": "fd80b0f12c77cf5e392e462a421ae794a275d7cd06cc2b8785d0ae9ef9f4168a",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/tethys/z2/x3_y1.png",
+    "bytes": 23337,
+    "sha256": "0b22b2cb28086771d40c14f3a1f8f3bf86f9512e757704b5e2fb8c53a2ef8292",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/titan/z0/x0_y0.png",
+    "bytes": 25379,
+    "sha256": "3e5e4ce206cbec5e2f99bee0121ffc15dc37466d7b3166153d17293ebc3b960a",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/titan/z1/x0_y0.png",
+    "bytes": 26029,
+    "sha256": "bd455294fbccefd512489cb52da6b5c365a17c3921f04ab0112c56d2f4e0e504",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/titan/z1/x1_y0.png",
+    "bytes": 25803,
+    "sha256": "0fc7e9a72aebf490c00d8bb6f1261d094f7121ba7462aa43c731caeae97241a3",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/titan/z2/x0_y0.png",
+    "bytes": 24201,
+    "sha256": "d2300951cfb60428f89521cd55e3952ad30a87b5c4a92516048be4a0a1d88f37",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/titan/z2/x0_y1.png",
+    "bytes": 24505,
+    "sha256": "001375e75f04586602d4fd5a3fcc4cdea8bf7aa6be8a6d447dea0a12ea0816c1",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/titan/z2/x1_y0.png",
+    "bytes": 24371,
+    "sha256": "82ead859b76bdec6ce2480112ad567f09747db2ceffa0a6723368c262e74a7c7",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/titan/z2/x1_y1.png",
+    "bytes": 24468,
+    "sha256": "ed96377efa412ea4b0e799446419b81161a95a71a66e1d358cb65484e70a679e",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/titan/z2/x2_y0.png",
+    "bytes": 24325,
+    "sha256": "f1917fd7b6756ef3e3577d4d349206bcab87355f3388488a9f80c998a5f67cb3",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/titan/z2/x2_y1.png",
+    "bytes": 24312,
+    "sha256": "d13c5936f0d5a8d513845a740900f9558b7b2ac45bafcc7181b092bbfbd42c99",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/titan/z2/x3_y0.png",
+    "bytes": 24586,
+    "sha256": "89230829545f209d5d876cc8c62fc1e86b7608ef9d3459c1fd224acaf1f7a514",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/moons/titan/z2/x3_y1.png",
+    "bytes": 24306,
+    "sha256": "194b7322cb63652df3fc3a20d1ab389a3b17516f9a0d84d127fafd2d9bfb6953",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/z0/x0_y0.png",
+    "bytes": 25298,
+    "sha256": "e52b433650119de89f6851fbf19c2e43af511dc34e1be768f9e11d3c442a8cae",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/z1/x0_y0.png",
+    "bytes": 24501,
+    "sha256": "a735a872d1e6a06c1efca63c4ff0577e043f47004e0a466474b9b646a1183083",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/z1/x1_y0.png",
+    "bytes": 24381,
+    "sha256": "8b46e63d246ea28a5a3f7f79c87641931d62be3ba46663460d2ae7c22599f797",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/z2/x0_y0.png",
+    "bytes": 22366,
+    "sha256": "6af9ab0c3217c2025552cee97fb2ea58bfb230059e76ae6b7c3ae2d466a3150c",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/z2/x0_y1.png",
+    "bytes": 22280,
+    "sha256": "f99c825625eac53e16bc8e8d9efc1a790e8d9b9ec09ca855e53ff0e0d5daf0ed",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/z2/x1_y0.png",
+    "bytes": 22443,
+    "sha256": "f3dbd1e0066855a9357b5cb51355312d92670cda0bfdf8a01b7da5b18506a669",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/z2/x1_y1.png",
+    "bytes": 22266,
+    "sha256": "73e0846dd6dcabb510146fb511d61117106ca791bdc1199d1c0dc9aeb368d298",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/z2/x2_y0.png",
+    "bytes": 22227,
+    "sha256": "635c3d96cf0749685222930797c4a86d839f8106e28a67a03ca590b5650e8555",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/z2/x2_y1.png",
+    "bytes": 22312,
+    "sha256": "29e144946c9d61ef4ba0d4aad17a84b8a5f7901b0aa1cff1c2f3b5e95b0982dd",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/z2/x3_y0.png",
+    "bytes": 22372,
+    "sha256": "91858beb5f04019f33543d5bcbda94c57e533a8c9995d03fee404e7939322836",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/saturn/z2/x3_y1.png",
+    "bytes": 22392,
+    "sha256": "ff21fc1e8ba2f08d6967606d07635daebdd737befb792af361408b1e9710d413",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/ariel/z0/x0_y0.png",
+    "bytes": 24570,
+    "sha256": "b0cd1d731156cfabbe448ddac4ae43b552f79e21baefe27526451a0c43c6490a",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/ariel/z1/x0_y0.png",
+    "bytes": 24844,
+    "sha256": "7828d2f0307817edf9d5a3ec75bfc0e0be0119ba8d1edf1a1d55c427ebac11c5",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/ariel/z1/x1_y0.png",
+    "bytes": 24804,
+    "sha256": "396749aad527760897c68b8062edeec6fa3796e91e568330f5b907f8bcf4d735",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/ariel/z2/x0_y0.png",
+    "bytes": 23162,
+    "sha256": "06b68a7d2a0d7c9bbaf3d650ff5a2b633dc0eef55dfd37cdb5295a09ebf6e133",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/ariel/z2/x0_y1.png",
+    "bytes": 23266,
+    "sha256": "966c9ca7d51b1672600639f88fd8fcbfe52380066756625ae8c6ee795582a1b1",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/ariel/z2/x1_y0.png",
+    "bytes": 23236,
+    "sha256": "155dc581936777c11829382a78a6abf5d744348cd0ae218a8c478666b7f7a86f",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/ariel/z2/x1_y1.png",
+    "bytes": 23109,
+    "sha256": "f901318d87c22dfad01ef5e82000361257ca78efdee88d0b2e92f71b9ebbee64",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/ariel/z2/x2_y0.png",
+    "bytes": 23285,
+    "sha256": "d604799cf7c14b25fda460e1ad8f3fa25ca3ec456ca32a9380a9f2800a44f626",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/ariel/z2/x2_y1.png",
+    "bytes": 23432,
+    "sha256": "64bfec995f47524f6e1b2894f99746df1bf79741ad4f2336aa9738f4dc77f7f2",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/ariel/z2/x3_y0.png",
+    "bytes": 23244,
+    "sha256": "010bc6b8dec538e1b531c5be99a93f2a840e0fdecf898ff276aab2315469f9bd",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/ariel/z2/x3_y1.png",
+    "bytes": 23308,
+    "sha256": "63090c9eba3d12e852196b8c37c83fec411b65ab4f56d8c878ca27d4aa2ad3af",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/miranda/z0/x0_y0.png",
+    "bytes": 24508,
+    "sha256": "cee929912c5807b0a38f65c127f3768aa669e1bafeba4c8ed95ee34c358f9724",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/miranda/z1/x0_y0.png",
+    "bytes": 24791,
+    "sha256": "16f9ea30b41a357d70f229b6d8c1a1a6c57d7462bd962ee0ee1e07d635a99217",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/miranda/z1/x1_y0.png",
+    "bytes": 24847,
+    "sha256": "ec7cb992f7ef74b065f7e1478465f1cac4f9a88af4784388ccbfc58a0090ea96",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/miranda/z2/x0_y0.png",
+    "bytes": 23323,
+    "sha256": "e554da93d0cf6a18511f16720f21622a0bfabb715f226f18bda6a6ca2cd968e1",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/miranda/z2/x0_y1.png",
+    "bytes": 23175,
+    "sha256": "cd328d16f2366fa740f4d371308ab081bd42285beaa2d8e589d2a5afd6f72a3c",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/miranda/z2/x1_y0.png",
+    "bytes": 23095,
+    "sha256": "55f69fc1e598405bbeb6ef4c5352af1e2057bea4db40e527450f01276f511523",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/miranda/z2/x1_y1.png",
+    "bytes": 23220,
+    "sha256": "6db9d909cdf0fde97bf39d8ffebb0f1fc85316063669612d0cbedc29062dd58d",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/miranda/z2/x2_y0.png",
+    "bytes": 23268,
+    "sha256": "fa222a7a94468eb5373bd1252623098482f97a06fc40a61d0b53c33eb9e0465c",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/miranda/z2/x2_y1.png",
+    "bytes": 23307,
+    "sha256": "e288fdbd1e22af536cda2391d46b6f58c1b8fc073ec1961bb9ef6c2a9230bd71",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/miranda/z2/x3_y0.png",
+    "bytes": 23417,
+    "sha256": "48dc40fe30b1df68107daa301be841438786aaed023ab8b01754d28db47f6b80",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/miranda/z2/x3_y1.png",
+    "bytes": 23383,
+    "sha256": "fad8797275afaedf3fdc1d2667d2ef04cc8b04c7dc742921bd81d2f8508fbdc4",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/oberon/z0/x0_y0.png",
+    "bytes": 24420,
+    "sha256": "c6392efbfb79bba5756b8a0444b392e64fc2a2de232981e299d9d4014c31735a",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/oberon/z1/x0_y0.png",
+    "bytes": 24826,
+    "sha256": "778d64bfd7d1b881687c8e8946936f86de582d98ce2dfdc1887fc15021a8fc7e",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/oberon/z1/x1_y0.png",
+    "bytes": 24782,
+    "sha256": "0518f75d81b54e2c9911a39a630437d7b6e9a59f448d4c86ed6f15bc1e666017",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/oberon/z2/x0_y0.png",
+    "bytes": 23244,
+    "sha256": "ba7633a810d6b722eb963c6bf4fded3dfb68b8352d34fefb706f6a2204b421ba",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/oberon/z2/x0_y1.png",
+    "bytes": 23053,
+    "sha256": "2f5bab48f9432da330c140071fa63a3863fce614cc4b32f41d79b690d3720fa9",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/oberon/z2/x1_y0.png",
+    "bytes": 23391,
+    "sha256": "2495fa7196cc3e06c6c7c9eaf43a2742b20ad9880ee6fdd04576566b4b165fcb",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/oberon/z2/x1_y1.png",
+    "bytes": 23234,
+    "sha256": "03a07ac398cdeee8818da4392bf666f5d3ab37f6fcc4e289dfc548269248a918",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/oberon/z2/x2_y0.png",
+    "bytes": 23266,
+    "sha256": "30837a2cab125220b2ff950943d84fe5fc087bdffc1aa3e719a111b5503992f6",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/oberon/z2/x2_y1.png",
+    "bytes": 23290,
+    "sha256": "d4bdd0a9b3836dda04e5556e144faf4ee94dfd40cfa7ac9133ac2354c8bb8aa5",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/oberon/z2/x3_y0.png",
+    "bytes": 23150,
+    "sha256": "c57e6085fbbf99bcbd3a7c475796ac561fb467243a71ea05de15221637b171e0",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/oberon/z2/x3_y1.png",
+    "bytes": 23331,
+    "sha256": "3146e322836e246ceec593106980f8b7c0a1aa24b5cc5761339d54d1250c15c2",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/titania/z0/x0_y0.png",
+    "bytes": 24513,
+    "sha256": "2a287f42316f28dcb366ba33ad2002b5e4fb3d6100ccf0172819e76d21d22f88",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/titania/z1/x0_y0.png",
+    "bytes": 24807,
+    "sha256": "53ae2df3d6f9143e5d46ea5b2a917343d165652e5a70ea68d2dd11143d9a7ef0",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/titania/z1/x1_y0.png",
+    "bytes": 24824,
+    "sha256": "a7dd82cffc7747a0c86d378572be18a1cc2dd4c7e95b031bf06b71b2fb02b0e9",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/titania/z2/x0_y0.png",
+    "bytes": 23290,
+    "sha256": "4deff919f9d201de301875ea1d17f2185121f3daed516241531a33ca257dd638",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/titania/z2/x0_y1.png",
+    "bytes": 23137,
+    "sha256": "4a392a57f0452fc46b8f7d113db12dd2cbbd616414d0eddb98acc47deda319b7",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/titania/z2/x1_y0.png",
+    "bytes": 23343,
+    "sha256": "f6ae97ce958a4d79b62b376836be2c820419b5596cf5a4c9863e72b707ba29a6",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/titania/z2/x1_y1.png",
+    "bytes": 23322,
+    "sha256": "b792866bd488727e89e99fb62dac3b2c18981cd997869afda49749ca4b12bf90",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/titania/z2/x2_y0.png",
+    "bytes": 23231,
+    "sha256": "04d6a56bc2d1644b07dea38d321ec9ee73ad4fcdbcbcb0baf1f2bd63ca10cba4",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/titania/z2/x2_y1.png",
+    "bytes": 23450,
+    "sha256": "4babaad4fa217558f2fe1f6e91d59bb7649d947e78804a563af8c39ea8c38e20",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/titania/z2/x3_y0.png",
+    "bytes": 23308,
+    "sha256": "e7327fb2db13b73e63a2cd3bab228192317a2c65e556a864837355297ff504a4",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/titania/z2/x3_y1.png",
+    "bytes": 23432,
+    "sha256": "5db8fc7c1bf1a6569b1157d9de1c0c5879fa601602049ec9f4d285db4ca4b43a",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/umbriel/z0/x0_y0.png",
+    "bytes": 24490,
+    "sha256": "5bb7bc3a2fd4021bbd09a11aad9e9d3e824eb7ea27c268c38b5afe0b8e96a9ee",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/umbriel/z1/x0_y0.png",
+    "bytes": 24977,
+    "sha256": "c2ee232bb44cbb4de03ef8b800354ff949934400fb11d98e80f3b1d0dc2781ed",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/umbriel/z1/x1_y0.png",
+    "bytes": 24939,
+    "sha256": "681ae53e0317d616f288dd5408000dcbdd26ea5653847f495bbcdd213f00fffb",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/umbriel/z2/x0_y0.png",
+    "bytes": 23255,
+    "sha256": "3655fea9e88d632cbd10d0f5dd5c306c9f6461ff9921a90d597d70403bd02a95",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/umbriel/z2/x0_y1.png",
+    "bytes": 23315,
+    "sha256": "c7edb1212077b36dfffcdb9353d220ca1eccdd665f1001ed977018de61eb1f88",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/umbriel/z2/x1_y0.png",
+    "bytes": 23333,
+    "sha256": "591917fb2a619e357da023df2c159c5fbed15b3c577cb7a6b5643490d84c859e",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/umbriel/z2/x1_y1.png",
+    "bytes": 23231,
+    "sha256": "6bab8f74e8d2be1527081a5fa05f49b17cb011c9dc4ed424b20e52b005f3df2d",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/umbriel/z2/x2_y0.png",
+    "bytes": 23253,
+    "sha256": "4b54ab957940e36623591a1d26e96c89a79a761734b18a2f6388cc191414849a",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/umbriel/z2/x2_y1.png",
+    "bytes": 23223,
+    "sha256": "1883925e8a867cba956a5612bf21b93194e0fa579ae3552580e1ccbdf28addc9",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/umbriel/z2/x3_y0.png",
+    "bytes": 23288,
+    "sha256": "2b6f6433242c0ec6626057718ade576a64be31c84d7bc28cfd600e82e7f963d8",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/moons/umbriel/z2/x3_y1.png",
+    "bytes": 23406,
+    "sha256": "bd4c0de852cd29021a865b5c2fb1a8e34f54302d2f16b55704ee61f4d32d7684",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/z0/x0_y0.png",
+    "bytes": 26031,
+    "sha256": "812a62da545fd8e33e07e2a24ee404e61dd87a5ec675a97a3fe2b2cd88ccb35f",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/z1/x0_y0.png",
+    "bytes": 26315,
+    "sha256": "adcf17d0ad1eb78696061be7481187942c0535d01077919ebe69578fdc6fc5a6",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/z1/x1_y0.png",
+    "bytes": 26488,
+    "sha256": "b886eb2d534309e6f696bef272262ca765c1a7b9b31fa6548657e11516816fed",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/z2/x0_y0.png",
+    "bytes": 24693,
+    "sha256": "f04607e7486112aa461005c3e025661c27bc06cca82b71787f0a4422c867f482",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/z2/x0_y1.png",
+    "bytes": 24685,
+    "sha256": "2b1186bf0d267c0ddf6537fe3468c97221cf2749a98a4f863fab56c21ff3810e",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/z2/x1_y0.png",
+    "bytes": 24518,
+    "sha256": "7e02e5c6bc9abf90a2ffa3e5280fb61fe8fb813f974b19970af68faf7c1b15c9",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/z2/x1_y1.png",
+    "bytes": 24687,
+    "sha256": "a4a1557f376613e845de05bb73a3e4cd1129a321b473d68a2a2324179ec0ab00",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/z2/x2_y0.png",
+    "bytes": 24612,
+    "sha256": "5d11be1980eb5d737ca7ae8c0c96385f62740622a7487edf00d39cca42b1e28b",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/z2/x2_y1.png",
+    "bytes": 24743,
+    "sha256": "28de93a2cdde881539ebf6c0f5d6b65a65c522d5e5c23a9841e31ca61f4be9e3",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/z2/x3_y0.png",
+    "bytes": 24786,
+    "sha256": "ec6b0d4fa0dc48cc93d28dd39da56b5d78db2957aa5ad6d6c403acb18e8b4a9d",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/uranus/z2/x3_y1.png",
+    "bytes": 24916,
+    "sha256": "bb9ca9a3b8d2c9d5cadfc412e9a1bc6fb40190c6d78f7546208ab6521fbe02cd",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/venus/z0/x0_y0.png",
+    "bytes": 25696,
+    "sha256": "57b70918b6d0bf84f5c34fa64269c6c825df4633f8edda947d0638daa223d883",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/venus/z1/x0_y0.png",
+    "bytes": 26083,
+    "sha256": "a5e2d3117cffe9a08811e4fef21c96d61786b55454e9ca0bdca051723dbd2c72",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/venus/z1/x1_y0.png",
+    "bytes": 26000,
+    "sha256": "9d158581c0a902a4d3cf48219d0e1e4ea9b6128349c3e342c913cf5ac16df8d4",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/venus/z2/x0_y0.png",
+    "bytes": 24632,
+    "sha256": "1798cc253463c3cea868e955640e983b7b21548678b1d10c92d9217afa4ab912",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/venus/z2/x0_y1.png",
+    "bytes": 24769,
+    "sha256": "8c75f86789dc96613cb6f692e8febc1a4740b5663e50cd91928970eef9822318",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/venus/z2/x1_y0.png",
+    "bytes": 24653,
+    "sha256": "b09b6f52e9f581aa0103053b7f3ea82d77a5a3082d6fb73f3c701141ec470bf8",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/venus/z2/x1_y1.png",
+    "bytes": 24500,
+    "sha256": "1d62f47c8986eebed42a579461f9cb3159999168c038ee9ccb91764f2db5d74a",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/venus/z2/x2_y0.png",
+    "bytes": 24618,
+    "sha256": "760727df98740e4f811ff76faefe08b5b9b252c7c63ec30da9e294bc58e85084",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/venus/z2/x2_y1.png",
+    "bytes": 24590,
+    "sha256": "3c97e430bae6806454d985805fae1238d6c0eeec7be9ed46ccc7d9e666eef2fd",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/venus/z2/x3_y0.png",
+    "bytes": 24736,
+    "sha256": "85700d7ac45cc7b884ef563833a08703bddefecc9bd5a3250bcb4df6f1c0b788",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  },
+  {
+    "path": "assets/terrain/venus/z2/x3_y1.png",
+    "bytes": 24493,
+    "sha256": "176bdbfec43117da58c867113f2c37206ff05168d4e717325ccd4ab8ad7b5728",
+    "dimensions": [
+      128,
+      128
+    ],
+    "format": "PNG"
+  }
+]
