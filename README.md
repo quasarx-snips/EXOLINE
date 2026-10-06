@@ -1,6 +1,6 @@
-# EXOLINE v0.0.2 — Solar System Explorer (Renderer Fix / Final Runtime Build)
+# EXOLINE v0.0.4 — Solar System Explorer (Flight-deck polish / Extended warp build)
 
-This build is the playable Solar-System exploration foundation for EXOLINE v0.0.2.
+This build is the playable Solar-System exploration foundation for EXOLINE v0.0.4.
 
 ## Run
 

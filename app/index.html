@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
   <meta name="theme-color" content="#06090d">
-  <title>EXOLINE v0.0.2 — Solar System</title>
+  <title>EXOLINE v0.0.4 — Solar System</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,18 +12,21 @@
     <canvas id="scene" aria-label="EXOLINE Solar System"></canvas>
     <canvas id="mapCanvas" class="hidden" aria-label="EXOLINE Planet Map"></canvas>
 
-    <header class="topbar">
-      <div class="brand-block top-left">
-        <div class="utility-actions">
-          <button class="small-btn" id="homeBtn" title="Open orbital view">◉ <span>ORBIT</span></button>
-          <button class="small-btn" id="resetBtn" title="Reset view">↻ <span>RESET</span></button>
-        </div>
-      </div>
+    <nav class="flight-top-actions" aria-label="Settings and view">
+      <button class="icon-btn" id="settingsBtn" title="Settings" aria-label="Settings"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <button class="small-btn" id="viewBtn" title="View" aria-label="View"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>VIEW</span></button>
+    </nav>
+
+    <section class="flight-status" aria-label="Status strip">
       <div class="top-center">
         <div class="system-name" id="systemName">EARTH</div>
         <div class="sim-date" id="simDate">—</div>
       </div>
-    </header>
+      <div><span>MASS</span><b id="shipMass">1.00 t</b></div>
+      <div><span>THRUST</span><b id="shipThrust">20 kN</b></div>
+      <div><span>T/W</span><b id="shipTwr">2.04</b></div>
+      <div><span>PARTS</span><b>1</b></div>
+    </section>
 
     <div class="map-topbar hidden" id="mapTopbar">
       <button class="small-btn" id="backBtn">← SYSTEM</button>
@@ -32,7 +35,7 @@
         <span id="mapReadout">MAP · 1.0×</span>
       </div>
       <div class="map-actions">
-        <button class="icon-btn" id="mapResetBtn">⌂</button>
+        <button class="icon-btn" id="mapResetBtn" title="Reset map view"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.5 12 4l8 7.5"/><path d="M6.5 10.5V20h11v-9.5"/></svg></button>
       </div>
     </div>
 
@@ -42,11 +45,7 @@
       <button class="round-btn" id="faster" aria-label="Faster">››</button>
     </div>
 
-    <div class="zoom-rail" aria-label="Map zoom controls">
-      <button class="icon-btn" id="mapZoomIn" title="Zoom in">+</button>
-      <div class="zoom-level"><span>+</span><span>−</span></div>
-      <button class="icon-btn" id="mapZoomOut" title="Zoom out">−</button>
-    </div>
+    <button class="icon-btn corner-reset" id="resetBtn" title="Reset view" aria-label="Reset view"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11a8 8 0 1 1 2.3 5.7"/><path d="M4 5v6h6"/></svg></button>
 
     <aside class="detail-panel hidden" id="detailPanel">
       <button class="detail-close" id="closeDetail">×</button>
@@ -93,6 +92,7 @@
         <button class="mission-option" id="exploreSolBtn">EXPLORE SOL</button>
         <button class="mission-option" id="continueMissionBtn">CONTINUE MISSION</button>
         <button class="mission-option" id="newCampaignBtn">NEW CAMPAIGN</button>
+        <button class="mission-option" id="changelogBtn">CHANGELOG</button>
         <div class="mission-divider"></div>
         <div class="mission-mode">EXPLORATION MODE</div>
         <ul class="mission-meta">
@@ -103,9 +103,37 @@
         <button class="mission-enter" id="missionEnter">ENTER</button>
       </div>
     </section>
+    <aside class="changelog-panel hidden" id="changelogPanel">
+      <button class="detail-close" id="closeChangelog">×</button>
+      <div class="detail-kicker">EXOLINE // RELEASE NOTES</div>
+      <div id="changelogContent">LOADING CHANGELOG…</div>
+    </aside>
   </div>
 
+    <aside class="flight-hud" id="flightHud">
+      <div class="hud-grid"><span>SOI <b id="hudSoi">EARTH</b></span><span>APO <b id="hudApo">—</b></span><span>PERI <b id="hudPeri">—</b></span><span>ECC <b id="hudEcc">—</b></span><span>DST <b id="hudDistance">—</b></span></div>
+      <div class="hud-row">
+        <button class="pitch-btn" id="turnLeft" aria-label="Pitch left" title="Pitch left"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></button>
+        <div class="hud-deck">
+          <div class="hud-readout"><span>Velocity</span><b id="hudVel">—</b></div>
+          <div class="dial-stack">
+            <div class="throttle-dial" id="throttleDial">
+              <div class="dial-fill"></div>
+              <div class="dial-face"><span>Throttle</span><b id="throttleReadout">0%</b></div>
+              <input id="throttle" type="range" min="0" max="100" value="0" aria-label="Throttle">
+            </div>
+            <div class="flight-controls">
+              <button id="launchBtn">IGNITION</button>
+              <button id="rcsBtn" aria-pressed="false" title="Fine attitude control">RCS</button>
+            </div>
+          </div>
+          <div class="hud-readout"><span>Height</span><b id="hudAlt">—</b></div>
+        </div>
+        <button class="pitch-btn" id="turnRight" aria-label="Pitch right" title="Pitch right"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
+      </div>
+    </aside>
   <script src="orbit-engine.js"></script>
+  <script src="flight-engine.js"></script>
   <script src="map-renderer.js"></script>
   <script src="app.js"></script>
 </body>

@@ -130,15 +130,21 @@ window.ExolineOrbit = (() => {
 
     const points=[];
     const T=(toJD(date)-J2000)/36525;
+    const days=(date-new Date('2000-01-01T12:00:00Z'))/DAY_MS;
     const a=base.a+(base.ad||0)*T;
     const e=Math.max(0,base.e+(base.ed||0)*T);
     const inc=((base.i||0)+(base.id||0)*T)*Math.PI/180;
     const node=((base.node||0)+(base.noded||0)*T)*Math.PI/180;
     const omega=((base.p||0)+(base.pd||0)*T)*Math.PI/180-node;
     const cosO=Math.cos(node), sinO=Math.sin(node), cosw=Math.cos(omega), sinw=Math.sin(omega), cosi=Math.cos(inc), sini=Math.sin(inc);
+    // Start the sampled curve at the body's propagated anomaly.  This gives
+    // the renderer an exact path vertex at the body's center at every frame.
+    const startM=raw.primary[id]
+      ? normDeg((base.L+(base.Ld||0)*T)-(base.p+(base.pd||0)*T))*Math.PI/180
+      : (base.L-base.p)*Math.PI/180+2*Math.PI*days/base.period_days;
 
     for (let i=0;i<segments;i++) {
-      const M=2*Math.PI*i/segments;
+      const M=(startM+2*Math.PI*i/segments)%(2*Math.PI);
       const E=solveKepler(M,e);
       const xOrb=a*(Math.cos(E)-e);
       const yOrb=a*Math.sqrt(1-e*e)*Math.sin(E);
@@ -150,15 +156,19 @@ window.ExolineOrbit = (() => {
     return points;
   }
 
-  function moonOrbitPath(id, segments=96) {
+  function moonOrbitPath(id, segments=96, date=new Date('2000-01-01T12:00:00Z')) {
     if (!raw || !raw.moons[id]) return [];
     const base=raw.moons[id],a=base.a_km/AU_KM,e=base.e||0;
+    // Begin the rendered ellipse at the moon's actual anomaly.  This keeps the
+    // rendered path and its propagated position on the exact same orbit.
+    const days=(date-new Date('2000-01-01T12:00:00Z'))/DAY_MS;
+    const anomaly=(base.M*Math.PI/180)+2*Math.PI*days/base.period_days;
     const inc=(base.i||0)*Math.PI/180,node=(base.node||0)*Math.PI/180;
     const omega=(base.omega||0)*Math.PI/180-node;
     const cosO=Math.cos(node),sinO=Math.sin(node),cosw=Math.cos(omega),sinw=Math.sin(omega);
     const cosi=Math.cos(inc),sini=Math.sin(inc),points=[];
     for(let i=0;i<segments;i++){
-      const E=solveKepler(2*Math.PI*i/segments,e);
+      const E=solveKepler((anomaly+2*Math.PI*i/segments)%(2*Math.PI),e);
       const xOrb=a*(Math.cos(E)-e),yOrb=a*Math.sqrt(1-e*e)*Math.sin(E);
       points.push({
         x:(cosO*cosw-sinO*sinw*cosi)*xOrb+(-cosO*sinw-sinO*cosw*cosi)*yOrb,

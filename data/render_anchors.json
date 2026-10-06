@@ -1,0 +1,13 @@
+{
+  "default": { "anchor_x": 0.5009765625, "anchor_y": 0.5009765625, "disk_scale": 0.810546875 },
+  "sun": { "anchor_x": 0.5009765625, "anchor_y": 0.5009765625, "disk_scale": 0.740234375 },
+  "mercury": { "anchor_x": 0.5, "anchor_y": 0.5, "disk_scale": 0.85546875 },
+  "venus": { "anchor_x": 0.5, "anchor_y": 0.5, "disk_scale": 0.85546875 },
+  "earth": { "anchor_x": 0.5, "anchor_y": 0.5, "disk_scale": 0.85546875 },
+  "mars": { "anchor_x": 0.5, "anchor_y": 0.5, "disk_scale": 0.85546875 },
+  "jupiter": { "anchor_x": 0.5, "anchor_y": 0.5, "disk_scale": 0.85546875 },
+  "saturn": { "anchor_x": 0.5, "anchor_y": 0.5, "disk_scale": 0.85546875 },
+  "uranus": { "anchor_x": 0.5, "anchor_y": 0.5, "disk_scale": 0.85546875 },
+  "neptune": { "anchor_x": 0.5, "anchor_y": 0.5, "disk_scale": 0.85546875 },
+  "note": "Anchors and disk scales are measured from each orbital sprite's alpha bounds; rendered centers coincide with physics coordinates."
+}
