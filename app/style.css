@@ -114,6 +114,13 @@ button { font-family:var(--font-ui); color:inherit; }
 .spinner { width:12px; height:12px; border:2px solid #1a313d; border-top-color:var(--accent); border-radius:50%; animation:spin .9s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
 .toast { position:absolute; left:50%; top:86px; transform:translateX(-50%) translateY(-8px); z-index:40; opacity:0; pointer-events:none; padding:7px 13px; border:1px solid rgba(255,255,255,.22); border-radius:999px; background:rgba(5,12,16,.94); color:#cfe4ee; font-size:9px; transition:.18s ease; }
+.orbit-node-add { position:absolute; z-index:22; padding:6px 10px; border:1px solid rgba(255,255,255,.75); border-radius:999px; background:var(--deck); color:var(--ink); font:800 8px var(--font-ui); letter-spacing:.08em; cursor:pointer; box-shadow:var(--deck-shadow); }
+.settings-panel { position:absolute; z-index:50; left:50%; top:50%; transform:translate(-50%,-50%); width:min(340px,calc(100vw - 28px)); padding:18px; border:1px solid rgba(135,194,235,.42); border-radius:14px; background:linear-gradient(180deg, rgba(15,37,58,.98), rgba(8,22,37,.97)); box-shadow:0 24px 60px rgba(0,0,0,.55); }
+.settings-panel h2 { margin:14px 0 8px; color:#eaf7ff; font:800 11px var(--font-ui); letter-spacing:.12em; }.setting-row { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:10px; border:1px solid rgba(255,255,255,.14); border-radius:10px; color:#eaf7ff; font:800 9px var(--font-ui); letter-spacing:.08em; }.setting-row small { display:block; max-width:220px; margin-top:5px; color:#9db4c2; font:9px/1.35 var(--font-body); letter-spacing:0; }.setting-row input { appearance:none; width:36px; height:20px; margin:0; border:1px solid rgba(255,255,255,.6); border-radius:999px; background:#172c43; cursor:pointer; }.setting-row input::after { content:""; display:block; width:14px; height:14px; margin:2px; border-radius:50%; background:#fff; transition:transform .16s; }.setting-row input:checked { background:#4c95d4; }.setting-row input:checked::after { transform:translateX(16px); }
+.keybind-list { display:grid; grid-template-columns:1fr 1fr; gap:6px; }.keybind-list label { display:flex; align-items:center; justify-content:space-between; gap:6px; padding:6px 7px; border:1px solid rgba(255,255,255,.12); border-radius:8px; color:#b8cbd4; font:800 7px var(--font-ui); letter-spacing:.08em; }.keybind-list input { width:58px; height:22px; border:1px solid rgba(255,255,255,.45); border-radius:6px; background:rgba(255,255,255,.88); color:var(--ink); text-align:center; font:800 9px var(--font-ui); cursor:pointer; }.keybind-list input:focus { outline:2px solid var(--accent); background:#fff; }.settings-panel .small-btn { width:100%; margin-top:10px; }
+
+/* Navigation stays compact and uses the same flight-deck language. */
+.nav-panel { position:absolute; z-index:16; left:8px; top:46px; bottom:64px; width:248px; display:flex; flex-direction:column; border:1px solid rgba(135,194,235,.42); border-radius:14px; background:linear-gradient(180deg, rgba(15,37,58,.96), rgba(8,22,37,.94)); backdrop-filter:blur(16px); box-shadow:0 24px 60px rgba(0,0,0,.45); overflow:hidden; }.nav-panel.collapsed { bottom:auto; }.nav-panel.collapsed .nav-body { display:none; }.nav-head { display:flex; align-items:center; justify-content:space-between; padding:7px 10px; background:var(--deck); }.nav-title { color:var(--ink); font:800 9px var(--font-ui); letter-spacing:.14em; }.nav-mini { width:20px; height:20px; border:1px solid rgba(255,255,255,.6); border-radius:6px; background:rgba(255,255,255,.55); color:var(--ink); cursor:pointer; }.nav-body { padding:8px; display:grid; gap:7px; overflow:auto; }.nav-grid { display:grid; grid-template-columns:1fr 1fr; gap:4px; }.nav-grid > div { padding:4px 6px; background:rgba(4,11,18,.58); border:1px solid rgba(255,255,255,.10); border-radius:8px; min-width:0; }.nav-grid span { display:block; color:#9db4c2; font-size:6.5px; letter-spacing:.14em; }.nav-grid b { display:block; color:var(--on-dark); font-size:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }.nav-sub { color:var(--muted); font-size:7.5px; letter-spacing:.1em; }.nav-actions { display:flex; gap:4px; }.nav-actions button { flex:1; min-width:0; height:24px; border:1px solid rgba(255,255,255,.55); border-radius:999px; background:var(--btn-bg); color:var(--ink); font:800 8px var(--font-ui); cursor:pointer; }.nav-actions .nav-exec { background:var(--deck); }.nav-node { display:grid; gap:5px; padding:7px; border:1px solid rgba(109,184,255,.35); border-radius:10px; background:rgba(4,11,18,.5); }.nav-node-row { display:flex; align-items:center; justify-content:space-between; }.nav-node-row span,.nav-field span,.nav-field em,.nav-key-help { color:#9db4c2; font-size:7px; letter-spacing:.1em; }.nav-node-row b { color:var(--on-dark); font-size:10px; }.nav-step { display:flex; align-items:center; gap:4px; }.nav-step button { width:20px; height:20px; border:0; border-radius:5px; background:#fff; color:var(--ink); cursor:pointer; }.nav-field { display:flex; align-items:center; gap:5px; }.nav-field span,.nav-field em { width:26px; }.nav-field input { flex:1; min-width:0; height:22px; border:0; border-radius:6px; padding:0 6px; color:var(--ink); font:800 10px var(--font-ui); }.nav-key-help { text-align:center; line-height:1.4; }
 .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
 /* --- flight HUD: the original light SFS deck (theme source, unchanged). --- */
@@ -168,6 +175,7 @@ body:has(#mapCanvas:not(.hidden)) .flight-top-actions,
 body:has(#mapCanvas:not(.hidden)) .flight-status,
 body:has(#mapCanvas:not(.hidden)) .warp-panel,
 body:has(#mapCanvas:not(.hidden)) .detail-panel,
+body:has(#mapCanvas:not(.hidden)) .nav-panel,
 body:has(#mapCanvas:not(.hidden)) .corner-reset,
 body:has(#mapCanvas:not(.hidden)) .flight-hud { display:none !important; }
 
@@ -272,7 +280,7 @@ body:has(#mapCanvas:not(.hidden)) .flight-hud { display:none !important; }
 #app.mission-active .warp-panel,
 #app.mission-active .flight-top-actions,
 #app.mission-active .corner-reset,
-#app.mission-active .flight-status { display:none; }
-
-
+#app.mission-active .flight-status,
+#app.mission-active .nav-panel,
+#app.mission-active .flight-hud { display:none; }
 

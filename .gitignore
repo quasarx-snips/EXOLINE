@@ -1,2 +1,11 @@
 nul
 __pycache__/
+*.pyc
+
+# Local recovery/download artifacts. Runtime assets live in assets/orbital/.
+assets/orbital.zip
+assets/orbital_rebuilt/
+
+# Generated validation output; keep only validation source in version control.
+validation/*.json
+validation/*.jpg

@@ -2,6 +2,8 @@
 
 This build is the playable Solar-System exploration foundation for EXOLINE v0.0.4.
 
+For a quick, task-oriented map of the codebase, start with [the developer guide](docs/DEVELOPER_GUIDE.md). It identifies the owning file for UI, physics, navigation, data, and asset changes.
+
 ## Run
 
 Use a local HTTP server because the app loads JSON and PNG assets via fetch().

@@ -1,13 +1,32 @@
-## EXOLINE changelog
+### v0.0.4 — Navigation, maneuver planning, and assisted burns
 
-### v0.0.4 — Flight-deck polish and extended time warp
+- Added a dedicated navigation engine that consumes the existing flight state, physics constants, and orbital ephemeris; target selection, relative telemetry, closest-approach estimates, SOI classification, maneuver planning, and transfer estimates now share the same physical coordinate system as flight.
+- Added target COM brackets, current SOI/target/relative-velocity/orbital diagnostics, safe hyperbolic-orbit reporting, and focus/reset navigation controls.
+- Added maneuver nodes with editable prograde, radial, and normal components, total Δv, plan-only propagation, selectable red node markers, keyboard controls, and orbit-click `ADD NODE` placement.
+- Added local orbital visualization: the live blue conic, a white dotted planet-relative predicted node orbit, and a yellow dotted propagated transfer preview. Impacting trajectories now stop at a predicted surface intersection instead of drawing a false closed orbit.
+- Added assisted auto-burn sequencing: it coasts under controlled warp, returns to 1× to align, takes temporary throttle control, checks the rocket-equation propellant requirement before arming, burns with live thrust/mass/Isp, and consumes the node once complete.
+- Added a Settings-panel Infinite Fuel cheat. It prevents propellant depletion while deliberately preserving the craft mass, as documented in the UI.
+- Added body-specific exponential atmospheric drag to live flight and preview propagation: Earth (100 km), Venus (250 km), Mars (125 km), and Titan (600 km), using approximate real-world density and scale-height ratios.
+- Added startup and navigation-preview guards so a preview exception cannot leave the player trapped behind the intro screen.
+- Fixed warp/physics epoch desynchronization: de-orbit and perturbed trajectories no longer advance celestial time farther than the craft integration. Exact circular coasting still supports full warp; perturbed trajectories are stepped in bounded RK4 chunks with queued simulation time.
+- Added editable, persistent Settings keybinds for pause, warp, craft focus, reset, node creation, and auto-burn.
+- Fixed dense-atmosphere integration instability by making RK4 timesteps drag-aware in both flight and prediction. SOI classification now uses the actual nominal SOI boundary rather than instantaneous gravity dominance, while all-body Newtonian gravity remains continuous.
+
+Navigation foundation and validation:
+- navigation-engine.js: restored the missing `soiRadius` closing brace/return/buildGrid header; added public exports (`buildGrid`, `gridAt`, `gravityAcc`, `propagateLeg`, `closestApproachIn`, `buildPreview`, `buildSnapshot`) plus `dv_vec` on nodes.
+- validation/navigation-validator.js: harness C8–C13, C15/C19, Scenarios A/B/C and `makeContext`/`getBodies`/`nav.init` shims aligned to the engine data model; export contract scan reports `used but not exported: NONE`, exit 0.
+- tools/check_contract.py: comma-separated export parsing; exits 0 when nothing is used but not exported.
+- tools/static_check.py: fixed `tree.root_node.text` line counting (bytes in this tree-sitter build); `ALL FILES PARSED OK`, exit 0.
+- tools/validate_all.py: engine brace depth 0; `solar_system.json`, `physics_constants.json`, `render_anchors.json` all valid JSON, exit 0.
+- tools/depth_scan.py: harness final depth 0, exit 0.
+- app/app.js: the spacecraft trajectory is now local to the body whose sphere of influence the craft has entered — a closed conic drawn around the SOI body (the old wavy solar-frame line is gone), escape path and periapsis/apoapsis markers drawn in the body's local frame, and the camera centres on the SOI body while inside it. The navigation plan polyline and craft render in the same body frame.
+- app/app.js: planet/moon mineral profile now populated — `data/mineral_profiles.json` is loaded and rendered into the detail panel's MINERAL PROFILE section (name, percentage, bar) for every catalogued body. Previously the panel existed in the HTML/CSS but no code ever wrote into it.
+
+### v0.0.3 — Orbital flight update
 
 - Softened the lower edges of the top flight-deck trays while keeping their upper edges aligned to the device edge.
 - Made RESET an icon-only rounded control.
 - Added 10M×, 100M×, and 1B× warp levels; high warp now advances ephemeris time at the selected rate instead of collapsing to the old backlog cap.
-
-### v0.0.3 — Orbital flight update
-
 - Added a selectable triangular spacecraft with camera focus, throttle, and corrected rotation controls.
 - Added three-dimensional Newtonian point-mass gravity from every catalogued body, RK4 integration, moving-body force evaluation, propellant mass flow, and collision cutoff.
 - Added live orbital diagnostics plus labelled periapsis and apoapsis altitude markers for closed orbits.
@@ -36,3 +55,12 @@
 ### v0.0.1 — Dataset generation
 
 - Established the canonical Solar System, terrain, and resource datasets.
+# Repository cleanup and contributor documentation
+
+- Fixed non-circular high-warp progression: escaping and de-orbiting craft now consume a bounded high-warp physics interval instead of being capped at five simulated seconds per frame.
+- Tightened coast integration steps to reduce PE/AP drift after a burn.
+- Replaced the simplified impact/escape display with drag-aware numerical prediction when the craft is in an atmosphere, on an impact path, or escaping an SOI. The displayed curve is now clickable to place a maneuver node.
+- Increased orbit/path click tolerance so the contextual `+ ADD NODE` button is reliably available above nearby bodies.
+- Added `docs/DEVELOPER_GUIDE.md`: task-to-file routing, runtime data flow, physics/navigation boundaries, and focused validation steps for new contributors.
+- Linked the README to the new guide.
+- Removed one-off, hard-coded local validation helpers; obsolete generated validation reports; the empty navigation validator; the stale checksum manifest; and ignored recovery/cache artifacts from the working tree.

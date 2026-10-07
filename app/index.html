@@ -54,6 +54,7 @@
       <div class="detail-sub" id="detailSub">—</div>
       <div class="detail-actions">
         <button class="primary-btn full" id="openMapBtn">OPEN PLANET MAP</button>
+        <button class="small-btn full" id="setTargetBtn">SET TARGET</button>
       </div>
       <div class="stat-grid">
         <div><span>TYPE</span><b id="detailType">—</b></div>
@@ -81,6 +82,7 @@
     </div>
 
     <div class="toast" id="toast"></div>
+    <button class="orbit-node-add hidden" id="orbitNodeAdd">+ ADD NODE</button>
     <div class="intro-screen" id="introScreen" aria-label="Loading EXOLINE">
       <div class="intro-word">EXOLINE</div>
     </div>
@@ -108,8 +110,29 @@
       <div class="detail-kicker">EXOLINE // RELEASE NOTES</div>
       <div id="changelogContent">LOADING CHANGELOG…</div>
     </aside>
-  </div>
-
+    <aside class="settings-panel hidden" id="settingsPanel" aria-label="Settings">
+      <button class="detail-close" id="closeSettings" aria-label="Close settings">×</button>
+      <div class="detail-kicker">EXOLINE // SETTINGS</div>
+      <h2>FLIGHT ASSISTS</h2>
+      <label class="setting-row"><span>INFINITE FUEL <small>Cheat: fuel never depletes; craft mass is unchanged.</small></span><input id="infiniteFuel" type="checkbox" role="switch"></label>
+      <h2>KEYBINDS</h2>
+      <div class="keybind-list">
+        <label>PAUSE <input data-bind="pause" readonly></label><label>WARP DOWN <input data-bind="warpDown" readonly></label>
+        <label>WARP UP <input data-bind="warpUp" readonly></label><label>FOCUS CRAFT <input data-bind="focusCraft" readonly></label>
+        <label>RESET VIEW <input data-bind="resetView" readonly></label><label>ADD NODE <input data-bind="addNode" readonly></label>
+        <label>AUTO BURN <input data-bind="autoBurn" readonly></label>
+      </div>
+      <button class="small-btn full" id="resetKeybinds">RESET KEYBINDS</button>
+    </aside>
+    <aside class="nav-panel hidden" id="navPanel" aria-label="Navigation">
+      <header class="nav-head"><span class="nav-title">NAVIGATION</span><button class="nav-mini" id="navToggle" aria-label="Collapse navigation">−</button></header>
+      <div class="nav-body">
+        <div class="nav-grid"><div><span>SOI</span><b id="navSoi">—</b></div><div><span>TARGET</span><b id="navTarget">—</b></div><div><span>DIST</span><b id="navDist">—</b></div><div><span>REL VEL</span><b id="navRelVel">—</b></div><div><span>APO</span><b id="navApo">—</b></div><div><span>PERI</span><b id="navPeri">—</b></div><div><span>ECC</span><b id="navEcc">—</b></div><div><span>VS REF</span><b id="navSpeed">—</b></div></div>
+        <div class="nav-extra hidden" id="navExtra"><div class="nav-grid"><div><span>RADIAL</span><b id="navRadial">—</b></div><div><span>CLOSING</span><b id="navClosing">—</b></div><div><span>TCA</span><b id="navTca">—</b></div><div><span>MISS</span><b id="navMiss">—</b></div><div><span>PERIOD</span><b id="navPeriod">—</b></div><div><span>V ESC</span><b id="navVEsc">—</b></div><div><span>ENERGY</span><b id="navEnergy">—</b></div><div><span>INCL</span><b id="navInc">—</b></div></div><div class="nav-sub">TRANSFER · <b id="navTransferTitle">—</b></div><div class="nav-grid"><div><span>DEP Δv</span><b id="navTransferDep">—</b></div><div><span>ARR Δv</span><b id="navTransferArr">—</b></div><div><span>XFER TIME</span><b id="navTransferTime">—</b></div><div><span>Δv TOTAL</span><b id="navDvTotal">—</b></div></div></div>
+        <div class="nav-actions"><button id="navDetailBtn">DETAIL</button><button id="navNodeBtn">+ NODE</button><button id="navClearTarget">CLEAR</button></div><div class="nav-actions"><button id="navFocusCraft">FOCUS</button><button id="navFocusTarget">FOCUS TGT</button><button id="navFit">FIT</button></div>
+        <div class="nav-node hidden" id="navNode"><div class="nav-node-row"><span>MANEUVER</span><div class="nav-step"><button id="navTimeMinus">−</button><b id="navNodeTime">T+0s</b><button id="navTimePlus">+</button></div></div><label class="nav-field"><span>PRO</span><input id="navNodePro" type="number" step="1" value="0"><em>m/s</em></label><label class="nav-field"><span>RAD</span><input id="navNodeRad" type="number" step="1" value="0"><em>m/s</em></label><label class="nav-field"><span>NOR</span><input id="navNodeNor" type="number" step="1" value="0"><em>m/s</em></label><div class="nav-node-row"><span>TOTAL</span><b id="navNodeTotal">0 m/s</b></div><div class="nav-key-help">RED DOT SELECTS NODE · YELLOW DOTTED = POST-BURN</div><div class="nav-actions"><button id="navExecute" class="nav-exec">AUTO BURN</button><button id="navNodeDelete">DELETE</button></div></div>
+      </div>
+    </aside>
     <aside class="flight-hud" id="flightHud">
       <div class="hud-grid"><span>SOI <b id="hudSoi">EARTH</b></span><span>APO <b id="hudApo">—</b></span><span>PERI <b id="hudPeri">—</b></span><span>ECC <b id="hudEcc">—</b></span><span>DST <b id="hudDistance">—</b></span></div>
       <div class="hud-row">
@@ -132,9 +155,11 @@
         <button class="pitch-btn" id="turnRight" aria-label="Pitch right" title="Pitch right"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
       </div>
     </aside>
+  </div>
   <script src="orbit-engine.js"></script>
   <script src="flight-engine.js"></script>
   <script src="map-renderer.js"></script>
+  <script src="navigation-engine.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
