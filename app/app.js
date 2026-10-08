@@ -2,7 +2,7 @@
   const $ = id => document.getElementById(id), C = $('scene'), X = C.getContext('2d');
   const AU = 149597870700, WARP = [1, 10, 100, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8, 1e9], images = new Map(), keys = {};
   let D, P, A, minerals = null, F, S = {}, sel, craftSelected = false, lock = null, date = new Date('2026-10-05T12:00:00Z');
-  let running = true, warpIndex = 0, lastFrame = performance.now(), simulationBacklog = 0, drag, terrain, mapRenderer, rcs = false;
+  let running = true, warpIndex = 0, lastFrame = performance.now(), simulationBacklog = 0, drag, terrain, mapRenderer, rcs = false, frameCount = 0;
   let panning = false, panDrag = { x: 0, y: 0 }, panned = false;
   keys.pan = { up: false, down: false, left: false, right: false };
   let navSnap = null, activeNodeId = null, toastTimer = 0, autoBurn = null, nodeHitRegions = [], orbitHitRegions = [];
@@ -87,13 +87,49 @@
     if (radius > 12 || sel?.id === body.id) { X.fillStyle = '#e8f8ff'; X.font = '10px sans-serif'; X.fillText(body.name, screen.x + radius + 5, screen.y - 4); }
   }
   function marker(world, label, colour) { const p = ws(world); X.fillStyle = colour; X.beginPath(); X.arc(p.x, p.y, 4, 0, Math.PI * 2); X.fill(); X.fillStyle = '#e7f9ff'; X.font = '9px sans-serif'; X.fillText(label, p.x + 7, p.y - 7); }
-  function drawEscape(t, relativeVelocity, periapsisPoint, periapsisAltitude) {
-    const speed = Math.hypot(relativeVelocity.x, relativeVelocity.y) || 1;
-    const from = t(F.s.r);
+  function drawHyperbolicArc(id, r, v, R, mu, h, e, p, ex, physical) {
+    // Analytic hyperbola branch in the PLANET frame: craft -> SOI exit (or
+    // screen edge for the sun). Exact 2-body math, stable at every warp.
+    const origin = S[id];
+    const dir = h >= 0 ? 1 : -1, perp = { x: -ex.y, y: ex.x };
+    const nu = Math.atan2(r.x * perp.x + r.y * perp.y, r.x * ex.x + r.y * ex.y);
+    const soi = (id && id !== 'sun' && window.ExolineNav) ? ExolineNav.soiRadius(id) : null;
     const span = Math.hypot(innerWidth, innerHeight) * 1.25 / cam.k;
-    const to = { x: from.x + relativeVelocity.x / speed * span, y: from.y + relativeVelocity.y / speed * span };
-    const a = ws(from), b = ws(to); X.save(); X.setLineDash([7, 6]); X.strokeStyle = 'rgba(255,192,115,.92)'; X.lineWidth = 1.5; X.beginPath(); X.moveTo(a.x, a.y); X.lineTo(b.x, b.y); X.stroke(); X.setLineDash([]); X.fillStyle = '#ffcf9c'; X.font = '9px sans-serif'; X.fillText('ESCAPE', b.x - 42, b.y - 8); X.restore();
-    if (finite(periapsisAltitude)) marker(periapsisPoint, `PE ${altitude(periapsisAltitude)}`, '#77edff');
+    const exitR = (soi && finite(soi) && soi > R) ? soi : R + span;
+    const cosExit = (p / exitR - 1) / Math.max(e, 1e-9);
+    const fwd = (a, b) => { let d = dir > 0 ? b - a : a - b; while (d < 0) d += Math.PI * 2; return d; };
+    let travel = Infinity, ok = Math.abs(cosExit) <= 1;
+    if (ok) {
+      for (const c of [Math.acos(Math.max(-1, Math.min(1, cosExit))), -Math.acos(Math.max(-1, Math.min(1, cosExit)))]) {
+        const d = fwd(nu, c);
+        if (d > 1e-6 && d < travel) travel = d;
+      }
+      if (!finite(travel)) ok = false;
+    }
+    X.save(); X.setLineDash([7, 6]); X.strokeStyle = 'rgba(255,192,115,.92)'; X.lineWidth = 1.5; X.beginPath();
+    if (ok) {
+      for (let i = 0; i <= 80; i++) {
+        const th = nu + dir * travel * i / 80, rad = p / (1 + e * Math.cos(th));
+        const pt = ws({ x: origin.x + rad * (Math.cos(th) * ex.x + Math.sin(th) * perp.x), y: origin.y + rad * (Math.cos(th) * ex.y + Math.sin(th) * perp.y) });
+        i ? X.lineTo(pt.x, pt.y) : X.moveTo(pt.x, pt.y);
+      }
+    } else {
+      // Degenerate (near-parabolic): straight asymptote ray, planet-relative.
+      const speed = Math.hypot(v.x, v.y) || 1;
+      const a = ws(F.s.r), b = ws({ x: F.s.r.x + v.x / speed * span, y: F.s.r.y + v.y / speed * span });
+      X.moveTo(a.x, a.y); X.lineTo(b.x, b.y);
+    }
+    X.stroke(); X.setLineDash([]); X.restore();
+    const peri = p / (1 + e);
+    marker({ x: origin.x + peri * ex.x, y: origin.y + peri * ex.y }, `PE ${altitude(peri - physical.radius_m)}`, '#77edff');
+    if (ok && soi && finite(soi) && soi > R) {
+      const th = nu + dir * travel;
+      marker({ x: origin.x + exitR * (Math.cos(th) * ex.x + Math.sin(th) * perp.x), y: origin.y + exitR * (Math.cos(th) * ex.y + Math.sin(th) * perp.y) }, 'SOI EXIT', '#ffcf9c');
+    } else if (ok) {
+      const th = nu + dir * travel;
+      const end = ws({ x: origin.x + exitR * (Math.cos(th) * ex.x + Math.sin(th) * perp.x), y: origin.y + exitR * (Math.cos(th) * ex.y + Math.sin(th) * perp.y) });
+      X.fillStyle = '#ffcf9c'; X.font = '9px sans-serif'; X.fillText('ESCAPE', end.x - 42, end.y - 8);
+    }
   }
   // Render the numerical coast prediction when a simple conic would be
   // misleading: atmospheric flight, surface impact, or SOI escape.  This is
@@ -101,22 +137,43 @@
   function drawNumericalCoast(leg, refId) {
     const records = leg?.records;
     if (!records || records.length < 2) return false;
-    const stride = Math.max(1, Math.ceil(records.length / 700));
-    X.save(); X.strokeStyle = leg.impact ? '#ff7373' : '#ffc96d'; X.lineWidth = 1.8; X.setLineDash([5, 5]); X.beginPath();
+    const physical = P.bodies[refId], origin = S[refId];
+    if (!physical || !origin) return false;
+    // Planet frame: frozen inertial records + live body position. rec.t is
+    // seconds-since-build, so the body offset is sampled at each record's own
+    // absolute time — no helical smear while the camera follows the planet.
+    const worldAt = window.ExolineNav?._internals?.worldAt;
+    const dtBuild = ((leg.builtAt || +date) - +date) / 1000;
+    const rel = (pt, tSec) => {
+      if (!worldAt || refId === 'sun') return { x: pt.x - origin.x, y: pt.y - origin.y };
+      const bp = worldAt(refId, tSec);
+      if (!bp) return null;
+      return { x: pt.x - bp.x, y: pt.y - bp.y };
+    };
+    const stride = Math.max(1, Math.ceil(records.length / 250));
+    const pts = [];
     for (let i = 0; i < records.length; i += stride) {
-      const p = ws(records[i].r);
+      const q = rel(records[i].r, records[i].t + dtBuild);
+      if (q) pts.push(q);
+    }
+    const last = records[records.length - 1];
+    const lastQ = rel(last.r, last.t + dtBuild);
+    if (lastQ) pts.push(lastQ);
+    if (pts.length < 2) return false;
+    X.save(); X.strokeStyle = leg.impact ? '#ff7373' : '#ffc96d'; X.lineWidth = 1.8; X.setLineDash([5, 5]); X.beginPath();
+    pts.forEach((q, i) => {
+      const p = ws({ x: origin.x + q.x, y: origin.y + q.y });
       i ? X.lineTo(p.x, p.y) : X.moveTo(p.x, p.y);
       // The propagated path sits above body picking and is always a valid
       // place to offer a maneuver node, including an escape trajectory.
-      orbitHitRegions.push({ x: p.x, y: p.y, t: Math.max(1, records[i].t) });
-    }
-    const last = records[records.length - 1], end = ws(last.r);
-    X.lineTo(end.x, end.y); X.stroke(); X.setLineDash([]); X.restore();
-    const physical = P.bodies[refId], origin = S[refId];
-    if (leg.impact && physical && origin) {
-      const dx = last.r.x - origin.x, dy = last.r.y - origin.y, scale = physical.radius_m / Math.max(1, Math.hypot(dx, dy));
-      marker({ x: origin.x + dx * scale, y: origin.y + dy * scale }, 'IMPACT', '#ff7373');
+      orbitHitRegions.push({ x: p.x, y: p.y, t: Math.max(1, records[Math.min(records.length - 1, i * stride)].t) });
+    });
+    X.stroke(); X.setLineDash([]); X.restore();
+    if (leg.impact) {
+      const lq = pts[pts.length - 1], scale = physical.radius_m / Math.max(1, Math.hypot(lq.x, lq.y));
+      marker({ x: origin.x + lq.x * scale, y: origin.y + lq.y * scale }, 'IMPACT', '#ff7373');
     } else {
+      const lq = pts[pts.length - 1], end = ws({ x: origin.x + lq.x, y: origin.y + lq.y });
       X.fillStyle = '#ffcf9c'; X.font = '9px sans-serif'; X.fillText('ESCAPE', end.x + 7, end.y - 7);
     }
     return true;
@@ -134,24 +191,37 @@
     if (!finite(e) || !finite(p)) return;
     const ex = e > .00001 ? { x: ev.x / e, y: ev.y / e } : { x: r.x / R, y: r.y / R };
     const peri = p / (1 + e), apo = p / (1 - e);
+    // On-rails coast: orbit elements come from the frozen arc, bit-identical
+    // every frame, so AP/PE/ecc and every branch below can never flicker.
+    const frozen = F.coast && F.coast.body === id ? F.coast : null;
+    let eF = e, pF = p, exF = ex, periF = peri, apoF = apo;
+    if (frozen) {
+      const pl = Math.hypot(frozen.Px, frozen.Py);
+      if (pl > 1e-9) {
+        eF = frozen.e; pF = frozen.a * (1 - frozen.e * frozen.e);
+        exF = { x: frozen.Px / pl, y: frozen.Py / pl };
+        periF = frozen.a * (1 - frozen.e);
+        apoF = frozen.e < 1 ? frozen.a * (1 + frozen.e) : Infinity;
+      }
+    }
     const atmosphere = ExolineFlight.atmospheres?.[id];
     const inAtmosphere = atmosphere && R - physical.radius_m < atmosphere.top;
     const numerical = navSnap?.heavy?.base;
     // Do not substitute a vacuum ellipse/straight line for a drag or escape
     // prediction.  The sampled curve also remains selectable for ADD NODE.
-    if (numerical && (numerical.impact || e >= 1 || inAtmosphere)) {
+    // Skipped on-rails: a clean coast arc can never impact or drag by construction.
+    if (!frozen && numerical && (numerical.impact || eF >= 1 || inAtmosphere)) {
       if (drawNumericalCoast(numerical, id)) {
         marker({ x: F.s.r.x, y: F.s.r.y }, 'CURRENT', '#ffbd76');
         return;
       }
     }
-    if (e >= 1) { drawEscape(t, v, { x: S[id].x + peri * ex.x, y: S[id].y + peri * ex.y }, peri - physical.radius_m); return; }
-    if (peri <= physical.radius_m) {
+    if (periF <= physical.radius_m) {
       // An osculating orbit that intersects the body is an impact trajectory,
       // not a complete orbit. Draw only the forward arc to the surface.
-      const perp = { x: -ex.y, y: ex.x };
-      const nu = Math.atan2(r.x * perp.x + r.y * perp.y, r.x * ex.x + r.y * ex.y);
-      const hitCos = Math.max(-1, Math.min(1, (p / physical.radius_m - 1) / Math.max(e, 1e-8)));
+      const perp = { x: -exF.y, y: exF.x };
+      const nu = Math.atan2(r.x * perp.x + r.y * perp.y, r.x * exF.x + r.y * exF.y);
+      const hitCos = Math.max(-1, Math.min(1, (pF / physical.radius_m - 1) / Math.max(eF, 1e-8)));
       const candidates = [Math.acos(hitCos), -Math.acos(hitCos)];
       const direction = h >= 0 ? 1 : -1;
       let hitNu = candidates[0], travel = Infinity;
@@ -162,31 +232,33 @@
       }
       X.save(); X.strokeStyle = '#ff7373'; X.lineWidth = 1.8; X.setLineDash([5, 5]); X.beginPath();
       for (let i = 0; i <= 80; i++) {
-        const theta = nu + direction * travel * i / 80, radial = p / (1 + e * Math.cos(theta));
-        const point = ws({ x: S[id].x + radial * (Math.cos(theta) * ex.x + Math.sin(theta) * perp.x), y: S[id].y + radial * (Math.cos(theta) * ex.y + Math.sin(theta) * perp.y) });
+        const theta = nu + direction * travel * i / 80, radial = pF / (1 + eF * Math.cos(theta));
+        const point = ws({ x: S[id].x + radial * (Math.cos(theta) * exF.x + Math.sin(theta) * perp.x), y: S[id].y + radial * (Math.cos(theta) * exF.y + Math.sin(theta) * perp.y) });
         i ? X.lineTo(point.x, point.y) : X.moveTo(point.x, point.y);
       }
       X.stroke(); X.setLineDash([]); X.restore();
-      const impact = { x: S[id].x + physical.radius_m * (Math.cos(hitNu) * ex.x + Math.sin(hitNu) * perp.x), y: S[id].y + physical.radius_m * (Math.cos(hitNu) * ex.y + Math.sin(hitNu) * perp.y) };
+      const impact = { x: S[id].x + physical.radius_m * (Math.cos(hitNu) * exF.x + Math.sin(hitNu) * perp.x), y: S[id].y + physical.radius_m * (Math.cos(hitNu) * exF.y + Math.sin(hitNu) * perp.y) };
       marker({ x: F.s.r.x, y: F.s.r.y }, 'CURRENT', '#ffbd76');
       marker(impact, 'IMPACT', '#ff7373');
       return;
     }
+    if (eF >= 1) { drawHyperbolicArc(id, r, v, R, mu, h, eF, pF, exF, physical); marker({ x: F.s.r.x, y: F.s.r.y }, 'CURRENT', '#ffbd76'); return; }
     // Closed conic: draw the full predicted orbit around the SOI body, in the
     // body's local frame, so the trajectory reads as an orbit around the planet
     // the craft is entering -- not as a wavy line in the solar-system frame.
     // The ellipse is rendered in screen space via ws() so it stays visible at
     // any zoom; the perigee/apogee markers sit on the same ellipse centre.
-    const N = 96, a = p / (1 - e * e), b = a * Math.sqrt(Math.max(0, 1 - e * e)), cc = a * e, perp = { x: -ex.y, y: ex.x };
+    // Shape comes from the frozen coast arc when on-rails: pixel-identical.
+    const N = 96, a = pF / (1 - eF * eF), b = a * Math.sqrt(Math.max(0, 1 - eF * eF)), cc = a * eF, perp = { x: -exF.y, y: exF.x };
     const origin = { x: S[id].x, y: S[id].y };
-    const cx = { x: origin.x - cc * ex.x, y: origin.y - cc * ex.y };
+    const cx = { x: origin.x - cc * exF.x, y: origin.y - cc * exF.y };
     X.save();
     X.beginPath();
-    const period = 2 * Math.PI * Math.sqrt(a ** 3 / mu), currentNu = Math.atan2(r.x * perp.x + r.y * perp.y, r.x * ex.x + r.y * ex.y), direction = h >= 0 ? 1 : -1;
+    const period = 2 * Math.PI * Math.sqrt(a ** 3 / mu), currentNu = Math.atan2(r.x * perp.x + r.y * perp.y, r.x * exF.x + r.y * exF.y), direction = h >= 0 ? 1 : -1;
     for (let i = 0; i <= N; i++) {
       const th = (2 * Math.PI * i) / N;
-      const px = cx.x + a * Math.cos(th) * ex.x + b * Math.sin(th) * perp.x;
-      const py = cx.y + a * Math.cos(th) * ex.y + b * Math.sin(th) * perp.y;
+      const px = cx.x + a * Math.cos(th) * exF.x + b * Math.sin(th) * perp.x;
+      const py = cx.y + a * Math.cos(th) * exF.y + b * Math.sin(th) * perp.y;
       const screen = ws({ x: px, y: py });
       let phase = direction > 0 ? th - currentNu : currentNu - th; while (phase < 0) phase += Math.PI * 2;
       orbitHitRegions.push({ x: screen.x, y: screen.y, t: Math.max(30, phase / (Math.PI * 2) * period) });
@@ -199,13 +271,13 @@
     X.restore();
     // The apses are measured from the ellipse centre by its semi-major axis;
     // peri/apo are distances from the focus, so using them here misplaces both.
-    const periPoint = { x: cx.x + a * ex.x, y: cx.y + a * ex.y };
-    const apoPoint = { x: cx.x - a * ex.x, y: cx.y - a * ex.y };
-    marker(periPoint, `PE ${altitude(peri - physical.radius_m)}`, '#77edff');
-    marker(apoPoint, `AP ${altitude(apo - physical.radius_m)}`, '#ffbd76');
+    const periPoint = { x: cx.x + a * exF.x, y: cx.y + a * exF.y };
+    const apoPoint = { x: cx.x - a * exF.x, y: cx.y - a * exF.y };
+    marker(periPoint, `PE ${altitude(periF - physical.radius_m)}`, '#77edff');
+    marker(apoPoint, `AP ${altitude(apoF - physical.radius_m)}`, '#ffbd76');
   }
   function craft() { if (!F) return; const p = ws(F.s.r); X.save(); X.translate(p.x, p.y); X.rotate(-F.s.heading + Math.PI / 2); X.fillStyle = '#f8fdff'; X.strokeStyle = '#0b3040'; X.lineWidth = 2; X.beginPath(); X.moveTo(0, -15); X.lineTo(11, 11); X.lineTo(-11, 11); X.closePath(); X.fill(); X.stroke(); X.fillStyle = '#53ddff'; X.beginPath(); X.moveTo(0, -8); X.lineTo(3, 3); X.lineTo(-3, 3); X.closePath(); X.fill(); X.restore(); }
-  function hud() { $('flightHud').classList.toggle('hidden', !craftSelected); if (!craftSelected || !F) return; const d = F.diagnostics(S, sel?.id), name = D.bodies.find(b => b.id === d.body)?.name || 'Sun', radius = P.bodies[d.body]?.radius_m || 0; $('hudSoi').textContent = name.toUpperCase(); $('hudAlt').textContent = d.alt < 10000 ? `${Math.round(d.alt)} m` : `${(d.alt / 1000).toFixed(1)} km`; $('hudVel').textContent = d.speed < 1000 ? `${d.speed.toFixed(1)} m/s` : `${Math.round(d.speed).toLocaleString('en-US')} m/s`; $('hudApo').textContent = altitude(d.apo - radius); $('hudPeri').textContent = altitude(d.peri - radius); $('hudEcc').textContent = d.e.toFixed(4); $('hudDistance').textContent = altitude(d.target); $('launchBtn').textContent = F.s.throttle > 0 ? 'CUTOFF' : 'IGNITION'; }
+  function hud() { $('flightHud').classList.toggle('hidden', !craftSelected); if (!craftSelected || !F) return; const d = F.diagnostics(S, sel?.id), name = D.bodies.find(b => b.id === d.body)?.name || 'Sun', radius = P.bodies[d.body]?.radius_m || 0; const fr = F.coast && F.coast.body === d.body ? F.coast : null, ecc = fr ? fr.e : d.e, apo = fr ? (fr.e < 1 ? fr.a * (1 + fr.e) : Infinity) : d.apo, peri = fr ? fr.a * (1 - fr.e) : d.peri; $('hudSoi').textContent = name.toUpperCase(); $('hudAlt').textContent = d.alt < 10000 ? `${Math.round(d.alt)} m` : `${(d.alt / 1000).toFixed(1)} km`; $('hudVel').textContent = d.speed < 1000 ? `${d.speed.toFixed(1)} m/s` : `${Math.round(d.speed).toLocaleString('en-US')} m/s`; $('hudApo').textContent = altitude(apo - radius); $('hudPeri').textContent = altitude(peri - radius); $('hudEcc').textContent = ecc.toFixed(4); $('hudDistance').textContent = altitude(d.target); $('launchBtn').textContent = F.s.throttle > 0 ? 'CUTOFF' : 'IGNITION'; }
   function vehicleReadout() { if (!F) return; $('shipMass').textContent = `${(F.s.m / 1000).toFixed(2)} t`; $('shipThrust').textContent = `${(F.thrust / 1000).toFixed(0)} kN`; $('shipTwr').textContent = (F.thrust * Math.max(F.s.throttle, .01) / (F.s.m * 9.80665)).toFixed(2); }
   // ---------- navigation rendering (world -> screen via the same ws() transform) ----------
   function drawLegPath(records, offset, colour, width, dashed) {
@@ -231,16 +303,13 @@
     const ex = e > 1e-6 ? { x: ev.x / e, y: ev.y / e } : { x: r.x / R, y: r.y / R }, perp = { x: -ex.y, y: ex.x };
     return { a, e, ex, perp, period: 2 * Math.PI * Math.sqrt(a ** 3 / mu) };
   }
-  function drawLocalPlannedOrbit(leg, refId) {
-    const rec = leg?.records?.[0], origin = S[refId]; if (!rec || !origin) return;
-    // Translate the predicted post-burn state into the current planet-centred
-    // frame, so this line remains a useful local orbit rather than a solar arc.
-    const bodyAtRecord = { x: origin.x + (origin.vx || 0) * rec.t, y: origin.y + (origin.vy || 0) * rec.t, vx: origin.vx || 0, vy: origin.vy || 0 };
-    const orbit = localOrbitFromState(rec, refId, bodyAtRecord); if (!orbit) return;
-    const centre = { x: origin.x - orbit.a * orbit.e * orbit.ex.x, y: origin.y - orbit.a * orbit.e * orbit.ex.y };
-    X.save(); X.strokeStyle = 'rgba(255,255,255,.96)'; X.lineWidth = 1.5; X.setLineDash([3, 5]); X.beginPath();
-    for (let i = 0; i <= 120; i++) {
-      const theta = Math.PI * 2 * i / 120, p = ws({ x: centre.x + orbit.a * Math.cos(theta) * orbit.ex.x + orbit.a * Math.sqrt(1 - orbit.e * orbit.e) * Math.sin(theta) * orbit.perp.x, y: centre.y + orbit.a * Math.cos(theta) * orbit.ex.y + orbit.a * Math.sqrt(1 - orbit.e * orbit.e) * Math.sin(theta) * orbit.perp.y });
+  function drawPlanetPlan(relRecords, origin, colour, dashed) {
+    // Planet-frame planned path: frozen body-relative offsets + LIVE body
+    // position. No per-frame math on the live craft state, so zero jitter.
+    if (!relRecords || relRecords.length < 2 || !origin) return;
+    X.save(); X.strokeStyle = colour; X.lineWidth = 1.8; if (dashed) X.setLineDash([5, 5]); X.beginPath();
+    for (let i = 0; i < relRecords.length; i++) {
+      const q = relRecords[i], p = ws({ x: origin.x + q.x, y: origin.y + q.y });
       i ? X.lineTo(p.x, p.y) : X.moveTo(p.x, p.y);
     }
     X.stroke(); X.restore();
@@ -277,6 +346,21 @@
     X.fillText(`MISS ${ExolineNav.fmtDistance(approach.distance)}`, p.x + 7, p.y + 13);
     X.restore();
   }
+  function drawFrozenPlannedOrbit(local, liveOrigin) {
+    // Frozen post-burn orbit shape (solved once at node edit) drawn around the
+    // body's LIVE position: follows the planet, never changes shape.
+    if (!local || !liveOrigin) return;
+    const b = Math.sqrt(Math.max(0, 1 - local.e * local.e));
+    const cx = liveOrigin.x - local.a * local.e * local.ex.x;
+    const cy = liveOrigin.y - local.a * local.e * local.ex.y;
+    X.save(); X.strokeStyle = 'rgba(255,255,255,.96)'; X.lineWidth = 1.5; X.setLineDash([3, 5]); X.beginPath();
+    for (let i = 0; i <= 120; i++) {
+      const theta = Math.PI * 2 * i / 120;
+      const p = ws({ x: cx + local.a * Math.cos(theta) * local.ex.x + local.a * b * Math.sin(theta) * local.perp.x, y: cy + local.a * Math.cos(theta) * local.ex.y + local.a * b * Math.sin(theta) * local.perp.y });
+      i ? X.lineTo(p.x, p.y) : X.moveTo(p.x, p.y);
+    }
+    X.stroke(); X.restore();
+  }
   function navPaths() {
     if (!craftSelected || !F || !navSnap || !navSnap.heavy || !navSnap.heavy.base || !navSnap.heavy.base.startR) return;
     const heavy = navSnap.heavy;
@@ -284,19 +368,41 @@
     // sampled blue transfer line here makes it read like a sine wave and hides
     // the actual maneuver result.  Only a planned post-burn path is drawn.
     if (!heavy.plan) return;
-    const start = heavy.base.startR;
-    const offset = { x: F.s.r.x - start.x, y: F.s.r.y - start.y };
-    const predictedOrbit = heavy.plan.segments[heavy.plan.segments.length - 1];
-    if (predictedOrbit) drawLegPath(predictedOrbit.records, offset, 'rgba(255,215,88,.98)', 1.8, true);
-    const localRef = currentSoi?.id || navSnap.refId;
-    if (localRef && localRef !== 'sun') drawLocalPlannedOrbit(predictedOrbit, localRef);
-    for (const mark of heavy.plan.marks) {
-      const anchor = nodeAnchors.get(mark.node.id);
-      const anchoredPosition = anchor && S[anchor.refId] ? { x: S[anchor.refId].x + anchor.rel.x, y: S[anchor.refId].y + anchor.rel.y } : null;
-      maneuverMarker(mark, offset, anchoredPosition || (localRef && localRef !== 'sun' ? localNodePosition(mark.node.t, localRef) : null));
+    // SOI-planet frame only: frozen offsets + live body position. There is no
+    // sun-frame rendering anywhere in the flight view.
+    const zero = { x: 0, y: 0 };
+    const plan = heavy.plan, refId = plan.refId || plan.local?.refId, origin = refId ? S[refId] : null;
+    const predictedOrbit = plan.segments[plan.segments.length - 1];
+    const isSunPlan = !refId || refId === 'sun';
+    if (isSunPlan) {
+      if (predictedOrbit) drawLegPath(predictedOrbit.records, zero, '#78e5ff', 1.8, true);
+    } else if (origin && plan.relRecords) {
+      if (plan.impact) {
+        drawPlanetPlan(plan.relRecords, origin, '#ff7373', true);
+        if (plan.relImpact) marker({ x: origin.x + plan.relImpact.x, y: origin.y + plan.relImpact.y }, 'IMPACT', '#ff7373');
+      } else if (plan.local && plan.local.refId === refId) {
+        drawFrozenPlannedOrbit(plan.local, origin);
+      } else if (plan.relRecords && plan.relRecords.length >= 2) {
+        // Escape / hyperbolic post-burn path wrt the planet.
+        drawPlanetPlan(plan.relRecords, origin, '#ffc96d', true);
+        const end = plan.relRecords[plan.relRecords.length - 1];
+        X.fillStyle = '#ffcf9c'; X.font = '9px sans-serif';
+        const label = ws({ x: origin.x + end.x, y: origin.y + end.y });
+        X.fillText('ESCAPE', label.x + 7, label.y - 7);
+      }
+      if (plan.relApproach && !plan.impact) approachMarker({ point: { x: origin.x + plan.relApproach.x, y: origin.y + plan.relApproach.y }, distance: plan.approach ? plan.approach.distance : 0 }, zero);
+      else if (plan.approach && plan.approach.point && !plan.approach.atHorizon) approachMarker(plan.approach, zero);
     }
-    const approach = navSnap.approach;
-    if (approach && approach.point && !approach.atHorizon) approachMarker(approach, offset);
+    const liveTimes = new Map((navSnap.nodes || []).map(n => [n.id, n.t]));
+    for (const mark of heavy.plan.marks) {
+      // Burn point in the PLANET frame (live body position + frozen offset) so
+      // the marker sits exactly on the blue orbit. Label countdown stays live
+      // via the snapshot (plan itself is not rebuilt).
+      if (liveTimes.has(mark.node.id)) mark.node.t = liveTimes.get(mark.node.id);
+      const markOrigin = (mark.refId && S[mark.refId]) || (plan.refId && S[plan.refId]) || null;
+      const markPos = (mark.rel && markOrigin) ? { x: markOrigin.x + mark.rel.x, y: markOrigin.y + mark.rel.y } : (mark.point || null);
+      maneuverMarker(mark, zero, markPos);
+    }
   }
   function drawTargetMarker() {
     if (!navSnap || !navSnap.targetId) return;
@@ -378,6 +484,7 @@
     setText('navTransferTime', transfer ? ExolineNav.fmtDur(transfer.timeSeconds) : '—');
     setText('navDvTotal', snap.nodes.length ? ExolineNav.fmtDv(snap.dvTotal) : '—');
     if (sel) setText('setTargetBtn', snap.targetId === sel.id ? 'TARGETED ✓' : 'SET TARGET');
+    else setText('setTargetBtn', 'SET TARGET');
     syncNodeForm(snap);
   }
   function syncNodeForm(snap) {
@@ -397,28 +504,33 @@
     $('navNode').classList.remove('hidden');
     $('navPanel').classList.remove('hidden');
     $('navPanel').classList.remove('collapsed');
-    showToast('MANEUVER NODE ADDED · T+10m');
+    showToast(`MANEUVER NODE ADDED · T+ ${ExolineNav.fmtDur(Math.max(0, time))}`);
   }
   function stepNodeTime(direction) {
     const nodes = ExolineNav.getNodes(), node = nodes.find(n => n.id === activeNodeId) || nodes[0];
     if (!node) return;
-    const step = node.t >= 86400 ? 3600 : node.t >= 3600 ? 300 : 60;
-    ExolineNav.updateNode(node.id, { t: Math.max(0, node.t + direction * step) });
+    // Epoch-based: derive live remaining from the absolute burn epoch (drift-free).
+    const remaining = Math.max(0, ((node.epoch || (+date + (node.t || 0) * 1000)) - +date) / 1000);
+    const step = remaining >= 86400 ? 3600 : remaining >= 3600 ? 300 : 60;
+    ExolineNav.updateNode(node.id, { t: Math.max(0, remaining + direction * step) });
     ExolineNav.setEditing(true);
     setTimeout(() => ExolineNav.setEditing(false), 500);
   }
   const angleDelta = (from, to) => Math.atan2(Math.sin(to - from), Math.cos(to - from));
-  function startAutoBurn() {
+function startAutoBurn() {
     const node = ExolineNav.getNodes().find(n => n.id === activeNodeId) || ExolineNav.getNodes()[0];
     if (!node) { showToast('AUTO BURN · NO NODE'); return; }
     if (Math.abs(node.normalDv) > .01) { showToast('AUTO BURN · NORMAL Δv NEEDS 3D RCS'); return; }
     if (node.totalDv <= .01) { showToast('AUTO BURN · SET A Δv FIRST'); return; }
     const needed = F.propellantForDeltaV(node.totalDv);
     if (!F.infiniteFuel && needed > F.s.propellant + 1e-6) { showToast(`AUTO BURN · NEEDS ${Math.ceil(needed)} kg FUEL`); return; }
-    autoBurn = { nodeId: node.id, nodeTime: node.t, fireAt: +date + node.t * 1000, delivered: 0, phase: 'COAST' };
+    // Center the finite burn on the node epoch (KSP style): start half a burn early
+    // so the impulsive prediction stays accurate.
+    const mdot = F.thrust / (F.specificImpulse * 9.80665);
+    const burnTime = mdot > 0 ? needed / mdot : 0;
+    const epoch = node.epoch || (+date + node.t * 1000);
+    autoBurn = { nodeId: node.id, nodeTime: node.t, fireAt: epoch - burnTime * 500, delivered: 0, phase: 'COAST', initialMass: 0, estBurn: burnTime, burnSimStart: 0, appliedRate: 0 };
     $('throttle').disabled = true; $('launchBtn').disabled = true;
-    // Coast quickly but not violently: the final approach and burn are always
-    // returned to real-time so the pitch change is visible and controllable.
     setWarp(1);
     $('navExecute').textContent = 'CANCEL AUTO';
     showToast(`AUTO BURN ARMED · T+ ${ExolineNav.fmtDur(node.t)}`);
@@ -430,27 +542,61 @@
     if (!autoBurn) return;
     const node = ExolineNav.getNodes().find(n => n.id === autoBurn.nodeId);
     if (!node || F.s.crashed || (!F.infiniteFuel && F.s.propellant <= 0)) { cancelAutoBurn('AUTO BURN ABORTED'); return; }
-    if (autoBurn.phase === 'COAST' && +date >= autoBurn.fireAt - 15000) { autoBurn.phase = 'ALIGN'; setWarp(0); }
+    if (autoBurn.phase === 'COAST' && +date >= autoBurn.fireAt - 15000) { autoBurn.phase = 'ALIGN'; }
     if (autoBurn.phase !== 'ALIGN' && autoBurn.phase !== 'BURN') return;
-    const frame = ExolineNav.getVelocityFrame(F.s, node.referenceBody, 0);
+    if (warpIndex !== 0) setWarp(0); // burns always execute at 1x: warp + burns never mix
+    // Steer along the FROZEN inertial burn vector solved at node edit time:
+    // zero per-frame propagation, zero jitter.
     const burn = ExolineNav.calculateBurn(node);
-    if (!frame || !burn || burn.total <= 0) { cancelAutoBurn('AUTO BURN · BAD FRAME'); return; }
-    const dv = { x: frame.prograde.x * burn.prograde + frame.radial.x * burn.radial, y: frame.prograde.y * burn.prograde + frame.radial.y * burn.radial };
+    if (!burn || burn.total <= 0) { cancelAutoBurn('AUTO BURN · BAD Δv'); return; }
+    const frozen = node.dv_vec && (node.dv_vec.x || node.dv_vec.y) ? node.dv_vec : null;
+    let dv;
+    if (frozen) {
+      dv = { x: frozen.x, y: frozen.y };
+    } else {
+      const exec = ExolineNav.prepareExecution();
+      if (!exec.ok || !exec.frame) { cancelAutoBurn('AUTO BURN · ' + exec.reason); return; }
+      const frame = exec.frame;
+      dv = { x: frame.prograde.x * burn.prograde + frame.radial.x * burn.radial, y: frame.prograde.y * burn.prograde + frame.radial.y * burn.radial };
+    }
+    if (Math.hypot(dv.x, dv.y) < 1e-9) { cancelAutoBurn('AUTO BURN · BAD Δv'); return; }
+    // PD pitch: proportional rate with a hard cap — slews fast, settles clean.
     const targetHeading = Math.atan2(dv.y, dv.x);
     const error = angleDelta(F.s.heading, targetHeading);
-    const turn = Math.sign(error) * Math.min(Math.abs(error), 1.8 * physicsSeconds);
-    F.s.heading += turn;
-    if (Math.abs(error) > .035 || +date < autoBurn.fireAt) { setThrottle(0, true); return; }
+    const maxRate = 2.5 * Math.max(0, physicsSeconds);
+    F.s.heading += Math.abs(error) < 1e-9 ? 0 : Math.sign(error) * Math.min(Math.abs(error) * 4, maxRate);
+    // Watchdog: sim-time cap so a burn can never run forever.
+    if (autoBurn.phase === 'BURN') {
+      if (!autoBurn.burnSimStart) autoBurn.burnSimStart = +date;
+      if ((+date - autoBurn.burnSimStart) / 1000 > (autoBurn.estBurn || 60) * 3 + 120) { cancelAutoBurn('AUTO BURN TIMEOUT'); return; }
+    }
+    if (Math.abs(error) > .035 || +date < autoBurn.fireAt) { autoBurn.appliedRate = 0; setThrottle(0, true); return; }
     autoBurn.phase = 'BURN';
-    setThrottle(100, true);
+    if (!autoBurn.burnSimStart) autoBurn.burnSimStart = +date;
+    // Throttle control: full thrust when far, ease off to land exactly on Δv.
+    // In BURN with a big pointing error, hold thrust until re-aligned.
+    const remaining = Math.max(0, node.totalDv - (autoBurn.delivered || 0));
+    const accel = F.thrust / Math.max(F.s.m, 1);
+    let thr;
+    if (Math.abs(error) > .12) thr = 0;
+    else if (remaining > accel * 1.0) thr = 100;
+    else thr = Math.max(8, Math.min(100, remaining / Math.max(accel * 0.5, 1e-9) * 100));
+    autoBurn.appliedRate = F.thrust * (thr / 100) / Math.max(F.s.m, 1);
+    setThrottle(thr, true);
   }
   function finishAutoBurn(physicsSeconds) {
     if (!autoBurn || autoBurn.phase !== 'BURN') return;
-    autoBurn.delivered += F.thrust / Math.max(F.s.m, 1) * physicsSeconds;
     const node = ExolineNav.getNodes().find(n => n.id === autoBurn.nodeId);
-    if (!node || autoBurn.delivered + .01 < node.totalDv) return;
-    const id = autoBurn.nodeId, nodeTime = autoBurn.nodeTime;
-    setThrottle(0, true); nodeAnchors.delete(id); ExolineNav.commitExecution(id, nodeTime); ExolineNav.invalidate();
+    if (!node) return;
+    // Delivered Δv = integrated thrust acceleration. Exact in every fuel mode
+    // (infinite fuel never changes mass, so mass-ratio tracking can't work).
+    const rate = autoBurn.appliedRate || 0;
+    if (rate > 0 && physicsSeconds > 0) autoBurn.delivered = (autoBurn.delivered || 0) + rate * physicsSeconds;
+    autoBurn.appliedRate = 0;
+    const tol = Math.max(0.05, rate * physicsSeconds * 0.5);
+    if (autoBurn.delivered + tol < node.totalDv) return;
+    const id = autoBurn.nodeId;
+    setThrottle(0, true); nodeAnchors.delete(id); ExolineNav.commitExecution(id); ExolineNav.invalidate();
     autoBurn = null; $('throttle').disabled = false; $('launchBtn').disabled = false; $('navExecute').textContent = 'AUTO BURN';
     if (!ExolineNav.getNodes().length) $('navNode').classList.add('hidden');
     showToast(`AUTO BURN COMPLETE · Δv ${ExolineNav.fmtDv(node.totalDv)}`);
@@ -527,6 +673,9 @@
     vehicleReadout();
     $('simDate').textContent = date.toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
     updateWarp();
+    if (window.ExolinePhysicsAgent && window.ExolinePhysicsAgent.drawDebugOverlay) {
+      window.ExolinePhysicsAgent.drawDebugOverlay(X);
+    }
   }
   function inspect(body) { sel = body; craftSelected = false; lock = 'body'; $('detailPanel').classList.remove('hidden'); $('detailName').textContent = body.name; $('detailKicker').textContent = 'CELESTIAL BODY'; $('detailSub').textContent = body.parent ? `MOON OF ${body.parent.toUpperCase()}` : 'SOL SYSTEM'; $('detailType').textContent = body.type; $('detailOrbit').textContent = body.kind === 'major_moon' ? 'LOCAL ORBIT' : 'HELIOCENTRIC'; $('detailPeriod').textContent = 'LIVE STATE'; $('detailSeed').textContent = body.seed || '—'; $('detailNote').textContent = 'Orbital position and rendered orbit use the same propagated Keplerian state.'; if (minerals) { const data = minerals[body.name]; const box = $('minerals'); if (!data) { box.textContent = 'No mineral profile defined for this body.'; return; } box.textContent = ''; for (const [name, frac] of Object.entries(data).sort((a, b) => b[1] - a[1])) { const row = document.createElement('div'); row.className = 'mineral-row'; const pct = (frac * 100).toFixed(1); row.innerHTML = `<span class="name">${name}</span><span class="value">${pct}%</span><div class="mineral-bar"><i style="width:${pct}%"></i></div>`; box.appendChild(row); } } cam.o = { x: S[body.id].x, y: S[body.id].y }; cam.k = Math.max(cam.k, 24 / P.bodies[body.id].radius_m); }
   function pick(x, y) { let chosen, best = Infinity; for (const body of D.bodies) { const p = ws(S[body.id]), anchor = A[body.id] || A.default || {}, r = Math.max(9, radiusOf(body) * (anchor.disk_scale || .848)), score = Math.hypot(p.x - x, p.y - y) / r; if (score <= 1 && score < best) { chosen = body; best = score; } } return chosen; }
@@ -540,6 +689,8 @@
     const saveBindings = () => localStorage.setItem('exoline.keybinds', JSON.stringify(bindings));
     $('settingsBtn').onclick = () => { renderKeybinds(); $('settingsPanel').classList.remove('hidden'); }; $('closeSettings').onclick = () => $('settingsPanel').classList.add('hidden');
     $('infiniteFuel').onchange = e => { F.infiniteFuel = e.target.checked; showToast(F.infiniteFuel ? 'INFINITE FUEL ENABLED' : 'INFINITE FUEL DISABLED'); };
+    const progradeBox = $('progradeLock');
+    if (progradeBox) { F.progradeLock = progradeBox.checked !== false; progradeBox.onchange = e => { F.progradeLock = e.target.checked; showToast(F.progradeLock ? 'PROGRADE LOCK ENABLED' : 'PROGRADE LOCK DISABLED'); }; }
     document.querySelectorAll('[data-bind]').forEach(input => {
       input.onclick = () => { input.value = 'PRESS KEY'; input.focus(); };
       input.onkeydown = event => {
@@ -651,6 +802,7 @@
     });
   }
   async function frame(now) {
+    frameCount++;
     const realSeconds = Math.min(.1, (now - lastFrame) / 1000); lastFrame = now;
     if (running) {
       const requestedSeconds = realSeconds * WARP[warpIndex];
@@ -667,10 +819,29 @@
       const physicsSeconds = exactCoast ? simulationBacklog : Math.min(integrationBudget, simulationBacklog);
       simulationBacklog = Math.max(0, simulationBacklog - physicsSeconds);
       F.s.heading += (Number(!!keys.right) - Number(!!keys.left)) * (rcs ? .7 : 2.2) * realSeconds;
+      F.manualSteer = !!(keys.left || keys.right);
+      F.steerOverride = !!autoBurn;
       try {
-        updateAutoBurn(physicsSeconds); F.step(physicsSeconds, S); finishAutoBurn(physicsSeconds);
-        date = new Date(+date + physicsSeconds * 1000);
-        await updateStates(); F.syncCircularHold(S);
+        if (exactCoast) {
+          // Analytic circular hold: exact at any warp, single step.
+          updateAutoBurn(physicsSeconds); F.step(physicsSeconds, S); finishAutoBurn(physicsSeconds);
+          date = new Date(+date + physicsSeconds * 1000);
+          await updateStates(); F.syncCircularHold(S);
+        } else {
+          // Perturbed flight: split into <=120 s chunks with a fresh ephemeris
+          // each chunk, so high warp can't inject energy via stale body
+          // positions (linear extrapolation error grows with t^2).
+          let remaining = physicsSeconds;
+          while (remaining > 1e-9) {
+            const chunk = Math.min(120, remaining);
+            updateAutoBurn(chunk); F.step(chunk, S); finishAutoBurn(chunk);
+            date = new Date(+date + chunk * 1000);
+            await updateStates(); F.syncCircularHold(S);
+            remaining -= chunk;
+            if (!running) break;
+          }
+        }
+        if (window.ExolinePhysicsAgent) window.ExolinePhysicsAgent.check(frameCount, F, S);
       } catch (error) { console.warn('Flight integration paused:', error); running = false; simulationBacklog = 0; }
     }
     draw(); requestAnimationFrame(frame);

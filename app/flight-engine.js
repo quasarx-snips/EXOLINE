@@ -61,12 +61,18 @@ window.ExolineFlight = (() => {
       this.dryMass = 500;
       this.infiniteFuel = false;
       this.circularHold = null;
+      this.progradeLock = true;   // powered flight tracks orbital prograde unless overridden
+      this.steerOverride = false; // set by auto-burn while it owns the heading
+      this.manualSteer = false;   // set by app while turn keys are held
+      this.coast = null;          // analytic on-rails coast arc (patched conic), or null
+      this.prevThrottle = 0;
       this.s = { r: { x: 0, y: 0, z: 0 }, v: { x: 0, y: 0, z: 0 }, m: 1000, propellant: 500, heading: 0, throttle: 0, crashed: false };
     }
     launch(id, bodies) {
       const body = bodies[id], physical = this.c.bodies[id], radius = physical.radius_m + 180000, speed = Math.sqrt(this.c.G * physical.mass / radius);
-      this.s = { r: { x: body.x, y: body.y + radius, z: body.z || 0 }, v: { x: body.vx - speed, y: body.vy, z: body.vz || 0 }, m: 1000, propellant: 500, heading: -Math.PI / 2, throttle: 0, crashed: false };
+      this.s = { r: { x: body.x, y: body.y + radius, z: body.z || 0 }, v: { x: body.vx - speed, y: body.vy, z: body.vz || 0 }, m: 1000, propellant: 500, heading: Math.PI, throttle: 0, crashed: false };
       this.circularHold = { id, radius, phase: Math.PI / 2, meanMotion: speed / radius };
+      this.coast = null; this.prevThrottle = 0;
     }
     advanceCircularHold(seconds, bodies) {
       const hold = this.circularHold, body = bodies[hold.id], physical = this.c.bodies[hold.id];
@@ -85,6 +91,116 @@ window.ExolineFlight = (() => {
       this.s.v = { x: (body.vx || 0) - speed * sin, y: (body.vy || 0) + speed * cos, z: body.vz || 0 };
     }
     bodyAt(body, time) { return { x: body.x + (body.vx || 0) * time, y: body.y + (body.vy || 0) * time, z: (body.z || 0) + (body.vz || 0) * time }; }
+    progradeHeading(bodies, state = this.s) {
+      const id = this.dominant(bodies, state), body = bodies[id];
+      if (!body) return null;
+      const vx = state.v.x - (body.vx || 0), vy = state.v.y - (body.vy || 0);
+      if (!(Math.hypot(vx, vy) > 1e-9)) return null;
+      return Math.atan2(vy, vx);
+    }
+    // ---------- analytic coast (on-rails patched conic) ----------
+    // Freezes the osculating 2-body orbit at engine cutoff and advances it
+    // exactly in 3D: PE/AP/eccentricity cannot drift while unpowered, at any
+    // warp. Falls back to numerical integration on thrust, atmosphere drag,
+    // or a change of dominant body (SOI handoff re-captures there).
+    captureCoast(bodies) {
+      const s = this.s;
+      if (s.crashed) return false;
+      const id = this.dominant(bodies, s), body = bodies[id], physical = this.c.bodies[id];
+      if (!body || !physical) return false;
+      const mu = this.c.G * physical.mass;
+      if (!(mu > 0)) return false;
+      const rx = s.r.x - body.x, ry = (s.r.y || 0) - (body.y || 0), rz = (s.r.z || 0) - (body.z || 0);
+      const vx = s.v.x - (body.vx || 0), vy = (s.v.y || 0) - (body.vy || 0), vz = (s.v.z || 0) - (body.vz || 0);
+      const R = Math.sqrt(rx * rx + ry * ry + rz * rz);
+      if (!(R > 0) || !Number.isFinite(R) || R < physical.radius_m) return false;
+      for (const [bid, b] of Object.entries(bodies)) {
+        const p = this.c.bodies[bid]; if (!p) continue;
+        const atm = ATMOSPHERES[bid]; if (!atm) continue;
+        if (length(sub(s.r, this.bodyAt(b, 0))) - p.radius_m < atm.top) return false;
+      }
+      const V2 = vx * vx + vy * vy + vz * vz, energy = V2 / 2 - mu / R, rv = rx * vx + ry * vy + rz * vz;
+      const hx = ry * vz - rz * vy, hy = rz * vx - rx * vz, hz = rx * vy - ry * vx;
+      const h = Math.sqrt(hx * hx + hy * hy + hz * hz);
+      if (!(h > 1e-9)) return false;
+      const k = V2 - mu / R;
+      const eX = (k * rx - rv * vx) / mu, eY = (k * ry - rv * vy) / mu, eZ = (k * rz - rv * vz) / mu;
+      const e = Math.sqrt(eX * eX + eY * eY + eZ * eZ);
+      if (Math.abs(e - 1) < 1e-6) return false;
+      const hyp = e > 1, a = -mu / (2 * energy);
+      if (!Number.isFinite(a) || (hyp ? !(a < 0) : !(a > 0))) return false;
+      const Wx = hx / h, Wy = hy / h, Wz = hz / h;
+      let Px, Py, Pz;
+      if (e > 1e-9) { Px = eX / e; Py = eY / e; Pz = eZ / e; }
+      else { Px = rx / R; Py = ry / R; Pz = rz / R; }
+      const Qx = Wy * Pz - Wz * Py, Qy = Wz * Px - Wx * Pz, Qz = Wx * Py - Wy * Px;
+      const n = Math.sqrt(mu / Math.pow(Math.abs(a), 3));
+      let M, E0;
+      if (!hyp) {
+        if (e > 1e-9) {
+          const cosE = Math.max(-1, Math.min(1, (1 - R / a) / e));
+          const sinE = rv / (e * Math.sqrt(mu * a));
+          E0 = Math.atan2(sinE, cosE);
+        } else {
+          E0 = 0; // circular: periapsis direction was set to current r-hat
+        }
+        M = E0 - e * Math.sin(E0);
+      } else {
+        const sh = Math.max(-1e6, Math.min(1e6, rv / (e * Math.sqrt(mu * Math.abs(a)))));
+        E0 = Math.asinh(sh);
+        M = e * Math.sinh(E0) - E0;
+      }
+      this.coast = { body: id, mu, a, e, hyp, Px, Py, Pz, Qx, Qy, Qz, n, M, E: E0, radius: physical.radius_m };
+      return true;
+    }
+    advanceCoast(seconds, bodies) {
+      const c = this.coast;
+      if (!c) return false;
+      let remaining = seconds;
+      let elapsed = 0;
+      while (remaining > 1e-9) {
+        const dt = Math.min(10, remaining);
+        elapsed += dt;
+        const body = bodies[c.body];
+        if (!body) { this.coast = null; return false; }
+        if (this.dominant(bodies, this.s) !== c.body) { this.coast = null; return false; }
+        c.M += c.n * dt;
+        let E = c.E;
+        if (!c.hyp) {
+          for (let i = 0; i < 8; i++) { const d = (E - c.e * Math.sin(E) - c.M) / Math.max(1e-12, 1 - c.e * Math.cos(E)); E -= d; if (Math.abs(d) < 1e-12) break; }
+        } else {
+          for (let i = 0; i < 16; i++) { const d = (c.e * Math.sinh(E) - E - c.M) / Math.max(1e-12, c.e * Math.cosh(E) - 1); E -= d; if (Math.abs(d) < 1e-12) break; }
+        }
+        if (!Number.isFinite(E)) { this.coast = null; return false; }
+        c.E = E;
+        let ox, oy, oz, ovx, ovy, ovz, R1;
+        if (!c.hyp) {
+          const cE = Math.cos(E), sE = Math.sin(E), sq = Math.sqrt(Math.max(0, 1 - c.e * c.e));
+          R1 = c.a * (1 - c.e * cE);
+          const f = Math.sqrt(c.mu * c.a) / Math.max(R1, 1e-9);
+          ox = c.a * (cE - c.e); oy = c.a * sq * sE; oz = 0;
+          ovx = -f * sE; ovy = f * sq * cE; ovz = 0;
+        } else {
+          const ch = Math.cosh(E), sh = Math.sinh(E), sq = Math.sqrt(c.e * c.e - 1), aa = Math.abs(c.a);
+          R1 = aa * (c.e * ch - 1);
+          const f = Math.sqrt(c.mu * aa) / Math.max(R1, 1e-9);
+          ox = -aa * (ch - c.e); oy = aa * sq * sh; oz = 0;
+          ovx = -f * sh; ovy = f * sq * ch; ovz = 0;
+        }
+        const bp = this.bodyAt(body, elapsed);
+        const bvx = body.vx || 0, bvy = body.vy || 0, bvz = body.vz || 0;
+        this.s.r = { x: bp.x + ox * c.Px + oy * c.Qx, y: bp.y + ox * c.Py + oy * c.Qy, z: (bp.z || 0) + ox * c.Pz + oy * c.Qz };
+        this.s.v = { x: bvx + ovx * c.Px + ovy * c.Qx, y: bvy + ovx * c.Py + ovy * c.Qy, z: bvz + ovx * c.Pz + ovy * c.Qz };
+        for (const [bid, b] of Object.entries(bodies)) {
+          const p = this.c.bodies[bid]; if (!p) continue;
+          if (length(sub(this.s.r, this.bodyAt(b, elapsed))) < p.radius_m) { this.s.crashed = true; this.s.throttle = 0; this.coast = null; return true; }
+        }
+        const atm = ATMOSPHERES[c.body];
+        if (atm && R1 - c.radius < atm.top) { this.coast = null; return false; }
+        remaining -= dt;
+      }
+      return true;
+    }
     acc(position, bodies, time = 0, velocity = this.s.v) {
       let acceleration = { x: 0, y: 0, z: 0 };
       for (const [id, initial] of Object.entries(bodies)) {
@@ -95,17 +211,24 @@ window.ExolineFlight = (() => {
         acceleration = add(acceleration, atmosphericDrag(position, velocity, this.bodyAt(initial, time), { ...physical, id }, this.s.m));
       }
       const usableThrottle = (this.infiniteFuel || this.s.propellant > 0) && !this.s.crashed ? this.s.throttle : 0;
-      return add(acceleration, mul({ x: Math.cos(this.s.heading), y: Math.sin(this.s.heading), z: 0 }, this.thrust * usableThrottle / this.s.m));
+      const safeMass = Math.max(this.s.m, 1);
+      return add(acceleration, mul({ x: Math.cos(this.s.heading), y: Math.sin(this.s.heading), z: 0 }, this.thrust * usableThrottle / safeMass));
     }
     rk4(dt, bodies, time) {
       const state = this.s;
       rk4Step(state, dt, (r, offset, v) => this.acc(r, bodies, time + offset, v));
+      if (!Number.isFinite(state.r.x) || !Number.isFinite(state.r.y) || !Number.isFinite(state.v.x) || !Number.isFinite(state.v.y)) {
+        this.s.crashed = true;
+        this.s.throttle = 0;
+        console.warn('[FlightEngine] NaN detected in state. Setting crashed.');
+        return;
+      }
       if (!this.infiniteFuel) {
         const burn = this.thrust * Math.max(0, state.throttle) / (this.specificImpulse * 9.80665) * dt;
         const used = Math.min(state.propellant, burn); state.propellant -= used; state.m = this.dryMass + state.propellant;
+        state.propellant = Math.max(0, state.propellant);
         if (used < burn) state.throttle = 0;
       }
-      if (!Number.isFinite(state.r.x) || !Number.isFinite(state.v.x)) throw Error('Invalid flight state');
     }
     dominant(bodies, state = this.s) { let id = 'sun', greatest = 0; for (const [key, body] of Object.entries(bodies)) { const physical = this.c.bodies[key]; if (!physical) continue; const distance = length(sub(state.r, body)), pull = this.c.G * physical.mass / (distance * distance); if (pull > greatest) { greatest = pull; id = key; } } return id; }
     maximumStep(bodies, state = this.s) {
@@ -117,10 +240,30 @@ window.ExolineFlight = (() => {
     }
     step(seconds, bodies) {
       if (!seconds || this.s.crashed) return;
-      if (this.s.throttle > 0) this.circularHold = null;
-      if (this.circularHold && this.s.throttle === 0) { this.advanceCircularHold(seconds, bodies); return; }
+      if (this.s.throttle > 0) { this.circularHold = null; this.coast = null; }
+      // Prograde lock tracks the orbit as it curves, re-snapping every RK4
+      // substep so long high-warp frames can't go stale mid-burn.
+      const lock = this.progradeLock && !this.steerOverride && !this.manualSteer && this.s.throttle > 0 && !this.s.crashed;
+      const lockId = lock ? this.dominant(bodies, this.s) : null;
+      const lockBody = lock && lockId ? bodies[lockId] : null;
+      const powered = this.s.throttle > 0;
+      if (!powered && !this.circularHold && !this.coast && !this.s.crashed) this.captureCoast(bodies);
+      if (this.coast && !powered && !this.s.crashed) {
+        const ok = this.advanceCoast(seconds, bodies);
+        this.prevThrottle = this.s.throttle;
+        if (!ok && !this.s.crashed) { this.coast = null; this.captureCoast(bodies); }
+        return;
+      }
+      if (this.circularHold && this.s.throttle === 0) { this.advanceCircularHold(seconds, bodies); this.prevThrottle = this.s.throttle; return; }
       const step = this.maximumStep(bodies), count = Math.max(1, Math.ceil(seconds / step)), dt = seconds / count;
-      for (let index = 0; index < count; index++) { this.rk4(dt, bodies, index * dt); for (const [id, body] of Object.entries(bodies)) { const physical = this.c.bodies[id]; if (physical && length(sub(this.s.r, this.bodyAt(body, (index + 1) * dt))) < physical.radius_m) { this.s.crashed = true; this.s.throttle = 0; return; } } }
+      for (let index = 0; index < count; index++) {
+        if (lockBody) {
+          const lvx = this.s.v.x - (lockBody.vx || 0), lvy = this.s.v.y - (lockBody.vy || 0);
+          if (Math.hypot(lvx, lvy) > 1e-9) this.s.heading = Math.atan2(lvy, lvx);
+        }
+        this.rk4(dt, bodies, index * dt); for (const [id, body] of Object.entries(bodies)) { const physical = this.c.bodies[id]; if (physical && length(sub(this.s.r, this.bodyAt(body, (index + 1) * dt))) < physical.radius_m) { this.s.crashed = true; this.s.throttle = 0; return; } }
+      }
+      this.prevThrottle = this.s.throttle;
     }
     diagnostics(bodies, target) {
       const id = this.dominant(bodies), body = bodies[id], physical = this.c.bodies[id], r = sub(this.s.r, body), v = sub(this.s.v, { x: body.vx, y: body.vy, z: body.vz || 0 }), distance = length(r), speed = length(v), mu = this.c.G * physical.mass, energy = speed * speed / 2 - mu / distance, semiMajor = -mu / (2 * energy), eccentricity = length(mul(sub(mul(r, speed * speed - mu / distance), mul(v, dot(r, v))), 1 / mu));

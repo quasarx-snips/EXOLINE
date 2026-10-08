@@ -20,6 +20,11 @@ window.ExolineNav = (() => {
   let lastHeavy = 0;
   let snapshot = null;
   let editing = false;
+  let cachedPlan = null;       // frozen post-burn plan: computed on edit, drawn as-is
+  let planDirty = true;          // set by node edits; rebuilt on next recompute (cadence-limited)
+  let lastNavThrottle = 0;
+  // Absolute burn epoch (sim ms). node.t stays as compat copy, refreshed from epoch.
+  function nodeRemaining(node) { return Math.max(0, (node.epoch - (+ctx.getDate())) / 1000); }
 
   // ---------- vector helpers (3D) ----------
   const add = (a, b) => ({ x: a.x + b.x, y: a.y + b.y, z: (a.z || 0) + (b.z || 0) });
@@ -42,6 +47,7 @@ window.ExolineNav = (() => {
   // Moons stay hierarchical: world = parent world + propagated parent-relative state.
   function worldAtDate(id, date) {
     if (id === 'sun') return { x: 0, y: 0, z: 0 };
+    if (!ctx.constants.bodies[id]) return null;
     const s = window.ExolineOrbit.state(id, date);
     if (!s || !finiteVec(s)) return null;
     const AU = ctx.constants.AU_M;
@@ -103,6 +109,7 @@ window.ExolineNav = (() => {
   // radial < 0 = approaching, > 0 = receding.
   function getRelativeState(craftState = ctx.flight.s, bodyId = target, tSec = 0) {
     if (!bodyId) return null;
+    if (!ctx.constants.bodies[bodyId]) return null;
     let tPos, tVel, tPhys;
     if (tSec) {
       tPos = worldAt(bodyId, tSec);
@@ -145,9 +152,10 @@ window.ExolineNav = (() => {
     }
     if (!refPos || !refVel) return null;
     const mu = ctx.constants.G * physical.mass;
+    if (!(mu > 0)) return null;
     const r = sub(craftState.r, refPos), v = sub(craftState.v, refVel);
     const distance = len(r), speed = len(v);
-    if (!(mu > 0) || !(distance > EPS) || !finiteVec(r) || !finiteVec(v)) return null;
+    if (!(distance > EPS) || !finiteVec(r) || !finiteVec(v)) return null;
     const energy = speed * speed / 2 - mu / distance;         // specific orbital energy
     const hVec = cross(r, v);                                  // specific angular momentum
     const h = len(hVec);
@@ -433,26 +441,23 @@ window.ExolineNav = (() => {
     const total = Math.sqrt(pro * pro + rad * rad + nor * nor);
     return { prograde: pro, radial: rad, normal: nor, total, finite: Number.isFinite(total) };
   }
-  function createManeuverNode(opts = {}) {
+function createManeuverNode(opts = {}) {
     const pro = Number(opts.progradeDv !== undefined ? opts.progradeDv : (opts.prograde || 0)) || 0;
     const rad = Number(opts.radialDv !== undefined ? opts.radialDv : (opts.radial || 0)) || 0;
     const nor = Number(opts.normalDv !== undefined ? opts.normalDv : (opts.normal || 0)) || 0;
+    const t = Math.max(0, Number(opts.t) || 0);
     const node = {
       id: ++seq,
-      t: Math.max(0, Number(opts.t) || 0), // seconds from now on the simulation clock
+      t,
+      epoch: (+ctx.getDate()) + t * 1000, // absolute sim ms of burn: never drifts
       referenceBody: opts.referenceBody || opts.body || currentRefId(),
       progradeDv: pro,
       radialDv: rad,
       normalDv: nor
     };
     node.totalDv = calculateBurn(node).total;
-    const dvFrame = getVelocityFrame(ctx.flight.s, node.referenceBody, node.t);
-    node.dv_vec = dvFrame
-      ? add(
-          add(mul(dvFrame.prograde, node.progradeDv), mul(dvFrame.radial, node.radialDv)),
-          mul(dvFrame.normal, node.normalDv)
-        )
-      : { x: 0, y: 0, z: 0 };
+    node.dv_vec = { x: 0, y: 0, z: 0 }; // frozen inertial burn vector, solved in buildPlan
+    node.predictedState = null;
     return node;
   }
   // dv_vec = pro*prograde + rad*radial + nor*normal in the frame at burn time.
@@ -466,12 +471,12 @@ window.ExolineNav = (() => {
     );
     return { r: { x: state.r.x, y: state.r.y, z: state.r.z || 0 }, v: add(state.v, dv) };
   }
-  function addNode(opts) { const node = createManeuverNode(opts); nodes.push(node); predToken++; dirty = true; return node; }
+  function addNode(opts) { const node = createManeuverNode(opts); nodes.push(node); predToken++; dirty = true; planDirty = true; return node; }
   function updateNode(id, patch = {}) {
     if (!id || !patch) return null;
     const node = nodes.find(n => n.id === id);
     if (!node) return null;
-    if (patch.t !== undefined) node.t = Math.max(0, Number(patch.t) || 0);
+    if (patch.t !== undefined) { node.epoch = (+ctx.getDate()) + Math.max(0, Number(patch.t) || 0) * 1000; node.t = Math.max(0, Number(patch.t) || 0); }
     if (patch.progradeDv !== undefined) node.progradeDv = Number(patch.progradeDv) || 0;
     else if (patch.prograde !== undefined) node.progradeDv = Number(patch.prograde) || 0;
     if (patch.radialDv !== undefined) node.radialDv = Number(patch.radialDv) || 0;
@@ -481,18 +486,11 @@ window.ExolineNav = (() => {
     if (patch.referenceBody) node.referenceBody = patch.referenceBody;
     else if (patch.body) node.referenceBody = patch.body;
     node.totalDv = calculateBurn(node).total;
-    const dvFrame = getVelocityFrame(ctx.flight.s, node.referenceBody, node.t);
-    node.dv_vec = dvFrame
-      ? add(
-          add(mul(dvFrame.prograde, node.progradeDv), mul(dvFrame.radial, node.radialDv)),
-          mul(dvFrame.normal, node.normalDv)
-        )
-      : { x: 0, y: 0, z: 0 };
-    predToken++; dirty = true;
+    predToken++; dirty = true; planDirty = true; // solved once in buildPlan (cadence-limited)
     return node;
   }
-  function removeNode(id) { nodes = nodes.filter(n => n.id !== id); predToken++; dirty = true; }
-  function clearNodes() { nodes = []; predToken++; dirty = true; }
+  function removeNode(id) { nodes = nodes.filter(n => n.id !== id); predToken++; dirty = true; planDirty = true; }
+  function clearNodes() { nodes = []; predToken++; dirty = true; planDirty = true; }
   function getNodes() { return nodes; }
   function setEditing(flag) { editing = !!flag; }
 
@@ -503,35 +501,130 @@ window.ExolineNav = (() => {
     const token = predToken;
     const live = ctx.flight.s;
     const base = propagateLeg(live, 0, pickHorizon(0, live, currentRefId()), true);
-    let plan = null;
-    if (nodes.length) {
-      const ordered = [...nodes].sort((a, b) => a.t - b.t);
-      const segments = [], marks = [];
-      let state = copyState(live), t0 = 0, dvTotal = 0;
-      for (const node of ordered) {
-        const legT = Math.max(node.t - t0, 1);
-        const leg = propagateLeg(state, t0, legT, false);
-        if (!leg || !leg.records.length) break;
-        leg.node = node;
-        segments.push(leg);
-        const frame = getVelocityFrame(leg.endState, node.referenceBody, node.t);
-        state = applyBurnToPreview(leg.endState, node, frame);
-        dvTotal += calculateBurn(node).total;
-        marks.push({ node, point: { ...leg.endState.r }, frame });
-        t0 = Math.max(node.t, leg.tEnd);
-      }
-      const finalLeg = propagateLeg(state, t0, pickHorizon(t0, state, currentRefId()), true);
-      if (finalLeg) {
-        finalLeg.node = ordered[ordered.length - 1];
-        segments.push(finalLeg);
-        plan = { segments, marks, dvTotal, approach: finalLeg.approach, impact: finalLeg.impact, find: id => ordered.find(n => n.id === id) };
-      }
+    if (base) base.builtAt = (+ctx.getDate());
+    return { base, plan: cachedPlan, token, predToken: token, refId: currentRefId(), targetId: target };
+  }
+
+  function buildPlan() {
+    if (!nodes.length) { cachedPlan = null; return; }
+    const live = ctx.flight.s;
+    for (const n of nodes) n.t = nodeRemaining(n); // refresh compat copy from epoch
+    const ordered = [...nodes].sort((a, b) => a.t - b.t);
+
+    // Propagate to first node from live state (edit-time solve only)
+    const firstNode = ordered[0];
+    const firstLeg = propagateLeg(live, 0, Math.max(firstNode.t, 1), false);
+    if (!firstLeg || !firstLeg.records.length) { cachedPlan = null; return; }
+
+    const segments = [], marks = [];
+    let state = firstLeg.endState;
+    let t0 = firstNode.t;
+    let dvTotal = 0;
+
+    // Apply first node burn, freezing the inertial burn vector
+    const firstFrame = getVelocityFrame(state, firstNode.referenceBody, firstNode.t);
+    if (!firstFrame) { cachedPlan = null; return; }
+    const firstBurn = calculateBurn(firstNode);
+    firstNode.dv_vec = add(
+      add(mul(firstFrame.prograde, firstBurn.prograde), mul(firstFrame.radial, firstBurn.radial)),
+      mul(firstFrame.normal, firstBurn.normal)
+    );
+    firstNode.predictedState = copyState(state);
+    state = applyBurnToPreview(state, firstNode, firstFrame);
+    dvTotal += firstBurn.total;
+    // Burn point frozen RELATIVE to the planet: drawn at live body position +
+    // offset, so the marker sits exactly on the planet-frame (blue) orbit.
+    const firstBody = worldAt(firstNode.referenceBody, firstNode.t);
+    marks.push({ node: firstNode, point: { ...firstLeg.endState.r }, rel: firstBody ? { x: firstLeg.endState.r.x - firstBody.x, y: firstLeg.endState.r.y - firstBody.y } : null, refId: firstNode.referenceBody, frame: firstFrame });
+
+    // Process remaining nodes
+    for (let i = 1; i < ordered.length; i++) {
+      const node = ordered[i];
+      const legT = Math.max(node.t - t0, 1);
+      const leg = propagateLeg(state, t0, legT, false);
+      if (!leg || !leg.records.length) break;
+      leg.node = node;
+      segments.push(leg);
+      const frame = getVelocityFrame(leg.endState, node.referenceBody, node.t);
+      if (!frame) break;
+      const b = calculateBurn(node);
+      node.dv_vec = add(
+        add(mul(frame.prograde, b.prograde), mul(frame.radial, b.radial)),
+        mul(frame.normal, b.normal)
+      );
+      node.predictedState = copyState(leg.endState);
+      state = applyBurnToPreview(leg.endState, node, frame);
+      dvTotal += b.total;
+      const legBody = worldAt(node.referenceBody, node.t);
+      marks.push({ node, point: { ...leg.endState.r }, rel: legBody ? { x: leg.endState.r.x - legBody.x, y: leg.endState.r.y - legBody.y } : null, refId: node.referenceBody, frame });
+      t0 = Math.max(node.t, leg.tEnd);
     }
-    return { base, plan, token, predToken: token, refId: currentRefId(), targetId: target };
+
+    // Final coast leg (frozen inertial records = the fixed target path)
+    const finalLeg = propagateLeg(state, t0, pickHorizon(t0, state, currentRefId()), true);
+    if (finalLeg) {
+      finalLeg.node = ordered[ordered.length - 1];
+      segments.push(finalLeg);
+      // Planet-relative copy of the post-burn path, solved once here: the
+      // renderer adds the body's LIVE position, so the path follows the planet
+      // and never jitters. rec.t is seconds-from-build, matching worldAt().
+      const refId = firstNode.referenceBody;
+      const rel = (pt, tSec) => {
+        const bp = refId === 'sun' ? { x: 0, y: 0 } : worldAt(refId, tSec);
+        if (!bp) return null;
+        return { x: pt.x - bp.x, y: pt.y - bp.y };
+      };
+      let relRecords = null, relApproach = null, relImpact = null;
+      if (refId) {
+        const stride = Math.max(1, Math.ceil(finalLeg.records.length / 350));
+        relRecords = [];
+        for (let i = 0; i < finalLeg.records.length; i += stride) {
+          const rec = finalLeg.records[i], q = rel(rec.r, rec.t);
+          if (q) relRecords.push(q);
+        }
+        const last = finalLeg.records[finalLeg.records.length - 1];
+        if (last) {
+          const q = rel(last.r, last.t);
+          if (q) { relRecords.push(q); if (finalLeg.impact) relImpact = q; }
+        }
+        if (finalLeg.approach && finalLeg.approach.point) {
+          relApproach = rel(finalLeg.approach.point, finalLeg.tStart + (finalLeg.approach.tSec || 0));
+        }
+      }
+      cachedPlan = { segments, marks, dvTotal, approach: finalLeg.approach, impact: finalLeg.impact, find: id => ordered.find(n => n.id === id), local: frozenLocalOrbit(state, firstNode.referenceBody, t0), refId, builtAt: (+ctx.getDate()), relRecords, relApproach, relImpact };
+    } else {
+      cachedPlan = null;
+    }
+  }
+  // Frozen post-burn orbit shape (inertial orientation) for a rock-stable ellipse.
+  // Drawn each frame around the body's LIVE position, so it tracks the planet
+  // without ever changing shape unless the node is edited.
+  function frozenLocalOrbit(postBurnState, refId, tSec) {
+    const physical = ctx.constants.bodies[refId];
+    if (!physical) return null;
+    const refPos = worldAt(refId, tSec), refVel = velocityAt(refId, tSec);
+    if (!refPos || !refVel) return null;
+    const mu = ctx.constants.G * physical.mass;
+    if (!(mu > 0)) return null;
+    const r = sub(postBurnState.r, refPos), v = sub(postBurnState.v, refVel);
+    const R = len(r);
+    if (!(R > EPS)) return null;
+    const h = r.x * v.y - r.y * v.x, p = h * h / mu;
+    const ev = {
+      x: (((v.x * v.x + v.y * v.y) - mu / R) * r.x - (r.x * v.x + r.y * v.y) * v.x) / mu,
+      y: (((v.x * v.x + v.y * v.y) - mu / R) * r.y - (r.x * v.x + r.y * v.y) * v.y) / mu
+    };
+    const e = Math.hypot(ev.x, ev.y);
+    if (!(e < 1)) return null; // escape/impact: polyline only
+    const a = p / Math.max(1e-12, 1 - e * e);
+    if (!(a > 0)) return null;
+    const ex = e > 1e-6 ? { x: ev.x / e, y: ev.y / e } : { x: r.x / R, y: r.y / R };
+    return { refId, a, e, ex, perp: { x: -ex.y, y: ex.x } };
   }
   // Explicit execution validation (PART 17): returns a plan to commit, or a reason.
   function prepareExecution() {
     if (!nodes.length) return { ok: false, reason: 'NO NODE' };
+    for (const n of nodes) n.t = nodeRemaining(n);
     const node = [...nodes].sort((a, b) => a.t - b.t)[0];
     if (!Number.isFinite(node.t) || node.t < 0) return { ok: false, reason: 'BAD TIME' };
     const burn = calculateBurn(node);
@@ -539,19 +632,19 @@ window.ExolineNav = (() => {
     if (node.t < 1e-6) {
       const frame = getVelocityFrame(ctx.flight.s, node.referenceBody, 0);
       if (!frame) return { ok: false, reason: 'BAD FRAME' };
-      return { ok: true, node, endState: applyBurnToPreview(ctx.flight.s, node, frame), t: 0, burn };
+      return { ok: true, node, endState: applyBurnToPreview(ctx.flight.s, node, frame), t: 0, burn, frame };
     }
     const leg = propagateLeg(ctx.flight.s, 0, node.t, false);
     if (!leg || !leg.records.length) return { ok: false, reason: 'PREDICTION FAILED' };
     if (leg.impact) return { ok: false, reason: 'IMPACT BEFORE NODE' };
     const frame = getVelocityFrame(leg.endState, node.referenceBody, node.t);
     if (!frame) return { ok: false, reason: 'BAD FRAME' };
-    return { ok: true, node, endState: applyBurnToPreview(leg.endState, node, frame), t: node.t, burn, leg };
+    return { ok: true, node, endState: applyBurnToPreview(leg.endState, node, frame), t: node.t, burn, leg, frame };
   }
-  function commitExecution(nodeId, tExec) {
+  function commitExecution(nodeId) {
     const executedNode = nodes.find(n => n.id === nodeId);
-    nodes = nodes.filter(n => n.id !== nodeId).map(n => ({ ...n, t: Math.max(0, n.t - tExec) }));
-    predToken++; dirty = true;
+    nodes = nodes.filter(n => n.id !== nodeId); // epochs are absolute: survivors need no shift
+    predToken++; dirty = true; planDirty = true;
     return { ok: true, nodeId, executedNode };
   }
 
@@ -648,7 +741,7 @@ window.ExolineNav = (() => {
     if (id && !isTargetable(id)) return false;
     if (id === target) return true;
     target = id || null;
-    predToken++; dirty = true;
+    predToken++; dirty = true; planDirty = true; // target drives approach: re-solve plan
     return true;
   }
   function clearTarget() { return setTarget(null); }
@@ -660,13 +753,22 @@ window.ExolineNav = (() => {
 
   function recompute() {
     const token = predToken;
+    const simNow = +ctx.getDate();
+    // Manual (non-auto) burn just ended: trajectory changed, re-solve the plan once.
+    const thr = ctx.flight ? ctx.flight.s.throttle : 0;
+    if (lastNavThrottle > 0 && !(thr > 0) && nodes.length) planDirty = true;
+    lastNavThrottle = thr;
+    // Solve the frozen plan only on edits (cadence-limited here), never per-frame.
+    if ((planDirty || (nodes.length && !cachedPlan)) && !(thr > 0)) { buildPlan(); planDirty = false; }
+    if (!nodes.length) { cachedPlan = null; planDirty = false; }
+
     const result = buildPreview();
-    if (token !== predToken) return;   // stale result never overwrites newer state
+    if (token !== predToken) return;
     heavy = result;
     dirty = false;
     lastHeavy = now();
     lastR = { x: ctx.flight.s.r.x, y: ctx.flight.s.r.y, z: ctx.flight.s.r.z || 0 };
-    lastT = +ctx.getDate();
+    lastT = simNow;
     const key = `${target}|${result.refId}`;
     if (key !== transferKey) { transferKey = key; transfer = target ? getTransferEstimate(result.refId, target) : null; }
   }
@@ -705,7 +807,7 @@ window.ExolineNav = (() => {
       heavy,
       dvTotal: heavy && heavy.plan ? heavy.plan.dvTotal : 0,
       transfer,
-      nodes: nodes.map(n => ({ id: n.id, t: n.t, referenceBody: n.referenceBody, progradeDv: n.progradeDv, radialDv: n.radialDv, normalDv: n.normalDv, totalDv: n.totalDv })),
+      nodes: nodes.map(n => ({ id: n.id, t: nodeRemaining(n), referenceBody: n.referenceBody, progradeDv: n.progradeDv, radialDv: n.radialDv, normalDv: n.normalDv, totalDv: n.totalDv })),
       token: predToken,
       predToken
     };
@@ -719,10 +821,11 @@ window.ExolineNav = (() => {
     };
     target = null; nodes = []; seq = 0;
     predToken++; dirty = true;
+    cachedPlan = null; planDirty = true; lastNavThrottle = 0;
     heavy = null; transfer = null; transferKey = ''; lastR = null; lastT = 0; snapshot = null;
   }
   function invalidate() { dirty = true; }
-  function onReset() { clearNodes(); }   // new campaign: plans are meaningless after relaunch
+  function onReset() { clearNodes(); planDirty = true; }   // new campaign: plans are meaningless after relaunch
   function getSnapshot() { return snapshot; }
   // Public prediction entry for an arbitrary state (spec PART 2 name).
   function propagatePreview(state, opts = {}) {

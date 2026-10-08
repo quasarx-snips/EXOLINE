@@ -115,6 +115,7 @@
       <div class="detail-kicker">EXOLINE // SETTINGS</div>
       <h2>FLIGHT ASSISTS</h2>
       <label class="setting-row"><span>INFINITE FUEL <small>Cheat: fuel never depletes; craft mass is unchanged.</small></span><input id="infiniteFuel" type="checkbox" role="switch"></label>
+      <label class="setting-row"><span>PROGRADE LOCK <small>Assist: powered flight auto-tracks orbital prograde. Turn keys override.</small></span><input id="progradeLock" type="checkbox" role="switch" checked></label>
       <h2>KEYBINDS</h2>
       <div class="keybind-list">
         <label>PAUSE <input data-bind="pause" readonly></label><label>WARP DOWN <input data-bind="warpDown" readonly></label>
@@ -160,6 +161,7 @@
   <script src="flight-engine.js"></script>
   <script src="map-renderer.js"></script>
   <script src="navigation-engine.js"></script>
+  <script src="physics-agent.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

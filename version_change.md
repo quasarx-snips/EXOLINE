@@ -1,3 +1,16 @@
+### v0.0.5 — Physics stability, frozen node planning, and assisted-burn overhaul
+
+- Added a read-only physics validation agent (`app/physics-agent.js`, 20 checks across light/deep tiers: state finiteness, mass/throttle sanity, vis-viva, energy and momentum conservation, SOI/rocket-equation/fuel-flow/TWR/atmosphere/drag checks, Kepler/RK4/collision/warp/prediction/ephemeris checks) with a `?physics-debug` overlay. It never mutates game state.
+- Added an offline physics validator (`tools/validate_physics.py`, 12 checks: gravitational parameters, SOI sanity, orbital elements, moon orbits, mass/radius ratios, rocket equation, escape velocity, Hohmann Δv, timestep stability, atmosphere data, Δv budget). All checks pass, exit 0.
+- Added flight-engine safety guards: NaN state detection sets crashed instead of throwing, propellant floor at zero, and a mass floor for thrust/mass division. Added navigation-engine null-body and division-by-zero guards.
+- Fixed launch thrust pointing into the planet: parking-orbit heading is now prograde, and throttle-up snaps to the current prograde. Added a Settings PROGRADE LOCK assist (on by default, re-snaps every RK4 substep, turn keys and auto-burn override it).
+- Reworked maneuver nodes into frozen target paths: each node carries an absolute burn epoch plus a burn state and inertial Δv vector solved once at edit time. The plan re-solves only on edits, target changes, or after a manual burn — never per frame — so the white line sits perfectly still at every warp.
+- Made the planet frame primary: closed node orbits render as a frozen ellipse around the live body position, impact plans draw a red planet-relative path with an IMPACT marker, and escape plans draw an orange planet-relative path with an ESCAPE label. The sun-frame inertial polyline moved behind a Settings HELIO PATH toggle (default off). Node markers sit on the blue orbit via planet-relative burn offsets.
+- Reworked auto-burn execution: burns start half a burn-length early (KSP-style centering), steer the frozen burn vector with a proportional-rate pitch controller, modulate throttle to land within ~0.1 m/s of planned Δv, track delivered Δv by integrated thrust acceleration (exact with infinite fuel too), force 1× warp while aligning/burning, and carry a sim-time watchdog so no burn can run forever.
+- Split perturbed high-warp flight into ≤120 s chunks with a fresh ephemeris each chunk, closing the stale-body-position energy leak (error grows with t²). Pure circular-hold coast keeps its exact single-step path.
+- Replaced the straight escape ray with the analytic hyperbola branch in the planet frame, drawn from the craft to the SOI boundary with PE and SOI EXIT markers (hyperbolic impactors now draw the impact arc instead).
+- Fixed target clearing leaving a stale approach line (target changes now re-solve the plan), the stuck TARGETED ✓ button label, and the hardcoded node-creation toast (now shows the real T+ time).
+
 ### v0.0.4 — Navigation, maneuver planning, and assisted burns
 
 - Added a dedicated navigation engine that consumes the existing flight state, physics constants, and orbital ephemeris; target selection, relative telemetry, closest-approach estimates, SOI classification, maneuver planning, and transfer estimates now share the same physical coordinate system as flight.
