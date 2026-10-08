@@ -1,0 +1,20 @@
+EXOLINE PROJECT RULES
+
+You are working on EXOLINE v0.0.5x.
+
+Critical rules:
+1. Do not change existing physics behavior.
+2. Do not change existing visual appearance.
+3. Do not change existing controls.
+4. Do not add new gameplay features.
+5. Do not add npm packages, build tools, bundlers, frameworks, or ES modules.
+6. Use vanilla JavaScript with IIFE modules attached to window.Exoline*.
+7. Use Canvas 2D only.
+8. Preserve v0.0.4 behavior exactly unless the master prompt explicitly instructs a refactor.
+9. Every function must be complete. No TODO comments, no placeholders, no stubs.
+10. Follow the master prompt at docs/V005X_MASTER_PROMPT.md.
+11. Execute only the step range requested by the user.
+12. After modifying files, list what changed and what tests should be run.
+13. If a requested change risks regressions, stop and explain the risk before proceeding.
+14. Keep app.js under 400 lines after the final rewrite.
+15. Physics validation must never alter gameplay state.

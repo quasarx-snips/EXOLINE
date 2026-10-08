@@ -1,7 +1,7 @@
 nul
 __pycache__/
 *.pyc
-
+.venv/
 # Local recovery/download artifacts. Runtime assets live in assets/orbital/.
 assets/orbital.zip
 assets/orbital_rebuilt/
