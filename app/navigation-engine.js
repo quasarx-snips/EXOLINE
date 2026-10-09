@@ -576,7 +576,7 @@ function createManeuverNode(opts = {}) {
       };
       let relRecords = null, relApproach = null, relImpact = null;
       if (refId) {
-        const stride = Math.max(1, Math.ceil(finalLeg.records.length / 350));
+        const stride = Math.max(1, Math.ceil(finalLeg.records.length / 700));
         relRecords = [];
         for (let i = 0; i < finalLeg.records.length; i += stride) {
           const rec = finalLeg.records[i], q = rel(rec.r, rec.t);
@@ -619,7 +619,12 @@ function createManeuverNode(opts = {}) {
     const a = p / Math.max(1e-12, 1 - e * e);
     if (!(a > 0)) return null;
     const ex = e > 1e-6 ? { x: ev.x / e, y: ev.y / e } : { x: r.x / R, y: r.y / R };
-    return { refId, a, e, ex, perp: { x: -ex.y, y: ex.x } };
+    const perp = { x: -ex.y, y: ex.x };
+    // Anomaly at the burn point (node position) in the new orbit
+    const cosNu = (r.x * ex.x + r.y * ex.y) / R;
+    const sinNu = (r.x * perp.x + r.y * perp.y) / R;
+    const nodeAnomaly = Math.atan2(sinNu, cosNu);
+    return { refId, a, e, ex, perp, nodeAnomaly };
   }
   // Explicit execution validation (PART 17): returns a plan to commit, or a reason.
   function prepareExecution() {
