@@ -286,7 +286,27 @@
     marker(apoPoint, `AP ${altitude(apoF - physical.radius_m)}`, '#ffbd76');
   }
   function craft() { if (!F) return; const p = ws(F.s.r); X.save(); X.translate(p.x, p.y); X.rotate(-F.s.heading + Math.PI / 2); X.fillStyle = '#f8fdff'; X.strokeStyle = '#0b3040'; X.lineWidth = 2; X.beginPath(); X.moveTo(0, -15); X.lineTo(11, 11); X.lineTo(-11, 11); X.closePath(); X.fill(); X.stroke(); X.fillStyle = '#53ddff'; X.beginPath(); X.moveTo(0, -8); X.lineTo(3, 3); X.lineTo(-3, 3); X.closePath(); X.fill(); X.restore(); }
-  function hud() { $('flightHud').classList.toggle('hidden', !craftSelected); if (!craftSelected || !F) return; const d = F.diagnostics(S, sel?.id), name = D.bodies.find(b => b.id === d.body)?.name || 'Sun', radius = P.bodies[d.body]?.radius_m || 0; const fr = F.coast && F.coast.body === d.body ? F.coast : null, ecc = fr ? fr.e : d.e, apo = fr ? (fr.e < 1 ? fr.a * (1 + fr.e) : Infinity) : d.apo, peri = fr ? fr.a * (1 - fr.e) : d.peri; $('hudSoi').textContent = name.toUpperCase(); $('hudAlt').textContent = d.alt < 10000 ? `${Math.round(d.alt)} m` : `${(d.alt / 1000).toFixed(1)} km`; $('hudVel').textContent = d.speed < 1000 ? `${d.speed.toFixed(1)} m/s` : `${Math.round(d.speed).toLocaleString('en-US')} m/s`; $('hudApo').textContent = altitude(apo - radius); $('hudPeri').textContent = altitude(peri - radius); $('hudEcc').textContent = ecc.toFixed(4); $('hudDistance').textContent = altitude(d.target); $('launchBtn').textContent = F.s.throttle > 0 ? 'CUTOFF' : 'IGNITION'; }
+  function hud() { $('flightHud').classList.toggle('hidden', !craftSelected); if (!craftSelected || !F) return; const d = F.diagnostics(S, sel?.id), name = D.bodies.find(b => b.id === d.body)?.name || 'Sun', radius = P.bodies[d.body]?.radius_m || 0; const fr = F.coast && F.coast.body === d.body ? F.coast : null, ecc = fr ? fr.e : d.e, apo = fr ? (fr.e < 1 ? fr.a * (1 + fr.e) : Infinity) : d.apo, peri = fr ? fr.a * (1 - fr.e) : d.peri; $('hudSoi').textContent = name.toUpperCase(); $('hudAlt').textContent = d.alt < 10000 ? `${Math.round(d.alt)} m` : `${(d.alt / 1000).toFixed(1)} km`; $('hudVel').textContent = d.speed < 1000 ? `${d.speed.toFixed(1)} m/s` : `${Math.round(d.speed).toLocaleString('en-US')} m/s`; $('hudApo').textContent = altitude(apo - radius); $('hudPeri').textContent = altitude(peri - radius); $('hudEcc').textContent = ecc.toFixed(4); $('hudDistance').textContent = altitude(d.target); $('launchBtn').textContent = F.s.throttle > 0 ? 'CUTOFF' : 'IGNITION'; updateBurnReadout(); }
+  // Burn progress lives in the HUD (always visible with the craft selected) so
+  // a collapsed navigation panel can never hide the auto-burn progress.
+  function updateBurnReadout() {
+    const box = $('hudBurn'), fill = $('hudBurnFill'), label = $('hudBurnText');
+    if (!box || !fill || !label) return;
+    const node = autoBurn ? (ExolineNav.getNodes().find(n => n.id === autoBurn.nodeId) || null) : null;
+    if (!autoBurn || !node) { box.classList.add('hidden'); return; }
+    box.classList.remove('hidden');
+    const total = node.totalDv || 0, done = Math.min(autoBurn.delivered || 0, total);
+    const pct = total > 0 ? Math.max(0, Math.min(100, done / total * 100)) : 0;
+    fill.style.width = pct.toFixed(1) + '%';
+    if (autoBurn.phase === 'BURN') {
+      const accel = F.thrust / Math.max(F.s.m, 1);
+      label.textContent = `BURN ${pct.toFixed(0)}%  T−${ExolineNav.fmtDur(Math.max(0, total - done) / Math.max(accel, 1e-9))} LEFT`;
+    } else if (autoBurn.phase === 'ALIGN') {
+      label.textContent = `ALIGNING  T−${ExolineNav.fmtDur(Math.max(0, (autoBurn.fireAt - +date) / 1000))}`;
+    } else {
+      label.textContent = `COASTING  BURN IN ${ExolineNav.fmtDur(Math.max(0, (autoBurn.fireAt - +date) / 1000))}`;
+    }
+  }
   function vehicleReadout() { if (!F) return; $('shipMass').textContent = `${(F.s.m / 1000).toFixed(2)} t`; $('shipThrust').textContent = `${(F.thrust / 1000).toFixed(0)} kN`; $('shipTwr').textContent = (F.thrust * Math.max(F.s.throttle, .01) / (F.s.m * 9.80665)).toFixed(2); }
   // ---------- navigation rendering (world -> screen via the same ws() transform) ----------
   function drawLegPath(records, offset, colour, width, dashed) {
@@ -498,11 +518,13 @@
     if (sel) setText('setTargetBtn', snap.targetId === sel.id ? 'TARGETED ✓' : 'SET TARGET');
     else setText('setTargetBtn', 'SET TARGET');
     syncNodeForm(snap);
-    const burnBox = $('burnProgress');
+const burnBox = $('burnProgress');
     if (burnBox) {
-      const showBurn = !!autoBurn && (autoBurn.phase === 'BURN' || autoBurn.phase === 'ALIGN');
-      burnBox.classList.toggle('hidden', !showBurn);
-      if (showBurn) {
+      // Show whenever an auto-burn is armed: COAST (countdown), ALIGN (slew),
+      // BURN (thrust) so the bar is visible for the whole maneuver, not last 15s.
+      const armed = !!autoBurn;
+      burnBox.classList.toggle('hidden', !armed);
+      if (armed) {
         const bnode = snap.nodes.find(n => n.id === autoBurn.nodeId);
         const btotal = bnode ? bnode.totalDv : 0;
         const bdone = Math.min(autoBurn.delivered || 0, btotal);
@@ -514,8 +536,10 @@
             const accel = F ? F.thrust / Math.max(F.s.m, 1) : 0;
             const left = btotal > 0 ? Math.max(0, btotal - bdone) / Math.max(accel, 1e-9) : 0;
             label.textContent = `BURN ${pct.toFixed(0)}% · T−${ExolineNav.fmtDur(left)} LEFT`;
-          } else {
+          } else if (autoBurn.phase === 'ALIGN') {
             label.textContent = `ALIGNING · T−${ExolineNav.fmtDur(Math.max(0, (autoBurn.fireAt - +date) / 1000))}`;
+          } else {
+            label.textContent = `COASTING · BURN IN ${ExolineNav.fmtDur(Math.max(0, (autoBurn.fireAt - +date) / 1000))}`;
           }
         }
       }
@@ -558,6 +582,10 @@ function startAutoBurn() {
     if (node.totalDv <= .01) { showToast('AUTO BURN · SET A Δv FIRST'); return; }
     const needed = F.propellantForDeltaV(node.totalDv);
     if (!F.infiniteFuel && needed > F.s.propellant + 1e-6) { showToast(`AUTO BURN · NEEDS ${Math.ceil(needed)} kg FUEL`); return; }
+    // Panel must be open: collapsed nav-body is display:none, which would hide
+    // the burn progress bar entirely for the whole maneuver.
+    $('navPanel').classList.remove('hidden', 'collapsed');
+    $('navNode').classList.remove('hidden');
     // Center the finite burn on the node epoch (KSP style): start half a burn early
     // so the impulsive prediction stays accurate.
     const mdot = F.thrust / (F.specificImpulse * 9.80665);
@@ -705,11 +733,49 @@ function startAutoBurn() {
     hud();
     navUi();
     vehicleReadout();
+    drawBurnProgress();
     $('simDate').textContent = date.toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
     updateWarp();
     if (window.ExolinePhysicsAgent && window.ExolinePhysicsAgent.drawDebugOverlay) {
       window.ExolinePhysicsAgent.drawDebugOverlay(X);
     }
+  }
+  // Burn progress drawn ON THE CANVAS. Cannot be hidden by DOM/CSS state, so
+  // auto-burn progress is always visible while a burn is armed.
+  function burnProgressState() {
+    if (!autoBurn) return null;
+    const node = ExolineNav.getNodes().find(n => n.id === autoBurn.nodeId) || null;
+    if (!node) return null;
+    const total = node.totalDv || 0, done = Math.min(autoBurn.delivered || 0, total);
+    const pct = total > 0 ? Math.max(0, Math.min(100, done / total * 100)) : 0;
+    const accel = F ? F.thrust / Math.max(F.s.m, 1) : 0;
+    return { phase: autoBurn.phase, pct, total, done, accel, fireAt: autoBurn.fireAt };
+  }
+  function drawBurnProgress() {
+    const st = burnProgressState();
+    if (!st) return;
+    const w = Math.min(320, innerWidth * 0.5), h = 26;
+    const x = Math.round(innerWidth / 2 - w / 2), y = Math.round(innerHeight - 190);
+    X.save();
+    X.fillStyle = 'rgba(6,14,24,.86)';
+    X.fillRect(x - 8, y - 8, w + 16, h + 16);
+    X.strokeStyle = 'rgba(120,200,230,.35)';
+    X.lineWidth = 1;
+    X.strokeRect(x - 8.5, y - 8.5, w + 17, h + 17);
+    X.fillStyle = 'rgba(120,180,200,.18)';
+    X.fillRect(x, y, w, 8);
+    X.fillStyle = '#78e5ff';
+    X.fillRect(x, y, w * st.pct / 100, 8);
+    X.font = '700 11px sans-serif';
+    X.fillStyle = '#e8f8ff';
+    X.textBaseline = 'top';
+    const txt = st.phase === 'BURN'
+      ? `AUTO BURN  ${st.pct.toFixed(0)}%  ·  T-${ExolineNav.fmtDur(Math.max(0, st.total - st.done) / Math.max(st.accel, 1e-9))} LEFT`
+      : st.phase === 'ALIGN'
+        ? `ALIGNING  ·  T-${ExolineNav.fmtDur(Math.max(0, (st.fireAt - +date) / 1000))}`
+        : `COASTING TO NODE  ·  BURN IN ${ExolineNav.fmtDur(Math.max(0, (st.fireAt - +date) / 1000))}`;
+    X.fillText(txt, x, y + 12);
+    X.restore();
   }
   function inspect(body) { sel = body; craftSelected = false; lock = 'body'; $('detailPanel').classList.remove('hidden'); $('detailName').textContent = body.name; $('detailKicker').textContent = 'CELESTIAL BODY'; $('detailSub').textContent = body.parent ? `MOON OF ${body.parent.toUpperCase()}` : 'SOL SYSTEM'; $('detailType').textContent = body.type; $('detailOrbit').textContent = body.kind === 'major_moon' ? 'LOCAL ORBIT' : 'HELIOCENTRIC'; $('detailPeriod').textContent = 'LIVE STATE'; $('detailSeed').textContent = body.seed || '—'; $('detailNote').textContent = 'Orbital position and rendered orbit use the same propagated Keplerian state.'; if (minerals) { const data = minerals[body.name]; const box = $('minerals'); if (!data) { box.textContent = 'No mineral profile defined for this body.'; return; } box.textContent = ''; for (const [name, frac] of Object.entries(data).sort((a, b) => b[1] - a[1])) { const row = document.createElement('div'); row.className = 'mineral-row'; const pct = (frac * 100).toFixed(1); row.innerHTML = `<span class="name">${name}</span><span class="value">${pct}%</span><div class="mineral-bar"><i style="width:${pct}%"></i></div>`; box.appendChild(row); } } cam.o = { x: S[body.id].x, y: S[body.id].y }; cam.k = Math.max(cam.k, 24 / P.bodies[body.id].radius_m); }
   function pick(x, y) { let chosen, best = Infinity; for (const body of D.bodies) { const p = ws(S[body.id]), anchor = A[body.id] || A.default || {}, r = Math.max(9, radiusOf(body) * (anchor.disk_scale || .848)), score = Math.hypot(p.x - x, p.y - y) / r; if (score <= 1 && score < best) { chosen = body; best = score; } } return chosen; }
