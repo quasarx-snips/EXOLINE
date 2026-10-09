@@ -24,6 +24,10 @@
   const sub = (a, b) => ({ x: a.x - b.x, y: a.y - b.y, z: (a.z || 0) - (b.z || 0) });
   const len = a => Math.hypot(a.x, a.y, a.z || 0);
   const finite = n => Number.isFinite(n);
+  // Curve tessellation: enough segments that no chord exceeds ~6 px on screen,
+  // so ellipses never read as polylines at any zoom. Bounded for perf.
+  const smoothCount = (worldLen, min, max) => Math.max(min, Math.min(max, Math.ceil(worldLen * cam.k / 6)));
+  const ellipsePerimeter = (a, b) => Math.PI * (3 * (a + b) - Math.sqrt((3 * a + b) * (a + 3 * b)));
 
   // Local frame of the body the craft is currently sitting inside (if any).
   // Outside an SOI the transform is the identity, so draw routines keep
@@ -108,8 +112,9 @@
     }
     X.save(); X.setLineDash([7, 6]); X.strokeStyle = 'rgba(255,192,115,.92)'; X.lineWidth = 1.5; X.beginPath();
     if (ok) {
-      for (let i = 0; i <= 80; i++) {
-        const th = nu + dir * travel * i / 80, rad = p / (1 + e * Math.cos(th));
+      const NH = smoothCount(travel * (R + exitR) / 2, 48, 512);
+      for (let i = 0; i <= NH; i++) {
+        const th = nu + dir * travel * i / NH, rad = p / (1 + e * Math.cos(th));
         const pt = ws({ x: origin.x + rad * (Math.cos(th) * ex.x + Math.sin(th) * perp.x), y: origin.y + rad * (Math.cos(th) * ex.y + Math.sin(th) * perp.y) });
         i ? X.lineTo(pt.x, pt.y) : X.moveTo(pt.x, pt.y);
       }
@@ -231,8 +236,9 @@
         if (delta < travel) { travel = delta; hitNu = candidate; }
       }
       X.save(); X.strokeStyle = '#ff7373'; X.lineWidth = 1.8; X.setLineDash([5, 5]); X.beginPath();
-      for (let i = 0; i <= 80; i++) {
-        const theta = nu + direction * travel * i / 80, radial = pF / (1 + eF * Math.cos(theta));
+      const NI = smoothCount(travel * (R + physical.radius_m) / 2, 48, 512);
+      for (let i = 0; i <= NI; i++) {
+        const theta = nu + direction * travel * i / NI, radial = pF / (1 + eF * Math.cos(theta));
         const point = ws({ x: S[id].x + radial * (Math.cos(theta) * exF.x + Math.sin(theta) * perp.x), y: S[id].y + radial * (Math.cos(theta) * exF.y + Math.sin(theta) * perp.y) });
         i ? X.lineTo(point.x, point.y) : X.moveTo(point.x, point.y);
       }
@@ -249,7 +255,8 @@
     // The ellipse is rendered in screen space via ws() so it stays visible at
     // any zoom; the perigee/apogee markers sit on the same ellipse centre.
     // Shape comes from the frozen coast arc when on-rails: pixel-identical.
-    const N = 96, a = pF / (1 - eF * eF), b = a * Math.sqrt(Math.max(0, 1 - eF * eF)), cc = a * eF, perp = { x: -exF.y, y: exF.x };
+    const a = pF / (1 - eF * eF), b = a * Math.sqrt(Math.max(0, 1 - eF * eF)), cc = a * eF, perp = { x: -exF.y, y: exF.x };
+    const N = smoothCount(ellipsePerimeter(a, b), 96, 2048), hitStride = Math.max(1, Math.floor(N / 256));
     const origin = { x: S[id].x, y: S[id].y };
     const cx = { x: origin.x - cc * exF.x, y: origin.y - cc * exF.y };
     X.save();
@@ -260,8 +267,10 @@
       const px = cx.x + a * Math.cos(th) * exF.x + b * Math.sin(th) * perp.x;
       const py = cx.y + a * Math.cos(th) * exF.y + b * Math.sin(th) * perp.y;
       const screen = ws({ x: px, y: py });
-      let phase = direction > 0 ? th - currentNu : currentNu - th; while (phase < 0) phase += Math.PI * 2;
-      orbitHitRegions.push({ x: screen.x, y: screen.y, t: Math.max(30, phase / (Math.PI * 2) * period) });
+      if (i % hitStride === 0) {
+        let phase = direction > 0 ? th - currentNu : currentNu - th; while (phase < 0) phase += Math.PI * 2;
+        orbitHitRegions.push({ x: screen.x, y: screen.y, t: Math.max(30, phase / (Math.PI * 2) * period) });
+      }
       i ? X.lineTo(screen.x, screen.y) : X.moveTo(screen.x, screen.y);
     }
     X.closePath();
@@ -351,11 +360,12 @@
     // body's LIVE position: follows the planet, never changes shape.
     if (!local || !liveOrigin) return;
     const b = Math.sqrt(Math.max(0, 1 - local.e * local.e));
+    const NW = smoothCount(ellipsePerimeter(local.a, b), 120, 1024);
     const cx = liveOrigin.x - local.a * local.e * local.ex.x;
     const cy = liveOrigin.y - local.a * local.e * local.ex.y;
     X.save(); X.strokeStyle = 'rgba(255,255,255,.96)'; X.lineWidth = 1.5; X.setLineDash([3, 5]); X.beginPath();
-    for (let i = 0; i <= 120; i++) {
-      const theta = Math.PI * 2 * i / 120;
+    for (let i = 0; i <= NW; i++) {
+      const theta = Math.PI * 2 * i / NW;
       const p = ws({ x: cx + local.a * Math.cos(theta) * local.ex.x + local.a * b * Math.sin(theta) * local.perp.x, y: cy + local.a * Math.cos(theta) * local.ex.y + local.a * b * Math.sin(theta) * local.perp.y });
       i ? X.lineTo(p.x, p.y) : X.moveTo(p.x, p.y);
     }
@@ -486,6 +496,28 @@
     if (sel) setText('setTargetBtn', snap.targetId === sel.id ? 'TARGETED ✓' : 'SET TARGET');
     else setText('setTargetBtn', 'SET TARGET');
     syncNodeForm(snap);
+    const burnBox = $('burnProgress');
+    if (burnBox) {
+      const showBurn = !!autoBurn && (autoBurn.phase === 'BURN' || autoBurn.phase === 'ALIGN');
+      burnBox.classList.toggle('hidden', !showBurn);
+      if (showBurn) {
+        const bnode = snap.nodes.find(n => n.id === autoBurn.nodeId);
+        const btotal = bnode ? bnode.totalDv : 0;
+        const bdone = Math.min(autoBurn.delivered || 0, btotal);
+        const pct = btotal > 0 ? Math.max(0, Math.min(100, bdone / btotal * 100)) : 0;
+        const fill = $('burnProgressFill'), label = $('burnProgressText');
+        if (fill) fill.style.width = pct.toFixed(1) + '%';
+        if (label) {
+          if (autoBurn.phase === 'BURN') {
+            const accel = F ? F.thrust / Math.max(F.s.m, 1) : 0;
+            const left = btotal > 0 ? Math.max(0, btotal - bdone) / Math.max(accel, 1e-9) : 0;
+            label.textContent = `BURN ${pct.toFixed(0)}% · T−${ExolineNav.fmtDur(left)} LEFT`;
+          } else {
+            label.textContent = `ALIGNING · T−${ExolineNav.fmtDur(Math.max(0, (autoBurn.fireAt - +date) / 1000))}`;
+          }
+        }
+      }
+    }
   }
   function syncNodeForm(snap) {
     const node = snap.nodes.find(n => n.id === activeNodeId) || snap.nodes[0];

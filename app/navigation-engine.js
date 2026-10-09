@@ -576,7 +576,7 @@ function createManeuverNode(opts = {}) {
       };
       let relRecords = null, relApproach = null, relImpact = null;
       if (refId) {
-        const stride = Math.max(1, Math.ceil(finalLeg.records.length / 350));
+        const stride = Math.max(1, Math.ceil(finalLeg.records.length / 700));
         relRecords = [];
         for (let i = 0; i < finalLeg.records.length; i += stride) {
           const rec = finalLeg.records[i], q = rel(rec.r, rec.t);
