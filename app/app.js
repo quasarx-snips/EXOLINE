@@ -518,32 +518,6 @@
     if (sel) setText('setTargetBtn', snap.targetId === sel.id ? 'TARGETED ✓' : 'SET TARGET');
     else setText('setTargetBtn', 'SET TARGET');
     syncNodeForm(snap);
-const burnBox = $('burnProgress');
-    if (burnBox) {
-      // Show whenever an auto-burn is armed: COAST (countdown), ALIGN (slew),
-      // BURN (thrust) so the bar is visible for the whole maneuver, not last 15s.
-      const armed = !!autoBurn;
-      burnBox.classList.toggle('hidden', !armed);
-      if (armed) {
-        const bnode = snap.nodes.find(n => n.id === autoBurn.nodeId);
-        const btotal = bnode ? bnode.totalDv : 0;
-        const bdone = Math.min(autoBurn.delivered || 0, btotal);
-        const pct = btotal > 0 ? Math.max(0, Math.min(100, bdone / btotal * 100)) : 0;
-        const fill = $('burnProgressFill'), label = $('burnProgressText');
-        if (fill) fill.style.width = pct.toFixed(1) + '%';
-        if (label) {
-          if (autoBurn.phase === 'BURN') {
-            const accel = F ? F.thrust / Math.max(F.s.m, 1) : 0;
-            const left = btotal > 0 ? Math.max(0, btotal - bdone) / Math.max(accel, 1e-9) : 0;
-            label.textContent = `BURN ${pct.toFixed(0)}% · T−${ExolineNav.fmtDur(left)} LEFT`;
-          } else if (autoBurn.phase === 'ALIGN') {
-            label.textContent = `ALIGNING · T−${ExolineNav.fmtDur(Math.max(0, (autoBurn.fireAt - +date) / 1000))}`;
-          } else {
-            label.textContent = `COASTING · BURN IN ${ExolineNav.fmtDur(Math.max(0, (autoBurn.fireAt - +date) / 1000))}`;
-          }
-        }
-      }
-    }
   }
   function syncNodeForm(snap) {
     const node = snap.nodes.find(n => n.id === activeNodeId) || snap.nodes[0];
@@ -593,7 +567,9 @@ function startAutoBurn() {
     const epoch = node.epoch || (+date + node.t * 1000);
     autoBurn = { nodeId: node.id, nodeTime: node.t, fireAt: epoch - burnTime * 500, delivered: 0, phase: 'COAST', initialMass: 0, estBurn: burnTime, burnSimStart: 0, appliedRate: 0 };
     $('throttle').disabled = true; $('launchBtn').disabled = true;
-    setWarp(1);
+    // Warp is KEPT while coasting to the node (so you can time-warp toward the
+    // burn instead of idling at 1x). It drops to 1x only when the align window
+    // opens, because a multi-second burn cannot be resolved at high warp.
     $('navExecute').textContent = 'CANCEL AUTO';
     showToast(`AUTO BURN ARMED · T+ ${ExolineNav.fmtDur(node.t)}`);
   }
@@ -604,9 +580,9 @@ function startAutoBurn() {
     if (!autoBurn) return;
     const node = ExolineNav.getNodes().find(n => n.id === autoBurn.nodeId);
     if (!node || F.s.crashed || (!F.infiniteFuel && F.s.propellant <= 0)) { cancelAutoBurn('AUTO BURN ABORTED'); return; }
-    if (autoBurn.phase === 'COAST' && +date >= autoBurn.fireAt - 15000) { autoBurn.phase = 'ALIGN'; }
+    if (autoBurn.phase === 'COAST' && +date >= autoBurn.fireAt - 15000) { autoBurn.phase = 'ALIGN'; if (warpIndex !== 0) setWarp(0); }
     if (autoBurn.phase !== 'ALIGN' && autoBurn.phase !== 'BURN') return;
-    if (warpIndex !== 0) setWarp(0); // burns always execute at 1x: warp + burns never mix
+    // No forced 1x here: warp is only dropped when entering ALIGN above.
     // Steer along the FROZEN inertial burn vector solved at node edit time:
     // zero per-frame propagation, zero jitter.
     const burn = ExolineNav.calculateBurn(node);
@@ -754,27 +730,24 @@ function startAutoBurn() {
   function drawBurnProgress() {
     const st = burnProgressState();
     if (!st) return;
-    const w = Math.min(320, innerWidth * 0.5), h = 26;
-    const x = Math.round(innerWidth / 2 - w / 2), y = Math.round(innerHeight - 190);
+    // Top-centre, directly below the SOI/date strip.
+    const w = Math.min(400, innerWidth * 0.62);
+    const x = Math.round(innerWidth / 2 - w / 2), y = 64;
     X.save();
-    X.fillStyle = 'rgba(6,14,24,.86)';
-    X.fillRect(x - 8, y - 8, w + 16, h + 16);
-    X.strokeStyle = 'rgba(120,200,230,.35)';
-    X.lineWidth = 1;
-    X.strokeRect(x - 8.5, y - 8.5, w + 17, h + 17);
-    X.fillStyle = 'rgba(120,180,200,.18)';
-    X.fillRect(x, y, w, 8);
+    X.fillStyle = 'rgba(120,180,200,.22)';
+    X.fillRect(x, y, w, 5);
     X.fillStyle = '#78e5ff';
-    X.fillRect(x, y, w * st.pct / 100, 8);
+    X.fillRect(x, y, w * st.pct / 100, 5);
+    // Text is suppressed while the engine is actually burning: the bar alone
+    // conveys progress, and the HUD throttle/velocity already read live state.
+    if (st.phase === 'BURN') { X.restore(); return; }
     X.font = '700 11px sans-serif';
     X.fillStyle = '#e8f8ff';
     X.textBaseline = 'top';
-    const txt = st.phase === 'BURN'
-      ? `AUTO BURN  ${st.pct.toFixed(0)}%  ·  T-${ExolineNav.fmtDur(Math.max(0, st.total - st.done) / Math.max(st.accel, 1e-9))} LEFT`
-      : st.phase === 'ALIGN'
-        ? `ALIGNING  ·  T-${ExolineNav.fmtDur(Math.max(0, (st.fireAt - +date) / 1000))}`
-        : `COASTING TO NODE  ·  BURN IN ${ExolineNav.fmtDur(Math.max(0, (st.fireAt - +date) / 1000))}`;
-    X.fillText(txt, x, y + 12);
+    const txt = st.phase === 'ALIGN'
+      ? `ALIGNING · T−${ExolineNav.fmtDur(Math.max(0, (st.fireAt - +date) / 1000))}`
+      : `COASTING TO NODE · BURN IN ${ExolineNav.fmtDur(Math.max(0, (st.fireAt - +date) / 1000))}`;
+    X.fillText(txt, x, y + 9);
     X.restore();
   }
   function inspect(body) { sel = body; craftSelected = false; lock = 'body'; $('detailPanel').classList.remove('hidden'); $('detailName').textContent = body.name; $('detailKicker').textContent = 'CELESTIAL BODY'; $('detailSub').textContent = body.parent ? `MOON OF ${body.parent.toUpperCase()}` : 'SOL SYSTEM'; $('detailType').textContent = body.type; $('detailOrbit').textContent = body.kind === 'major_moon' ? 'LOCAL ORBIT' : 'HELIOCENTRIC'; $('detailPeriod').textContent = 'LIVE STATE'; $('detailSeed').textContent = body.seed || '—'; $('detailNote').textContent = 'Orbital position and rendered orbit use the same propagated Keplerian state.'; if (minerals) { const data = minerals[body.name]; const box = $('minerals'); if (!data) { box.textContent = 'No mineral profile defined for this body.'; return; } box.textContent = ''; for (const [name, frac] of Object.entries(data).sort((a, b) => b[1] - a[1])) { const row = document.createElement('div'); row.className = 'mineral-row'; const pct = (frac * 100).toFixed(1); row.innerHTML = `<span class="name">${name}</span><span class="value">${pct}%</span><div class="mineral-bar"><i style="width:${pct}%"></i></div>`; box.appendChild(row); } } cam.o = { x: S[body.id].x, y: S[body.id].y }; cam.k = Math.max(cam.k, 24 / P.bodies[body.id].radius_m); }
