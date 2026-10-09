@@ -363,9 +363,11 @@
     const NW = smoothCount(ellipsePerimeter(local.a, b), 120, 1024);
     const cx = liveOrigin.x - local.a * local.e * local.ex.x;
     const cy = liveOrigin.y - local.a * local.e * local.ex.y;
-    X.save(); X.strokeStyle = 'rgba(255,255,255,.96)'; X.lineWidth = 1.5; X.setLineDash([3, 5]); X.beginPath();
+    X.save(); X.strokeStyle = 'rgba(255,255,255,.96)'; X.lineWidth = 1.5; X.setLineDash([2, 6]); X.beginPath();
+    // Offset dash so a dot lands exactly at the maneuver node anomaly
+    const nodeOffset = (local.nodeAnomaly || 0) / (2 * Math.PI);
     for (let i = 0; i <= NW; i++) {
-      const theta = Math.PI * 2 * i / NW;
+      const theta = Math.PI * 2 * i / NW + nodeOffset * 2 * Math.PI;
       const p = ws({ x: cx + local.a * Math.cos(theta) * local.ex.x + local.a * b * Math.sin(theta) * local.perp.x, y: cy + local.a * Math.cos(theta) * local.ex.y + local.a * b * Math.sin(theta) * local.perp.y });
       i ? X.lineTo(p.x, p.y) : X.moveTo(p.x, p.y);
     }
