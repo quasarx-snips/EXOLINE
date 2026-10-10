@@ -90,6 +90,7 @@ window.ExolineOrbit = (() => {
   }
 
   function moonState(id, date) {
+    if (!raw) return null;
     const base = raw.moons[id];
     if (!base) return null;
     const ref = new Date('2000-01-01T12:00:00Z');
@@ -105,8 +106,27 @@ window.ExolineOrbit = (() => {
       x:(cosO*cosw-sinO*sinw*cosi)*xOrb+(-cosO*sinw-sinO*cosw*cosi)*yOrb,
       y:(sinO*cosw+cosO*sinw*cosi)*xOrb+(-sinO*sinw+cosO*cosw*cosi)*yOrb,
       z:(sinw*sini)*xOrb+(cosw*sini)*yOrb,
-      r:aAU, periodDays:base.period_days
+      r:Math.hypot(xOrb, yOrb), periodDays:base.period_days
     };
+  }
+  // Two-body elements (a, e) for any catalogued orbit — primary planets,
+  // dwarfs AND moons. state() only covers primary/dwarf positions; the Hill
+  // sphere of a moon needs the moon's own semi-major axis and eccentricity.
+  function elements(id, date = new Date()) {
+    if (!raw) return null;
+    if (raw.primary[id]) {
+      const s = primaryState(id, date);
+      return s ? { aAU: s.a, aM: s.a * AU_KM * 1000, e: s.e, parent: 'sun' } : null;
+    }
+    if (raw.dwarfs[id]) {
+      const s = dwarfState(id, date);
+      return s ? { aAU: s.a, aM: s.a * AU_KM * 1000, e: s.e, parent: 'sun' } : null;
+    }
+    if (raw.moons[id]) {
+      const b = raw.moons[id];
+      return { aAU: b.a_km / AU_KM, aM: b.a_km * 1000, e: b.e || 0, parent: null };
+    }
+    return null;
   }
 
   function state(id, date) {
@@ -180,6 +200,9 @@ window.ExolineOrbit = (() => {
   }
 
   async function moon(id, date) { if (!raw) await load(); return moonState(id,date); }
+  // Synchronous moon lookup for callers that can never await (per-frame
+  // prediction grids). Returns null until load() has completed.
+  function moonAt(id, date) { return moonState(id, date); }
 
-  return { load, positions, state, orbitPath, moonOrbitPath, moon, toJD };
+  return { load, positions, state, elements, orbitPath, moonOrbitPath, moon, moonAt, toJD };
 })();
