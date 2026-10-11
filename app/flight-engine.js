@@ -670,7 +670,30 @@ window.ExolineFlight = (() => {
       // A tighter orbital step keeps osculating PE/AP stable after a coast or
       // burn, particularly while the craft is close to its SOI primary.
       const orbitalLimit = Math.max(.125, Math.min(180, period / 2400));
-      return Math.min(orbitalLimit, atmosphereStepLimit(state.r, state.v, bodies, this.c, state.m));
+      let limit = Math.min(orbitalLimit, atmosphereStepLimit(state.r, state.v, bodies, this.c, state.m));
+      // Anti-tunnel guard: while closing on any solid surface, never take a step
+      // long enough to cross it. Without this a fast entry leaps from thin air
+      // to below the crust in a single RK4 substep, where the density model
+      // reads zero and drag disappears — the craft then either tunnels through
+      // or is ejected back out (the reentry "bounce"). Capping the step to the
+      // FULL time-to-surface lets a substep advance at most to the crust, so
+      // resolveContacts always meets it. (Half the time-to-surface is NOT used:
+      // with per-substep recompute it halves the altitude every step — a Zeno
+      // approach that never quite reaches the surface. Gas giants are skipped.)
+      for (const [bid, b] of Object.entries(bodies)) {
+        const p = this.c.bodies[bid];
+        if (!p || p.solidSurface === false) continue;
+        const rel = sub(state.r, b), dist = length(rel);
+        const surfAlt = dist - p.radius_m;
+        if (!(surfAlt > 0)) continue;
+        const vRel = sub(state.v, { x: b.vx || 0, y: b.vy || 0, z: b.vz || 0 });
+        const vRad = dot(vRel, rel) / dist;          // radial closing speed (+outward)
+        if (vRad < -1) {
+          const cross = surfAlt / -vRad;             // seconds until surface contact
+          limit = Math.min(limit, Math.max(0.02, cross));
+        }
+      }
+      return limit;
     }
     // Contact resolution shared by every integrator substep: land on solid
     // surfaces, crash on hard solid impacts, and pass straight through gas
@@ -689,9 +712,17 @@ window.ExolineFlight = (() => {
         if (!physical.solidSurface) continue;             // gas body: pass through
         const vRel = sub(this.s.v, this.bodyVelAt(body, tAbs, accels, id));
         const vRadial = dot(vRel, rel);
-        if (vRadial > 0) {
-          // Ascending/climbing away from body: keep craft above crust if sub-meter
-          // ephemeris jitter dipped below surface during liftoff.
+        const speedRel = length(vRel);
+        // Snap-and-continue is ONLY for sub-meter liftoff/ephemeris jitter: a
+        // craft climbing gently off the pad can momentarily sit a hair below the
+        // computed crust, so we lift it back and keep going. Gated on LOW speed.
+        // A reentry craft that tunnels to the surface with an OUTWARD velocity
+        // (from a drag overshoot) must NOT take this branch — snapping it back
+        // with that outward speed intact and continuing is exactly the
+        // atmosphere "bounce," and every bounce raises the osculating perigee.
+        // At speed it falls through to the crash/land handling below so contact
+        // terminates cleanly instead of ratcheting the orbit back up.
+        if (vRadial > 0 && speedRel < 10) {
           const nx = distance > 1e-6 ? rel.x / distance : 0;
           const ny = distance > 1e-6 ? rel.y / distance : 1;
           const nz = distance > 1e-6 ? rel.z / distance : 0;
@@ -855,8 +886,20 @@ window.ExolineFlight = (() => {
         // Fall through to RK4 for numerical integration.
       }
       if (this.circularHold && this.s.throttle === 0) { this.advanceCircularHold(seconds, bodies); this.prevThrottle = this.s.throttle; return; }
-      const step = this.maximumStep(bodies), count = Math.max(1, Math.ceil(seconds / step)), dt = seconds / count;
-      for (let index = 0; index < count; index++) {
+      // Adaptive substeps: maximumStep is recomputed EVERY substep, not once per
+      // chunk. Sized only at the thin entry altitude it stays ~5 s while drag
+      // climbs by orders of magnitude during the plunge, and a fixed 5 s explicit
+      // RK4 step overshoots the stiff lower-atmosphere drag — spuriously
+      // reversing velocity, which resolveContacts turns into the reentry
+      // "bounce" and a perigee that ratchets up after every touch. Recomputing dt
+      // lets it collapse as density rises (see atmosphereStepLimit) and as the
+      // craft closes on the surface (see the anti-tunnel guard in maximumStep),
+      // so the descent is stable and monotonic into a clean land/crash. The loop
+      // tracks elapsed time so each substep's dt also never overshoots the chunk.
+      let elapsed = 0;
+      while (elapsed < seconds - 1e-9) {
+        const step = this.maximumStep(bodies);
+        const dt = Math.min(step, seconds - elapsed);
         if (lockBody) {
           const ldx = this.s.r.x - lockBody.x, ldy = this.s.r.y - lockBody.y, ldz = (this.s.r.z || 0) - (lockBody.z || 0);
           const lDist = Math.hypot(ldx, ldy, ldz);
@@ -865,8 +908,9 @@ window.ExolineFlight = (() => {
           const lSpeed = Math.hypot(lvx, lvy);
           if (lAlt >= 500 && lSpeed >= 50) this.s.heading = Math.atan2(lvy, lvx);
         }
-        this.rk4(dt, bodies, index * dt);
-        if (this.resolveContacts(bodies, (index + 1) * dt)) break;
+        this.rk4(dt, bodies, elapsed);
+        elapsed += dt;
+        if (this.resolveContacts(bodies, elapsed)) break;
       }
 
       // --- Reentry phase tracking (per dominant body) ---
