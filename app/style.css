@@ -284,3 +284,8 @@ body:has(#mapCanvas:not(.hidden)) .flight-hud { display:none !important; }
 #app.mission-active .nav-panel,
 #app.mission-active .flight-hud { display:none; }
 
+
+.nav-xfer { display:grid; gap:5px; padding:7px; border:1px solid rgba(109,184,255,.32); border-radius:10px; background:rgba(4,11,18,.5); }
+.xfer-list { display:grid; gap:3px; max-height:190px; overflow:auto; }
+.xfer-list .xfer-item { border:1px solid rgba(255,255,255,.10); border-radius:7px; background:rgba(6,16,26,.65); cursor:pointer; }
+.xfer-list .xfer-item:hover { border-color:rgba(120,229,255,.55); background:rgba(10,30,46,.8); }

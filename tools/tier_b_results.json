@@ -1,0 +1,40 @@
+{
+  "failures": 4,
+  "results": [
+    {
+      "name": "B1 script order",
+      "status": "PASS",
+      "detail": "found: ['orbit-engine.js', 'flight-engine.js', 'map-renderer.js', 'navigation-engine.js', 'physics-agent.js', 'app.js']"
+    },
+    {
+      "name": "B3 no import/export",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "B4 no package.json",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "B5 ExolinePhysicsAgent.check guarded",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "B5b VERSION exposed",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "B6 gas giant diskFraction",
+      "status": "FAIL",
+      "detail": "all gas giants in range 0.2-0.95"
+    },
+    {
+      "name": "B7 ATMOSPHERES",
+      "status": "PASS",
+      "detail": "8 entries with correct fields"
+    }
+  ]
+}

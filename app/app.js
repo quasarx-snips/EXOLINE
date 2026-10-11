@@ -7,7 +7,7 @@
   keys.pan = { up: false, down: false, left: false, right: false };
   let navSnap = null, activeNodeId = null, toastTimer = 0, autoBurn = null, nodeHitRegions = [], orbitHitRegions = [];
   const nodeAnchors = new Map();
-  const defaultBindings = { pause: 'Space', warpDown: 'BracketLeft', warpUp: 'BracketRight', focusCraft: 'KeyF', resetView: 'KeyR', addNode: 'KeyN', autoBurn: 'KeyB' };
+  const defaultBindings = { pause: 'Space', warpDown: 'BracketLeft', warpUp: 'BracketRight', focusCraft: 'KeyF', resetView: 'KeyR', addNode: 'KeyN', autoBurn: 'KeyB', stage: 'KeyX' };
   let bindings = { ...defaultBindings };
   try { bindings = { ...defaultBindings, ...JSON.parse(localStorage.getItem('exoline.keybinds') || '{}') }; } catch { /* use defaults */ }
   const bindingLabel = code => code === 'Space' ? 'Space' : code.replace(/^Key/, '').replace(/^Digit/, '');
@@ -79,18 +79,71 @@
     X.beginPath(); points.forEach((point, index) => { const p = ws({ x: point.x * AU + (parent?.x || 0), y: point.y * AU + (parent?.y || 0) }); index ? X.lineTo(p.x, p.y) : X.moveTo(p.x, p.y); }); X.closePath(); X.strokeStyle = id === sel?.id ? '#78e5ff' : 'rgba(110,170,190,.20)'; X.lineWidth = id === sel?.id ? 1.5 : .7; X.stroke();
   }
   function body(body, point) {
-    const screen = ws(point), radius = radiusOf(body), anchor = A[body.id] || A.default || { anchor_x: .5, anchor_y: .5 }, surfaceRadius = radius * (anchor.disk_scale || .848), sprite = img(body.orbital_asset);
-    if (sprite.complete && sprite.naturalWidth) { X.save(); X.translate(screen.x, screen.y); X.rotate(rotationAngle(body)); X.drawImage(sprite, -radius * 2 * anchor.anchor_x, -radius * 2 * anchor.anchor_y, radius * 2, radius * 2); X.restore(); }
+    const screen = ws(point), radius = radiusOf(body), anchor = A[body.id] || A.default || { anchor_x: .5, anchor_y: .5 }, physical = P.bodies[body.id], sprite = img(body.orbital_asset);
+    const surfacePx = physical ? physical.radius_m * cam.k : radius;
+    // diskFraction: fraction of the sprite half-width occupied by the planet
+    // disk (the rest is rings/glow). Scaling by it makes the sprite's disk
+    // pixel radius exactly radius_m * cam.k, so the disk edge coincides with
+    // the surface border and the collision radius.
+    const diskFraction = Math.min(1, Math.max(0.05, (A[body.id] && A[body.id].diskFraction) || 1.0));
+    const drawHalfSize = surfacePx / diskFraction;
+    if (sprite.complete && sprite.naturalWidth) { X.save(); X.translate(screen.x, screen.y); X.rotate(rotationAngle(body)); X.drawImage(sprite, -drawHalfSize * 2 * anchor.anchor_x, -drawHalfSize * 2 * anchor.anchor_y, drawHalfSize * 2, drawHalfSize * 2); X.restore(); }
     else { X.fillStyle = '#94abb4'; X.beginPath(); X.arc(screen.x, screen.y, radius, 0, Math.PI * 2); X.fill(); }
     if (body.id !== 'sun' && radius > 2) {
-      const length = Math.hypot(point.x, point.y) || 1, lx = -point.x / length, ly = point.y / length;
+      // Shadow anchor: for moons, the com moves around the host on the rendered
+      // surrogate orbit, so a sunward/interplanetary light direction (host-less
+      // vector) is only loosely meaningful; using the radial from the host keeps
+      // the phase terminator consistent with the rendered orbit.
+      const hostPoint = body.parent && S[D.bodies.find(b => b.id === body.parent)?.id] || null;
+      const length = hostPoint ? Math.hypot(point.x - hostPoint.x, point.y - hostPoint.y) || 1 : (Math.hypot(point.x, point.y) || 1);
+      const lx = hostPoint ? -(point.x - hostPoint.x) / length : -point.x / length;
+      const ly = hostPoint ? (point.y - hostPoint.y) / length : point.y / length;
       const night = X.createLinearGradient(screen.x - lx * radius * 1.35, screen.y - ly * radius * 1.35, screen.x + lx * radius * 1.35, screen.y + ly * radius * 1.35);
       night.addColorStop(0, 'rgba(0,2,9,.96)'); night.addColorStop(.42, 'rgba(0,4,14,.78)'); night.addColorStop(.56, 'rgba(2,10,20,.20)'); night.addColorStop(.68, 'rgba(0,0,0,0)');
       X.save(); X.beginPath(); X.arc(screen.x, screen.y, radius, 0, Math.PI * 2); X.clip(); X.fillStyle = night; X.fillRect(screen.x - radius, screen.y - radius, radius * 2, radius * 2); X.restore();
     }
+    // Thin surface border for solid-surface bodies: exactly one physical radius
+    // in screen space, coincident with the collision / landing radius. Gas
+    // bodies get no border.
+    if (physical && physical.solidSurface && surfacePx >= 6) {
+      X.save();
+      X.strokeStyle = 'rgba(180,220,255,0.5)';
+      X.lineWidth = 1;
+      X.beginPath();
+      X.arc(screen.x, screen.y, surfacePx, 0, Math.PI * 2);
+      X.stroke();
+      X.restore();
+    }
     if (radius > 12 || sel?.id === body.id) { X.fillStyle = '#e8f8ff'; X.font = '10px sans-serif'; X.fillText(body.name, screen.x + radius + 5, screen.y - 4); }
   }
   function marker(world, label, colour) { const p = ws(world); X.fillStyle = colour; X.beginPath(); X.arc(p.x, p.y, 4, 0, Math.PI * 2); X.fill(); X.fillStyle = '#e7f9ff'; X.font = '9px sans-serif'; X.fillText(label, p.x + 7, p.y - 7); }
+  // Sphere-of-influence envelope for every body: a green rim with a faint
+  // green fill. Radius is the physical Hill sphere (a(1-e)·(m/3M)^(1/3)), so
+  // the rim marks where the body's gravity actually dominates its primary's.
+  // Cross the rim on a trajectory and the patched-conic prediction switches
+  // to the full N-body dotted path (see trajectory()).
+  function drawSoiCircles() {
+    if (!D || !P) return;
+    X.save();
+    for (const body of D.bodies) {
+      if (body.id === 'sun') continue;
+      const point = S[body.id];
+      const physical = P.bodies[body.id];
+      if (!point || !physical) continue;
+      const soi = ExolineNav.soiRadius(body.id);
+      if (!finite(soi) || soi <= physical.radius_m) continue;
+      const screen = ws(point), radiusPx = soi * cam.k;
+      if (radiusPx < 4) continue;                                        // smaller than the body dot
+      if (radiusPx > 3 * Math.max(innerWidth, innerHeight)) continue;    // far off-screen
+      X.beginPath(); X.arc(screen.x, screen.y, radiusPx, 0, Math.PI * 2);
+      X.fillStyle = 'rgba(74,222,128,.055)';
+      X.fill();
+      X.lineWidth = 1;
+      X.strokeStyle = 'rgba(74,222,128,.42)';
+      X.stroke();
+    }
+    X.restore();
+  }
   function drawHyperbolicArc(id, r, v, R, mu, h, e, p, ex, physical) {
     // Analytic hyperbola branch in the PLANET frame: craft -> SOI exit (or
     // screen edge for the sun). Exact 2-body math, stable at every warp.
@@ -122,6 +175,54 @@
       // Degenerate (near-parabolic): straight asymptote ray, planet-relative.
       const speed = Math.hypot(v.x, v.y) || 1;
       const a = ws(F.s.r), b = ws({ x: F.s.r.x + v.x / speed * span, y: F.s.r.y + v.y / speed * span });
+      X.moveTo(a.x, a.y); X.lineTo(b.x, b.y);
+    }
+    X.stroke(); X.setLineDash([]); X.restore();
+    const peri = p / (1 + e);
+    marker({ x: origin.x + peri * ex.x, y: origin.y + peri * ex.y }, `PE ${altitude(peri - physical.radius_m)}`, '#77edff');
+    if (ok && soi && finite(soi) && soi > R) {
+      const th = nu + dir * travel;
+      marker({ x: origin.x + exitR * (Math.cos(th) * ex.x + Math.sin(th) * perp.x), y: origin.y + exitR * (Math.cos(th) * ex.y + Math.sin(th) * perp.y) }, 'SOI EXIT', '#ffcf9c');
+    } else if (ok) {
+      const th = nu + dir * travel;
+      const end = ws({ x: origin.x + exitR * (Math.cos(th) * ex.x + Math.sin(th) * perp.x), y: origin.y + exitR * (Math.cos(th) * ex.y + Math.sin(th) * perp.y) });
+      X.fillStyle = '#ffcf9c'; X.font = '9px sans-serif'; X.fillText('ESCAPE', end.x - 42, end.y - 8);
+    }
+  }
+  // Plan-version of drawHyperbolicArc: draws the hyperbolic escape arc for a
+  // planned maneuver node, using the plan's final state and the live body pos.
+  function drawHyperbolicArcPlan(refId, rRel, vRel, R, mu, h, e, p, physical, origin, plan) {
+    // Compute eccentricity vector from state
+    const rv = rRel.x * vRel.x + rRel.y * vRel.y;
+    const V2 = vRel.x * vRel.x + vRel.y * vRel.y;
+    const ev = { x: (((V2 - mu / R) * rRel.x - rv * vRel.x) / mu), y: (((V2 - mu / R) * rRel.y - rv * vRel.y) / mu) };
+    const ex = e > 1e-6 ? { x: ev.x / e, y: ev.y / e } : { x: rRel.x / R, y: rRel.y / R };
+    const dir = h >= 0 ? 1 : -1, perp = { x: -ex.y, y: ex.x };
+    const nu = Math.atan2(rRel.x * perp.x + rRel.y * perp.y, rRel.x * ex.x + rRel.y * ex.y);
+    const soi = ExolineNav.soiRadius(refId);
+    const span = Math.hypot(innerWidth, innerHeight) * 1.25 / cam.k;
+    const exitR = (soi && finite(soi) && soi > R) ? soi : R + span;
+    const cosExit = (p / exitR - 1) / Math.max(e, 1e-9);
+    const fwd = (a, b) => { let d = dir > 0 ? b - a : a - b; while (d < 0) d += Math.PI * 2; return d; };
+    let travel = Infinity, ok = Math.abs(cosExit) <= 1;
+    if (ok) {
+      for (const c of [Math.acos(Math.max(-1, Math.min(1, cosExit))), -Math.acos(Math.max(-1, Math.min(1, cosExit)))]) {
+        const d = fwd(nu, c);
+        if (d > 1e-6 && d < travel) travel = d;
+      }
+      if (!finite(travel)) ok = false;
+    }
+    X.save(); X.setLineDash([7, 6]); X.strokeStyle = 'rgba(255,192,115,.92)'; X.lineWidth = 1.5; X.beginPath();
+    if (ok) {
+      const NH = smoothCount(travel * (R + exitR) / 2, 48, 512);
+      for (let i = 0; i <= NH; i++) {
+        const th = nu + dir * travel * i / NH, rad = p / (1 + e * Math.cos(th));
+        const pt = ws({ x: origin.x + rad * (Math.cos(th) * ex.x + Math.sin(th) * perp.x), y: origin.y + rad * (Math.cos(th) * ex.y + Math.sin(th) * perp.y) });
+        i ? X.lineTo(pt.x, pt.y) : X.moveTo(pt.x, pt.y);
+      }
+    } else {
+      const speed = Math.hypot(vRel.x, vRel.y) || 1;
+      const a = ws({ x: origin.x + rRel.x, y: origin.y + rRel.y }), b = ws({ x: origin.x + rRel.x + vRel.x / speed * span, y: origin.y + rRel.y + vRel.y / speed * span });
       X.moveTo(a.x, a.y); X.lineTo(b.x, b.y);
     }
     X.stroke(); X.setLineDash([]); X.restore();
@@ -212,10 +313,17 @@
     const atmosphere = ExolineFlight.atmospheres?.[id];
     const inAtmosphere = atmosphere && R - physical.radius_m < atmosphere.top;
     const numerical = navSnap?.heavy?.base;
-    // Do not substitute a vacuum ellipse/straight line for a drag or escape
-    // prediction.  The sampled curve also remains selectable for ADD NODE.
-    // Skipped on-rails: a clean coast arc can never impact or drag by construction.
-    if (!frozen && numerical && (numerical.impact || eF >= 1 || inAtmosphere)) {
+    // A closed osculating conic is only valid INSIDE the SOI: once the
+    // apoapsis crosses the Hill radius, the primary's gravity dominates and
+    // the full N-body dotted path takes over (patched-conic boundary), so
+    // the trajectory stays physical past the green rim.
+    const refSoi = (id && id !== 'sun') ? ExolineNav.soiRadius(id) : null;
+    const crossesSoi = !!(refSoi && finite(refSoi) && apoF > refSoi);
+    // Do not substitute a vacuum ellipse/straight line for a drag, escape, or
+    // SOI-crossing prediction.  The sampled curve also remains selectable for
+    // ADD NODE.  Skipped on-rails: a clean coast arc can never impact, drag,
+    // or exceed the SOI it was validated against when it was captured.
+    if (numerical && (numerical.impact || eF >= 1 || inAtmosphere || crossesSoi) && (!frozen || crossesSoi)) {
       if (drawNumericalCoast(numerical, id)) {
         marker({ x: F.s.r.x, y: F.s.r.y }, 'CURRENT', '#ffbd76');
         return;
@@ -286,7 +394,18 @@
     marker(apoPoint, `AP ${altitude(apoF - physical.radius_m)}`, '#ffbd76');
   }
   function craft() { if (!F) return; const p = ws(F.s.r); X.save(); X.translate(p.x, p.y); X.rotate(-F.s.heading + Math.PI / 2); X.fillStyle = '#f8fdff'; X.strokeStyle = '#0b3040'; X.lineWidth = 2; X.beginPath(); X.moveTo(0, -15); X.lineTo(11, 11); X.lineTo(-11, 11); X.closePath(); X.fill(); X.stroke(); X.fillStyle = '#53ddff'; X.beginPath(); X.moveTo(0, -8); X.lineTo(3, 3); X.lineTo(-3, 3); X.closePath(); X.fill(); X.restore(); }
-  function hud() { $('flightHud').classList.toggle('hidden', !craftSelected); if (!craftSelected || !F) return; const d = F.diagnostics(S, sel?.id), name = D.bodies.find(b => b.id === d.body)?.name || 'Sun', radius = P.bodies[d.body]?.radius_m || 0; const fr = F.coast && F.coast.body === d.body ? F.coast : null, ecc = fr ? fr.e : d.e, apo = fr ? (fr.e < 1 ? fr.a * (1 + fr.e) : Infinity) : d.apo, peri = fr ? fr.a * (1 - fr.e) : d.peri; $('hudSoi').textContent = name.toUpperCase(); $('hudAlt').textContent = d.alt < 10000 ? `${Math.round(d.alt)} m` : `${(d.alt / 1000).toFixed(1)} km`; $('hudVel').textContent = d.speed < 1000 ? `${d.speed.toFixed(1)} m/s` : `${Math.round(d.speed).toLocaleString('en-US')} m/s`; $('hudApo').textContent = altitude(apo - radius); $('hudPeri').textContent = altitude(peri - radius); $('hudEcc').textContent = ecc.toFixed(4); $('hudDistance').textContent = altitude(d.target); $('launchBtn').textContent = F.s.throttle > 0 ? 'CUTOFF' : 'IGNITION'; updateBurnReadout(); }
+  function hud() { $('flightHud').classList.toggle('hidden', !craftSelected); if (!craftSelected || !F) return; const d = F.diagnostics(S, sel?.id), name = D.bodies.find(b => b.id === d.body)?.name || 'Sun', radius = P.bodies[d.body]?.radius_m || 0; const fr = F.coast && F.coast.body === d.body ? F.coast : null, ecc = fr ? fr.e : d.e, apo = fr ? (fr.e < 1 ? fr.a * (1 + fr.e) : Infinity) : d.apo, peri = fr ? fr.a * (1 - fr.e) : d.peri; $('hudSoi').textContent = name.toUpperCase(); $('hudAlt').textContent = d.alt < 10000 ? `${Math.round(d.alt)} m` : `${(d.alt / 1000).toFixed(1)} km`; $('hudVel').textContent = d.speed < 1000 ? `${d.speed.toFixed(1)} m/s` : `${Math.round(d.speed).toLocaleString('en-US')} m/s`; $('hudApo').textContent = altitude(apo - radius); $('hudPeri').textContent = altitude(peri - radius); $('hudEcc').textContent = ecc.toFixed(4); $('hudDistance').textContent = altitude(d.target); $('launchBtn').textContent = F.s.throttle > 0 ? 'CUTOFF' : 'IGNITION'; updateBurnReadout();
+
+    // Reentry HUD
+    const rs = F.reentryState;
+    if (rs.bodyId && rs.phase !== 'EXO') {
+      const bodyName = D.bodies.find(b => b.id === rs.bodyId)?.name || rs.bodyId;
+      $('hudReentry').textContent = `${bodyName} ${rs.phase}  q=${(rs.q || 0).toFixed(1)}  g=${rs.gLoad.toFixed(2)}  alt=${altitude(rs.alt)}`;
+      $('hudReentry').classList.remove('hidden');
+    } else {
+      $('hudReentry').classList.add('hidden');
+    }
+}
   // Burn progress lives in the HUD (always visible with the craft selected) so
   // a collapsed navigation panel can never hide the auto-burn progress.
   function updateBurnReadout() {
@@ -408,28 +527,120 @@
     const isSunPlan = !refId || refId === 'sun';
     if (isSunPlan) {
       if (predictedOrbit) drawLegPath(predictedOrbit.records, zero, '#78e5ff', 1.8, true);
-    } else if (origin && plan.relRecords) {
-      if (plan.impact) {
-        drawPlanetPlan(plan.relRecords, origin, '#ff7373', true);
-        if (plan.relImpact) marker({ x: origin.x + plan.relImpact.x, y: origin.y + plan.relImpact.y }, 'IMPACT', '#ff7373');
-      } else if (plan.local && plan.local.refId === refId) {
-        drawFrozenPlannedOrbit(plan.local, origin);
-      } else if (plan.relRecords && plan.relRecords.length >= 2) {
-        // Escape / hyperbolic post-burn path wrt the planet.
-        drawPlanetPlan(plan.relRecords, origin, '#ffc96d', true);
-        const end = plan.relRecords[plan.relRecords.length - 1];
-        X.fillStyle = '#ffcf9c'; X.font = '9px sans-serif';
-        const label = ws({ x: origin.x + end.x, y: origin.y + end.y });
-        X.fillText('ESCAPE', label.x + 7, label.y - 7);
+    } else {
+      // Draw patched conic segments if available, otherwise fall back to old logic
+      if (plan.patchedSegments && plan.patchedSegments.length) {
+        // Draw each patched segment in its own reference frame
+        for (let si = 0; si < plan.patchedSegments.length; si++) {
+          const seg = plan.patchedSegments[si];
+          const segRefId = seg.dominantBody || seg.refId || refId;
+          const segOrigin = S[segRefId];
+          const physical = P.bodies[segRefId];
+          if (!segOrigin || !physical) continue;
+          const soiRadius = ExolineNav.soiRadius(segRefId);
+          // Draw SOI circle for this segment's reference body
+          if (soiRadius && finite(soiRadius) && soiRadius > physical.radius_m) {
+            const rpx = soiRadius * cam.k;
+            if (rpx > 4 && rpx < 3 * Math.max(innerWidth, innerHeight)) {
+              X.save(); X.strokeStyle = 'rgba(74,222,128,.28)'; X.lineWidth = 1; X.setLineDash([5, 6]);
+              X.beginPath(); X.arc(segOrigin.x, segOrigin.y, rpx, 0, Math.PI * 2); X.stroke(); X.restore();
+            }
+          }
+          // Draw this segment's records
+          const segRelRecords = plan.relRecords ? plan.relRecords.filter(r => r.segIndex === si) : [];
+          if (seg.impact) {
+            drawPlanetPlan(segRelRecords, segOrigin, '#ff7373', true);
+            const impactRec = plan.relImpact && plan.relImpact.segIndex === si ? plan.relImpact : null;
+            if (impactRec) marker({ x: segOrigin.x + impactRec.x, y: segOrigin.y + impactRec.y }, 'IMPACT', '#ff7373');
+          } else if (plan.local && plan.local.refId === segRefId && si === 0) {
+            // Only draw the frozen local orbit for the first segment (initial body)
+            drawFrozenPlannedOrbit(plan.local, segOrigin);
+          } else if (segRelRecords.length >= 2) {
+            // Check if this is an escape trajectory (hyperbolic)
+            const lastRec = seg.records[seg.records.length - 1];
+            if (lastRec) {
+              const rRel = { x: lastRec.r.x - segOrigin.x, y: lastRec.r.y - segOrigin.y };
+              const vRel = { x: lastRec.v.x - (S[segRefId]?.vx || 0), y: lastRec.v.y - (S[segRefId]?.vy || 0) };
+              const R = Math.hypot(rRel.x, rRel.y);
+              const mu = P.G * physical.mass;
+              const h = rRel.x * vRel.y - rRel.y * vRel.x;
+              const V2 = vRel.x * vRel.x + vRel.y * vRel.y;
+              const rv = rRel.x * vRel.x + rRel.y * vRel.y;
+              const ev = { x: (((V2 - mu / R) * rRel.x - rv * vRel.x) / mu), y: (((V2 - mu / R) * rRel.y - rv * vRel.y) / mu) };
+              const e = Math.hypot(ev.x, ev.y);
+              const p = h * h / mu;
+              if (finite(e) && finite(p) && e > 1 - 1e-6) {
+                drawHyperbolicArcPlan(segRefId, rRel, vRel, R, mu, h, e, p, physical, segOrigin, plan);
+              } else {
+                drawPlanetPlan(segRelRecords, segOrigin, '#ffc96d', true);
+                const end = segRelRecords[segRelRecords.length - 1];
+                if (end) {
+                  X.fillStyle = '#ffcf9c'; X.font = '9px sans-serif';
+                  const label = ws({ x: segOrigin.x + end.x, y: segOrigin.y + end.y });
+                  X.fillText('ESCAPE', label.x + 7, label.y - 7);
+                }
+              }
+            } else {
+              drawPlanetPlan(segRelRecords, segOrigin, '#ffc96d', true);
+            }
+          }
+          // Draw SOI exit marker if this segment crosses into another body's SOI
+          if (seg.soiCrossing) {
+            const cross = seg.soiCrossing;
+            const crossRec = seg.records.find(r => Math.abs(r.t - cross.crossTime) < 1);
+            if (crossRec) {
+              const crossPos = ws({ x: crossRec.r.x, y: crossRec.r.y });
+              X.fillStyle = '#ffcf9c'; X.font = '9px sans-serif';
+              X.fillText(`SOI → ${cross.toBody.toUpperCase()}`, crossPos.x + 7, crossPos.y - 7);
+            }
+          }
+        }
+      } else if (origin && plan.relRecords) {
+        // Legacy single-body fallback
+        const physical = P.bodies[refId];
+        const soiRadius = physical ? ExolineNav.soiRadius(refId) : null;
+        if (soiRadius && finite(soiRadius) && soiRadius > physical.radius_m) {
+          const rpx = soiRadius * cam.k;
+          if (rpx > 4 && rpx < 3 * Math.max(innerWidth, innerHeight)) {
+            X.save(); X.strokeStyle = 'rgba(74,222,128,.28)'; X.lineWidth = 1; X.setLineDash([5, 6]);
+            X.beginPath(); X.arc(origin.x, origin.y, rpx, 0, Math.PI * 2); X.stroke(); X.restore();
+          }
+        }
+        if (plan.impact) {
+          drawPlanetPlan(plan.relRecords, origin, '#ff7373', true);
+          if (plan.relImpact) marker({ x: origin.x + plan.relImpact.x, y: origin.y + plan.relImpact.y }, 'IMPACT', '#ff7373');
+        } else if (plan.local && plan.local.refId === refId) {
+          drawFrozenPlannedOrbit(plan.local, origin);
+        } else if (plan.relRecords && plan.relRecords.length >= 2) {
+          const lastSeg = plan.segments[plan.segments.length - 1];
+          const endState = lastSeg.endState;
+          const rRel = { x: endState.r.x - origin.x, y: endState.r.y - origin.y };
+          const vRel = { x: endState.v.x - (S[refId]?.vx || 0), y: endState.v.y - (S[refId]?.vy || 0) };
+          const R = Math.hypot(rRel.x, rRel.y);
+          const mu = P.G * physical.mass;
+          const h = rRel.x * vRel.y - rRel.y * vRel.x;
+          const V2 = vRel.x * vRel.x + vRel.y * vRel.y;
+          const energy = V2 / 2 - mu / R;
+          const rv = rRel.x * vRel.x + rRel.y * vRel.y;
+          const ev = { x: (((V2 - mu / R) * rRel.x - rv * vRel.x) / mu), y: (((V2 - mu / R) * rRel.y - rv * vRel.y) / mu) };
+          const e = Math.hypot(ev.x, ev.y);
+          const p = h * h / mu;
+          if (finite(e) && finite(p) && e > 1 - 1e-6) {
+            drawHyperbolicArcPlan(refId, rRel, vRel, R, mu, h, e, p, physical, origin, plan);
+          } else {
+            drawPlanetPlan(plan.relRecords, origin, '#ffc96d', true);
+            const end = plan.relRecords[plan.relRecords.length - 1];
+            X.fillStyle = '#ffcf9c'; X.font = '9px sans-serif';
+            const label = ws({ x: origin.x + end.x, y: origin.y + end.y });
+            X.fillText('ESCAPE', label.x + 7, label.y - 7);
+          }
+        }
+        if (plan.relApproach && !plan.impact) approachMarker({ point: { x: origin.x + plan.relApproach.x, y: origin.y + plan.relApproach.y }, distance: plan.approach ? plan.approach.distance : 0 }, zero);
+        else if (plan.approach && plan.approach.point && !plan.approach.atHorizon) approachMarker(plan.approach, zero);
       }
-      if (plan.relApproach && !plan.impact) approachMarker({ point: { x: origin.x + plan.relApproach.x, y: origin.y + plan.relApproach.y }, distance: plan.approach ? plan.approach.distance : 0 }, zero);
-      else if (plan.approach && plan.approach.point && !plan.approach.atHorizon) approachMarker(plan.approach, zero);
     }
     const liveTimes = new Map((navSnap.nodes || []).map(n => [n.id, n.t]));
     for (const mark of heavy.plan.marks) {
-      // Burn point in the PLANET frame (live body position + frozen offset) so
-      // the marker sits exactly on the blue orbit. Label countdown stays live
-      // via the snapshot (plan itself is not rebuilt).
       if (liveTimes.has(mark.node.id)) mark.node.t = liveTimes.get(mark.node.id);
       const markOrigin = (mark.refId && S[mark.refId]) || (plan.refId && S[plan.refId]) || null;
       const markPos = (mark.rel && markOrigin) ? { x: markOrigin.x + mark.rel.x, y: markOrigin.y + mark.rel.y } : (mark.point || null);
@@ -549,7 +760,7 @@
     setTimeout(() => ExolineNav.setEditing(false), 500);
   }
   const angleDelta = (from, to) => Math.atan2(Math.sin(to - from), Math.cos(to - from));
-function startAutoBurn() {
+  function startAutoBurn() {
     const node = ExolineNav.getNodes().find(n => n.id === activeNodeId) || ExolineNav.getNodes()[0];
     if (!node) { showToast('AUTO BURN · NO NODE'); return; }
     if (Math.abs(node.normalDv) > .01) { showToast('AUTO BURN · NORMAL Δv NEEDS 3D RCS'); return; }
@@ -560,12 +771,17 @@ function startAutoBurn() {
     // the burn progress bar entirely for the whole maneuver.
     $('navPanel').classList.remove('hidden', 'collapsed');
     $('navNode').classList.remove('hidden');
-    // Center the finite burn on the node epoch (KSP style): start half a burn early
-    // so the impulsive prediction stays accurate.
+    // Center the finite burn on the node epoch (KSP style): start half a burn
+    // early so the impulsive prediction stays accurate.
     const mdot = F.thrust / (F.specificImpulse * 9.80665);
     const burnTime = mdot > 0 ? needed / mdot : 0;
     const epoch = node.epoch || (+date + node.t * 1000);
-    autoBurn = { nodeId: node.id, nodeTime: node.t, fireAt: epoch - burnTime * 500, delivered: 0, phase: 'COAST', initialMass: 0, estBurn: burnTime, burnSimStart: 0, appliedRate: 0 };
+    autoBurn = { nodeId: node.id, nodeTime: node.t, fireAt: epoch - burnTime * 0.5, delivered: 0, phase: 'COAST', initialMass: 0, estBurn: burnTime, burnSimStart: 0, appliedRate: 0, alignWindow: Math.max(90, Math.min(900, burnTime * 4)) };
+    // Cut the engine for the coast-to-node phase. Without this a throttle left
+    // on before arming keeps firing (prograde-locked) all the way to the node,
+    // which silently destroys the planned burn vector and looks like the craft
+    // "accelerating on its own". The burn window re-commands the throttle.
+    setThrottle(0, true);
     $('throttle').disabled = true; $('launchBtn').disabled = true;
     // Warp is KEPT while coasting to the node (so you can time-warp toward the
     // burn instead of idling at 1x). It drops to 1x only when the align window
@@ -580,29 +796,37 @@ function startAutoBurn() {
     if (!autoBurn) return;
     const node = ExolineNav.getNodes().find(n => n.id === autoBurn.nodeId);
     if (!node || F.s.crashed || (!F.infiniteFuel && F.s.propellant <= 0)) { cancelAutoBurn('AUTO BURN ABORTED'); return; }
-    if (autoBurn.phase === 'COAST' && +date >= autoBurn.fireAt - 15000) { autoBurn.phase = 'ALIGN'; if (warpIndex !== 0) setWarp(0); }
+    // Enter the align window a few burn-times before fireAt and drop to 1x —
+    // a multi-second burn cannot be resolved at high warp.
+    if (autoBurn.phase === 'COAST' && +date >= autoBurn.fireAt - (autoBurn.alignWindow || 15000)) { autoBurn.phase = 'ALIGN'; if (warpIndex !== 0) setWarp(0); }
     if (autoBurn.phase !== 'ALIGN' && autoBurn.phase !== 'BURN') return;
     // No forced 1x here: warp is only dropped when entering ALIGN above.
-    // Steer along the FROZEN inertial burn vector solved at node edit time:
-    // zero per-frame propagation, zero jitter.
     const burn = ExolineNav.calculateBurn(node);
     if (!burn || burn.total <= 0) { cancelAutoBurn('AUTO BURN · BAD Δv'); return; }
-    const frozen = node.dv_vec && (node.dv_vec.x || node.dv_vec.y) ? node.dv_vec : null;
-    let dv;
-    if (frozen) {
-      dv = { x: frozen.x, y: frozen.y };
-    } else {
-      const exec = ExolineNav.prepareExecution();
-      if (!exec.ok || !exec.frame) { cancelAutoBurn('AUTO BURN · ' + exec.reason); return; }
-      const frame = exec.frame;
-      dv = { x: frame.prograde.x * burn.prograde + frame.radial.x * burn.radial, y: frame.prograde.y * burn.prograde + frame.radial.y * burn.radial };
-    }
+    // Steer along the craft's LIVE local frame: the burn fires while the craft
+    // is sitting AT the node (inside the align window), so the live
+    // prograde/radial basis is exact. The frozen/predicted vector is only
+    // trustworthy when the pre-node coast was solved over its full length, but
+    // the step-budgeted preview cannot reach a node days away — its frame mixes
+    // epochs (craft state clipped to the step budget, reference body sampled at
+    // the true node epoch), which points the burn the wrong way and decays the
+    // craft into the planet instead of transferring to the target.
+    const frame = ExolineNav.getVelocityFrame(F.s, node.referenceBody, 0);
+    if (!frame) { cancelAutoBurn('AUTO BURN · BAD FRAME'); return; }
+    const dv = {
+      x: frame.prograde.x * burn.prograde + frame.radial.x * burn.radial,
+      y: frame.prograde.y * burn.prograde + frame.radial.y * burn.radial
+    };
     if (Math.hypot(dv.x, dv.y) < 1e-9) { cancelAutoBurn('AUTO BURN · BAD Δv'); return; }
-    // PD pitch: proportional rate with a hard cap — slews fast, settles clean.
+    // Rate-limited slew that can NEVER overshoot: the applied rotation is
+    // clamped to the remaining angle itself, so the heading error is
+    // monotonically non-increasing at every time step. (The previous
+    // proportional form multiplied the error by -3 per call and diverged at
+    // high warp, which spun the craft and broke the burn.)
     const targetHeading = Math.atan2(dv.y, dv.x);
     const error = angleDelta(F.s.heading, targetHeading);
     const maxRate = 2.5 * Math.max(0, physicsSeconds);
-    F.s.heading += Math.abs(error) < 1e-9 ? 0 : Math.sign(error) * Math.min(Math.abs(error) * 4, maxRate);
+    F.s.heading += Math.abs(error) < 1e-9 ? 0 : Math.sign(error) * Math.min(Math.abs(error), maxRate);
     // Watchdog: sim-time cap so a burn can never run forever.
     if (autoBurn.phase === 'BURN') {
       if (!autoBurn.burnSimStart) autoBurn.burnSimStart = +date;
@@ -611,14 +835,17 @@ function startAutoBurn() {
     if (Math.abs(error) > .035 || +date < autoBurn.fireAt) { autoBurn.appliedRate = 0; setThrottle(0, true); return; }
     autoBurn.phase = 'BURN';
     if (!autoBurn.burnSimStart) autoBurn.burnSimStart = +date;
-    // Throttle control: full thrust when far, ease off to land exactly on Δv.
-    // In BURN with a big pointing error, hold thrust until re-aligned.
+    // Throttle control: full thrust when far, then taper so the Δv lands
+    // exactly at the planned value within one chunk. The taper is scaled by
+    // the chunk length, so a large warp step cannot overshoot the burn.
     const remaining = Math.max(0, node.totalDv - (autoBurn.delivered || 0));
     const accel = F.thrust / Math.max(F.s.m, 1);
     let thr;
     if (Math.abs(error) > .12) thr = 0;
-    else if (remaining > accel * 1.0) thr = 100;
-    else thr = Math.max(8, Math.min(100, remaining / Math.max(accel * 0.5, 1e-9) * 100));
+    else {
+      const burnSeconds = remaining / Math.max(accel, 1e-9);
+      thr = burnSeconds >= physicsSeconds ? 100 : Math.max(5, Math.min(100, burnSeconds / Math.max(physicsSeconds, 1e-9) * 100));
+    }
     autoBurn.appliedRate = F.thrust * (thr / 100) / Math.max(F.s.m, 1);
     setThrottle(thr, true);
   }
@@ -631,13 +858,33 @@ function startAutoBurn() {
     const rate = autoBurn.appliedRate || 0;
     if (rate > 0 && physicsSeconds > 0) autoBurn.delivered = (autoBurn.delivered || 0) + rate * physicsSeconds;
     autoBurn.appliedRate = 0;
-    const tol = Math.max(0.05, rate * physicsSeconds * 0.5);
+    // Tight commit tolerance: the burn must land ON the planned Δv. An escape-
+    // class transfer (e.g. TLI) is hypersensitive near the parabolic energy, so
+    // even a ~1% early cutoff (tens of m/s) throws the apoapsis ~100,000 km
+    // short of the target and the craft never reaches it.
+    // Near-parabolic transfers magnify a Δv error by ~3,700 km per m/s, so the
+    // commit tolerance has to be a small fraction of a m/s: the old 2%-of-chunk
+    // window let the burn stop ~1.1 m/s early, which is ~4,000 km of apogee and
+    // tens of thousands of km of encounter error.
+    const tol = Math.max(0.01, rate * physicsSeconds * 0.002);
     if (autoBurn.delivered + tol < node.totalDv) return;
     const id = autoBurn.nodeId;
     setThrottle(0, true); nodeAnchors.delete(id); ExolineNav.commitExecution(id); ExolineNav.invalidate();
     autoBurn = null; $('throttle').disabled = false; $('launchBtn').disabled = false; $('navExecute').textContent = 'AUTO BURN';
     if (!ExolineNav.getNodes().length) $('navNode').classList.add('hidden');
     showToast(`AUTO BURN COMPLETE · Δv ${ExolineNav.fmtDv(node.totalDv)}`);
+    // Chain the maneuver sequence. A transfer is a DEPARTURE plus a CAPTURE —
+    // two nodes — but only the node that was armed ever fired, so the capture
+    // burn never executed and the craft sailed straight past the Moon, which
+    // reads as "bouncing off" its sphere of influence. Hand off to the next
+    // remaining node so the whole plan runs to completion on its own.
+    const next = ExolineNav.getNodes().slice().sort((a, b) => (a.epoch || 0) - (b.epoch || 0)).find(n => n.totalDv > .01);
+    if (next) {
+      activeNodeId = next.id;
+      $('navNode').classList.remove('hidden');
+      $('navPanel').classList.remove('hidden', 'collapsed');
+      setTimeout(() => startAutoBurn(), 0);
+    }
   }
   function updateWarp() { const button = $('warpBtn'); button.innerHTML = `${running ? pauseIcon : playIcon}<span>${running ? warpText(WARP[warpIndex]) : ''}</span>`; button.classList.toggle('is-paused', !running); button.setAttribute('aria-label', running ? `Pause at ${warpText(WARP[warpIndex])}` : 'Resume simulation'); }
   function setWarp(index) { warpIndex = Math.max(0, Math.min(WARP.length - 1, index)); simulationBacklog = 0; updateWarp(); }
@@ -698,6 +945,7 @@ function startAutoBurn() {
     X.fillRect(0, 0, innerWidth, innerHeight);
     for (let i = 0; i < 140; i++) { X.fillStyle = 'rgba(190,230,250,.25)'; X.fillRect((i * 197) % innerWidth, (i * 89) % innerHeight, 1, 1); }
     if (!D) return;
+    drawSoiCircles();
     D.bodies.forEach(b => orbit(b.id));
     body({ id: 'sun', name: 'Sun', orbital_asset: D.sun.asset }, S.sun);
     D.bodies.forEach(b => body(b, S[b.id]));
@@ -709,46 +957,11 @@ function startAutoBurn() {
     hud();
     navUi();
     vehicleReadout();
-    drawBurnProgress();
     $('simDate').textContent = date.toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
     updateWarp();
     if (window.ExolinePhysicsAgent && window.ExolinePhysicsAgent.drawDebugOverlay) {
       window.ExolinePhysicsAgent.drawDebugOverlay(X);
     }
-  }
-  // Burn progress drawn ON THE CANVAS. Cannot be hidden by DOM/CSS state, so
-  // auto-burn progress is always visible while a burn is armed.
-  function burnProgressState() {
-    if (!autoBurn) return null;
-    const node = ExolineNav.getNodes().find(n => n.id === autoBurn.nodeId) || null;
-    if (!node) return null;
-    const total = node.totalDv || 0, done = Math.min(autoBurn.delivered || 0, total);
-    const pct = total > 0 ? Math.max(0, Math.min(100, done / total * 100)) : 0;
-    const accel = F ? F.thrust / Math.max(F.s.m, 1) : 0;
-    return { phase: autoBurn.phase, pct, total, done, accel, fireAt: autoBurn.fireAt };
-  }
-  function drawBurnProgress() {
-    const st = burnProgressState();
-    if (!st) return;
-    // Top-centre, directly below the SOI/date strip.
-    const w = Math.min(400, innerWidth * 0.62);
-    const x = Math.round(innerWidth / 2 - w / 2), y = 64;
-    X.save();
-    X.fillStyle = 'rgba(120,180,200,.22)';
-    X.fillRect(x, y, w, 5);
-    X.fillStyle = '#78e5ff';
-    X.fillRect(x, y, w * st.pct / 100, 5);
-    // Text is suppressed while the engine is actually burning: the bar alone
-    // conveys progress, and the HUD throttle/velocity already read live state.
-    if (st.phase === 'BURN') { X.restore(); return; }
-    X.font = '700 11px sans-serif';
-    X.fillStyle = '#e8f8ff';
-    X.textBaseline = 'top';
-    const txt = st.phase === 'ALIGN'
-      ? `ALIGNING · T−${ExolineNav.fmtDur(Math.max(0, (st.fireAt - +date) / 1000))}`
-      : `COASTING TO NODE · BURN IN ${ExolineNav.fmtDur(Math.max(0, (st.fireAt - +date) / 1000))}`;
-    X.fillText(txt, x, y + 9);
-    X.restore();
   }
   function inspect(body) { sel = body; craftSelected = false; lock = 'body'; $('detailPanel').classList.remove('hidden'); $('detailName').textContent = body.name; $('detailKicker').textContent = 'CELESTIAL BODY'; $('detailSub').textContent = body.parent ? `MOON OF ${body.parent.toUpperCase()}` : 'SOL SYSTEM'; $('detailType').textContent = body.type; $('detailOrbit').textContent = body.kind === 'major_moon' ? 'LOCAL ORBIT' : 'HELIOCENTRIC'; $('detailPeriod').textContent = 'LIVE STATE'; $('detailSeed').textContent = body.seed || '—'; $('detailNote').textContent = 'Orbital position and rendered orbit use the same propagated Keplerian state.'; if (minerals) { const data = minerals[body.name]; const box = $('minerals'); if (!data) { box.textContent = 'No mineral profile defined for this body.'; return; } box.textContent = ''; for (const [name, frac] of Object.entries(data).sort((a, b) => b[1] - a[1])) { const row = document.createElement('div'); row.className = 'mineral-row'; const pct = (frac * 100).toFixed(1); row.innerHTML = `<span class="name">${name}</span><span class="value">${pct}%</span><div class="mineral-bar"><i style="width:${pct}%"></i></div>`; box.appendChild(row); } } cam.o = { x: S[body.id].x, y: S[body.id].y }; cam.k = Math.max(cam.k, 24 / P.bodies[body.id].radius_m); }
   function pick(x, y) { let chosen, best = Infinity; for (const body of D.bodies) { const p = ws(S[body.id]), anchor = A[body.id] || A.default || {}, r = Math.max(9, radiusOf(body) * (anchor.disk_scale || .848)), score = Math.hypot(p.x - x, p.y - y) / r; if (score <= 1 && score < best) { chosen = body; best = score; } } return chosen; }
@@ -756,7 +969,42 @@ function startAutoBurn() {
   function closeMission() { $('missionScreen').classList.add('hidden'); $('app').classList.remove('mission-active'); }
   function renderChangelog(markdown) { const target = $('changelogContent'); target.replaceChildren(); let list; for (const line of markdown.split(/\r?\n/)) { if (line.startsWith('### ')) { list = null; const heading = document.createElement('h2'); heading.textContent = line.slice(4); target.append(heading); } else if (line.startsWith('- ')) { if (!list) { list = document.createElement('ul'); target.append(list); } const item = document.createElement('li'); item.textContent = line.slice(2); list.append(item); } else if (line.trim()) { list = null; const paragraph = document.createElement('p'); paragraph.textContent = line.replace(/^# /, ''); target.append(paragraph); } else list = null; } }
   function controls() {
-    $('exploreSolBtn').onclick = closeMission; $('continueMissionBtn').onclick = closeMission; $('missionEnter').onclick = closeMission; $('newCampaignBtn').onclick = () => { F.launch('earth', S); nodeAnchors.clear(); ExolineNav.onReset(); ExolineNav.invalidate(); cam.o = { x: F.s.r.x, y: F.s.r.y }; closeMission(); };
+    $('exploreSolBtn').onclick = closeMission; $('continueMissionBtn').onclick = closeMission;
+    // ENTER sits directly under the initial-orbit selector, so it must honour
+    // it: if the chosen body differs from the current one, launch there; if it
+    // matches, just resume. (Previously ENTER only closed the menu, so the
+    // selector appeared to do nothing.)
+    const selectedOrbitId = () => { const v = $('orbitSelect') && $('orbitSelect').value; return v && P.bodies[v] ? v : null; };
+    const applySelectedOrbit = () => {
+      const id = selectedOrbitId();
+      if (id && id !== (F.circularHold?.id || ExolineNav.currentRefId())) {
+        F.launch(id, S); nodeAnchors.clear(); ExolineNav.onReset(); ExolineNav.invalidate(); cam.o = { x: F.s.r.x, y: F.s.r.y };
+      }
+      closeMission();
+    };
+    $('missionEnter').onclick = applySelectedOrbit;
+    // Populate orbit selector with all bodies from physics_constants
+    function populateOrbitSelect() {
+      const select = $('orbitSelect');
+      select.innerHTML = '';
+      // Every body in physics_constants.json, so a launch can begin at any
+      // world (launch site later).
+      const ids = Object.keys(P.bodies).sort((a, b) => ExolineNav.bodyName(a).localeCompare(ExolineNav.bodyName(b)));
+      for (const id of ids) {
+        const opt = document.createElement('option');
+        opt.value = id;
+        opt.textContent = ExolineNav.bodyName(id);
+        select.appendChild(opt);
+      }
+      // Restore saved selection, defaulting to Earth.
+      const saved = localStorage.getItem('exoline.orbitSelect');
+      select.value = saved && P.bodies[saved] ? saved : 'earth';
+      select.onchange = () => localStorage.setItem('exoline.orbitSelect', select.value);
+    }
+    $('newCampaignBtn').onclick = () => { const selId = selectedOrbitId() || 'earth'; F.launch(selId, S); nodeAnchors.clear(); ExolineNav.onReset(); ExolineNav.invalidate(); cam.o = { x: F.s.r.x, y: F.s.r.y }; closeMission(); };
+    // Populate orbit selector on mission screen open
+    populateOrbitSelect();
+    $('orbitSelect').onchange = () => localStorage.setItem('exoline.orbitSelect', $('orbitSelect').value);
     $('changelogBtn').onclick = async () => { $('changelogPanel').classList.remove('hidden'); try { renderChangelog(await (await fetch('../version_change.md', { cache: 'no-store' })).text()); } catch { $('changelogContent').textContent = 'Unable to load version_change.md'; } }; $('closeChangelog').onclick = () => $('changelogPanel').classList.add('hidden');
     const renderKeybinds = () => document.querySelectorAll('[data-bind]').forEach(input => { input.value = bindingLabel(bindings[input.dataset.bind]); });
     const saveBindings = () => localStorage.setItem('exoline.keybinds', JSON.stringify(bindings));
@@ -776,7 +1024,7 @@ function startAutoBurn() {
     $('resetKeybinds').onclick = () => { bindings = { ...defaultBindings }; saveBindings(); renderKeybinds(); showToast('KEYBINDS RESET'); };
     $('slower').innerHTML = rewindIcon; $('faster').innerHTML = forwardIcon; $('slower').onclick = e => { e.preventDefault(); e.stopPropagation(); setWarp(warpIndex - 1); }; $('faster').onclick = e => { e.preventDefault(); e.stopPropagation(); setWarp(warpIndex + 1); }; $('warpBtn').onclick = e => { e.preventDefault(); e.stopPropagation(); running = !running; updateWarp(); };
     $('throttle').oninput = e => setThrottle(e.target.value); $('turnLeft').onpointerdown = () => keys.right = true; $('turnRight').onpointerdown = () => keys.left = true; addEventListener('pointerup', () => { keys.left = false; keys.right = false; });
-    $('launchBtn').onclick = () => { if (autoBurn) { showToast('THROTTLE CONTROLLED BY AUTO BURN'); return; } craftSelected = true; lock = 'craft'; sel = null; focusCraftView(); setThrottle(F.s.throttle > 0 ? 0 : 100); $('launchBtn').textContent = F.s.throttle ? 'CUTOFF' : 'IGNITION'; }; $('rcsBtn').onclick = () => { rcs = !rcs; $('rcsBtn').classList.toggle('is-on', rcs); $('rcsBtn').setAttribute('aria-pressed', String(rcs)); };
+    $('launchBtn').onclick = () => { if (autoBurn) { showToast('THROTTLE CONTROLLED BY AUTO BURN'); return; } craftSelected = true; lock = 'craft'; sel = null; focusCraftView(); setThrottle(F.s.throttle > 0 ? 0 : 100); $('launchBtn').textContent = F.s.throttle ? 'CUTOFF' : 'IGNITION'; }; $('rcsBtn').onclick = () => { rcs = !rcs; $('rcsBtn').classList.toggle('is-on', rcs); $('rcsBtn').setAttribute('aria-pressed', String(rcs)); }; $('ascentBtn').onclick = () => { if (!F) return; F.ascentMode = !F.ascentMode; $('ascentBtn').classList.toggle('is-on', F.ascentMode); $('ascentBtn').setAttribute('aria-pressed', String(F.ascentMode)); showToast(F.ascentMode ? 'ASCENT MODE ON' : 'ASCENT MODE OFF'); };
     $('orbitNodeAdd').onclick = () => { const seconds = Number($('orbitNodeAdd').dataset.time) || 600; $('orbitNodeAdd').classList.add('hidden'); addNodeForCraft(seconds); };
     $('resetBtn').onclick = () => { lock = null; cam.o = { x: 0, y: 0 }; cam.k = innerHeight / (2.5 * AU); }; $('closeDetail').onclick = () => { $('detailPanel').classList.add('hidden'); sel = null; lock = null; }; $('openMapBtn').onclick = openMap; $('mapResetBtn').onclick = () => mapRenderer?.reset(); $('backBtn').onclick = () => { C.style.display = 'block'; $('mapCanvas').style.display = 'none'; $('mapCanvas').classList.add('hidden'); $('mapTopbar').classList.add('hidden'); };
     $('setTargetBtn').onclick = () => { if (sel && ExolineNav.setTarget(sel.id)) showToast(`TARGET: ${ExolineNav.bodyName(sel.id).toUpperCase()}`); else if (sel) showToast('TARGET UNAVAILABLE'); };
@@ -791,6 +1039,64 @@ function startAutoBurn() {
     $('navTimeMinus').onclick = () => stepNodeTime(-1); $('navTimePlus').onclick = () => stepNodeTime(1);
     $('navNodeDelete').onclick = () => { if (activeNodeId !== null) { nodeAnchors.delete(activeNodeId); ExolineNav.removeNode(activeNodeId); activeNodeId = null; $('navNode').classList.add('hidden'); showToast('MANEUVER NODE DELETED'); } };
     $('navExecute').onclick = () => autoBurn ? cancelAutoBurn() : startAutoBurn();
+    // Transfer window computation and auto-transfer
+    $('navComputeXfer').onclick = async () => {
+      const targetId = ExolineNav.getTarget();
+      if (!targetId) { showToast('SET A TARGET FIRST'); return; }
+      const xferList = $('navXferList');
+      const xferSection = $('navXfer');
+      xferSection.classList.remove('hidden');
+      xferList.classList.add('hidden');
+      xferList.innerHTML = 'COMPUTING...';
+      xferList.classList.remove('hidden');
+      try {
+        const fromId = ExolineNav.currentRefId();
+        const windows = ExolineNav.computeTransferWindows(fromId, targetId, 10, 730);
+        if (!windows || !windows.length) {
+          xferList.innerHTML = '<div class="xfer-item">NO WINDOWS FOUND</div>';
+          return;
+        }
+        xferList.innerHTML = windows.map((w, i) => `
+          <div class="xfer-item" data-index="${i}" style="padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.08);cursor:pointer;">
+            <div style="font-size:10px;color:#78e5ff;">${w.date.toISOString().slice(0,19).replace('T',' ')} UTC</div>
+            <div style="font-size:9px;color:#aaa;">DEP Δv ${ExolineNav.fmtDv(w.dvDeparture)} · ARR Δv ${ExolineNav.fmtDv(w.dvArrival)} · TOF ${ExolineNav.fmtDur(w.tof)}</div>
+            <div style="font-size:9px;color:#78e5ff;">TOTAL Δv ${ExolineNav.fmtDv(w.totalDv)}</div>
+          </div>
+        `).join('');
+        // Click handler for each window
+        xferList.querySelectorAll('.xfer-item').forEach((el, i) => {
+          el.onclick = () => {
+            const w = windows[i];
+            // computeTransferWindows already solved the arc (Hohmann window for
+            // heliocentric transfers, planet-frame Lambert for moon transfers),
+            // so use its Δv directly rather than re-solving with a different
+            // frame convention.
+            const tSec = (w.date - date) / 1000;
+            if (!(tSec >= 0)) { showToast('WINDOW IN PAST'); return; }
+            if (!(w.dvDeparture > 0)) { showToast('NO VIABLE BURN'); return; }
+            const refId = ExolineNav.currentRefId();
+            // Departure burn: prograde at the craft's reference body.
+            const node = ExolineNav.addNode({ t: tSec, referenceBody: refId, progradeDv: Math.round(w.dvDeparture), radialDv: 0, normalDv: 0 });
+            if (!node) { showToast('NODE CREATION FAILED'); return; }
+            // Capture burn at the target, one TOF later: retrograde relative to
+            // the target's own frame so it circularises instead of flying past.
+            if (w.dvArrival > 0) {
+              ExolineNav.addNode({ t: tSec + w.tof, referenceBody: w.arrivalBody, progradeDv: -Math.round(w.dvArrival), radialDv: 0, normalDv: 0 });
+            }
+            activeNodeId = node.id;
+            $('navNode').classList.remove('hidden');
+            $('navPanel').classList.remove('hidden', 'collapsed');
+            xferSection.classList.add('hidden');
+            ExolineNav.invalidate();
+            startAutoBurn();
+            showToast(`TRANSFER ARMED · ${ExolineNav.bodyName(w.arrivalBody).toUpperCase()} · T+${ExolineNav.fmtDur(tSec)}`);
+          };
+        });
+      } catch (e) {
+        console.error('Transfer window error:', e);
+        xferList.innerHTML = '<div class="xfer-item" style="color:#ff7373">ERROR</div>';
+      }
+    };
     const nodeFields = [['navNodePro', 'progradeDv'], ['navNodeRad', 'radialDv'], ['navNodeNor', 'normalDv']];
     for (const field of nodeFields) { const input = $(field[0]); input.oninput = () => { const nodes = ExolineNav.getNodes(), node = nodes.find(n => n.id === activeNodeId) || nodes[0]; if (node) { ExolineNav.updateNode(node.id, { [field[1]]: input.value }); ExolineNav.setEditing(true); } }; input.onchange = input.onblur = () => ExolineNav.setEditing(false); }
 
@@ -865,6 +1171,7 @@ function startAutoBurn() {
       if (matches(e, 'focusCraft')) { craftSelected = true; sel = null; lock = 'craft'; focusCraftView(); }
       if (matches(e, 'resetView')) resetView();
       if (matches(e, 'autoBurn')) { if (autoBurn) cancelAutoBurn(); else startAutoBurn(); }
+      if (matches(e, 'stage')) { e.preventDefault(); if (F) { F.stage(); showToast('STAGE SEPARATION'); } }
     });
     addEventListener('keyup', e => {
       if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
@@ -903,10 +1210,18 @@ function startAutoBurn() {
         } else {
           // Perturbed flight: split into <=120 s chunks with a fresh ephemeris
           // each chunk, so high warp can't inject energy via stale body
-          // positions (linear extrapolation error grows with t^2).
+          // positions.
+          //
+          // Any powered burn is capped hard, at 2 s while auto-burn owns the
+          // throttle and 5 s for a manual one. Without this a single 120 s
+          // chunk at full thrust delivers 2400 m/s of Δv in one frame, which
+          // throws the craft onto a wildly wrong conic and is the classic
+          // "I warped while burning and my orbit exploded" failure.
           let remaining = physicsSeconds;
           while (remaining > 1e-9) {
-            const chunk = Math.min(120, remaining);
+            const powered = F.s.throttle > 0;
+            const autoActive = autoBurn && autoBurn.phase !== 'COAST';
+            const chunk = Math.min(autoActive ? 2 : powered ? 5 : 120, remaining);
             updateAutoBurn(chunk); F.step(chunk, S); finishAutoBurn(chunk);
             date = new Date(+date + chunk * 1000);
             await updateStates(); F.syncCircularHold(S);
@@ -919,7 +1234,7 @@ function startAutoBurn() {
     }
     draw(); requestAnimationFrame(frame);
   }
-  async function start() { [D, P, A, minerals] = await Promise.all(['solar_system.json', 'physics_constants.json', 'render_anchors.json', 'mineral_profiles.json'].map(async file => (await fetch('../data/' + file)).json())); await ExolineOrbit.load(); await updateStates(); F = new ExolineFlight.Flight(P); F.launch('earth', S); ExolineNav.init({ catalog: D, constants: P, flight: F, getBodies: () => S, getDate: () => date, getRefId: () => soiBody()?.id || F.dominant(S) }); resize(); controls(); setWarp(0); setTimeout(() => { $('introScreen')?.classList.add('is-exiting'); setTimeout(() => { $('introScreen')?.remove(); $('missionScreen')?.classList.remove('hidden'); $('app')?.classList.add('mission-active'); }, 850); }, 4200); requestAnimationFrame(frame); }
+  async function start() { [D, P, A, minerals] = await Promise.all(['solar_system.json', 'physics_constants.json', 'render_anchors.json', 'mineral_profiles.json'].map(async file => (await fetch('../data/' + file)).json())); await ExolineOrbit.load(); await updateStates(); F = new ExolineFlight.Flight(P); const savedOrbit = (() => { try { return localStorage.getItem('exoline.orbitSelect'); } catch { return null; } })(); F.launch(savedOrbit && P.bodies[savedOrbit] ? savedOrbit : 'earth', S); ExolineNav.init({ catalog: D, constants: P, flight: F, getBodies: () => S, getDate: () => date, getRefId: () => soiBody()?.id || F.dominant(S) }); resize(); controls(); setWarp(0); setTimeout(() => { $('introScreen')?.classList.add('is-exiting'); setTimeout(() => { $('introScreen')?.remove(); $('missionScreen')?.classList.remove('hidden'); $('app')?.classList.add('mission-active'); }, 850); }, 4200); requestAnimationFrame(frame); }
   addEventListener('resize', resize);
   start().catch(error => {
     // Do not leave the player behind an opaque splash screen if data or a
