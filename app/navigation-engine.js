@@ -99,9 +99,15 @@ window.ExolineNav = (() => {
       refVel = velocityAt(refId, tSec);
     } else {
       const live = bodies[refId];
-      if (!live) return null;
-      refPos = { x: live.x, y: live.y, z: live.z || 0 };
-      refVel = { x: live.vx || 0, y: live.vy || 0, z: live.vz || 0 };
+      if (live) {
+        refPos = { x: live.x, y: live.y, z: live.z || 0 };
+        refVel = { x: live.vx || 0, y: live.vy || 0, z: live.vz || 0 };
+      } else {
+        // The live body map may omit moons; fall back to the ephemeris at the
+        // current epoch so a lunar reference frame still resolves.
+        refPos = worldAt(refId, 0);
+        refVel = velocityAt(refId, 0);
+      }
     }
     if (!refPos) return null;
     const rRel = sub(craftState.r, refPos);
@@ -932,15 +938,66 @@ function createManeuverNode(opts = {}) {
       const craftEl = getOrbitalElements(ctx.flight.s, fromId);
       if (!el || !(el.aAU > 0)) return null;
       const moonA = el.aAU * AU;
+      // Aim the apogee a little ABOVE the Moon's mean orbit. A transfer that
+      // tops out exactly on the mean radius arrives below the Moon whenever the
+      // Moon is near its own apogee (up to ~28,000 km farther out), and the
+      // encounter then starts from underneath — a few m/s of under-delivery at
+      // these energies costs thousands of km, which is how a "correct" transfer
+      // ends up skimming past outside the sphere of influence. A small overshoot
+      // makes the craft CROSS the Moon's orbit rather than stop short of it.
+      const aimApo = moonA + 1.2e7;
       const r1 = craftEl && craftEl.distance > EPS ? craftEl.distance : fromP.radius_m + 180000;
       if (!(moonA > r1) || r1 <= fromP.radius_m) return null;
-      // Transfer TOF from a Hohmann arc between the two radii (planet frame)
-      const aT = (r1 + moonA) / 2;
+      // ---- Planar Hohmann transfer timed to a moon node crossing ----
+      // The craft flies strictly in the departure body's plane: the flight
+      // engine applies thrust only in x/y and launches with vz = 0, so the
+      // auto-burn physically cannot execute an out-of-plane (normal) Δv. The
+      // moon is inclined ~5.16° to that plane, so a general Lambert solution
+      // demands a large normal burn the craft can never perform — and, with a
+      // stale-velocity selection metric, it picked garbage epochs and reported
+      // a planet-frame arrival speed as if it were the capture Δv. Instead we
+      // fly a PLANAR Hohmann arc (pure-prograde departure, which the craft CAN
+      // do) and SCAN the departure epoch for the instant the moon sits nearest
+      // the arc's apogee point. The moon crosses the craft's plane twice per
+      // orbit (its nodes); near those crossings a correctly-timed Hohmann
+      // apogee lands the craft inside the moon's sphere of influence, where
+      // lunar gravity and the capture burn take over.
+      const aT = (r1 + aimApo) / 2;
       const tHohmann = Math.PI * Math.sqrt(aT ** 3 / mu);
       const moonPeriod = 2 * Math.PI * Math.sqrt(moonA ** 3 / mu);
-      const stepSec = Math.max(300, moonPeriod / 400);
-      const total = Math.min(searchDays * 86400, moonPeriod);
-      // Craft's current state in the planet frame (frozen for window math)
+      const craftR = Math.max(r1, fromP.radius_m + 1e5);
+      const nCraft = Math.sqrt(mu / (craftR * craftR * craftR));
+      // Hohmann Δv is pure prograde and depends only on the two radii — the
+      // same for every candidate epoch (phase affects arrival, not Δv).
+      const vCirc1 = Math.sqrt(mu / r1);
+      const vDep1 = Math.sqrt(mu * (2 / r1 - 1 / aT));
+      let dvDeparture = Math.max(0, vDep1 - vCirc1);
+      // ---- Finite-burn correction ----
+      // The engine delivers Δv by integrating thrust, so the burn sweeps an arc
+      // instead of landing the impulse instantly. That arc costs a little Δv,
+      // and at transfer energies a few m/s is worth thousands of km of apogee:
+      // requesting the impulsive 3,154 m/s delivered ~3,151 and reached only
+      // 373,200 km — short of the Moon's 384,400 km orbit, so the craft sailed
+      // past with a closest approach outside the Moon's sphere of influence.
+      // Inflate the request by the first-order arc loss (θ²/24, with θ the mean
+      // motion times the burn duration) so the DELIVERED Δv is the impulsive
+      // value and the apogee lands on the Moon's orbit.
+      const burnThrust = (ctx.flight && ctx.flight.thrust) || 0;
+      const burnMass = (ctx.flight && ctx.flight.s && ctx.flight.s.m) || 0;
+      if (burnThrust > 0 && burnMass > 0 && dvDeparture > 0) {
+        const accelBurn = burnThrust / burnMass;
+        const nCirc = Math.sqrt(mu / (r1 * r1 * r1));
+        const theta = nCirc * (dvDeparture / accelBurn);
+        dvDeparture += dvDeparture * theta * theta / 24;
+      }
+      const vArr = Math.sqrt(mu * (2 / aimApo - 1 / aT)); // apogee speed, planet frame
+      // Sphere of influence of the target: a window "reaches" the moon only if
+      // its apogee point falls inside it.
+      let soi = null;
+      try { if (window.ExolineNav && typeof window.ExolineNav.soiRadius === 'function') soi = window.ExolineNav.soiRadius(toId); } catch (e) { soi = null; }
+      const soiLim = (soi && Number.isFinite(soi)) ? soi : Infinity;
+      // Craft's current planet-frame longitude (near-circular orbit, so it
+      // advances at the mean motion between now and departure).
       const hostNow = worldAtDate(fromId, now);
       if (!hostNow) return null;
       const craftOff = {
@@ -948,50 +1005,139 @@ function createManeuverNode(opts = {}) {
         y: ctx.flight.s.r.y - hostNow.y,
         z: (ctx.flight.s.r.z || 0) - (hostNow.z || 0)
       };
-      // The transfer is solved in the PLANET frame, so the craft's velocity
-      // must be planet-relative too. Using the raw inertial velocity mixes
-      // frames and inflates the departure Δv by the planet's own heliocentric
-      // speed (for Earth that is ~30 km/s of pure error).
-      const hostVel = velocityAt(fromId, 0) || { x: 0, y: 0, z: 0 };
-      const craftVelNow = {
-        x: ctx.flight.s.v.x - (hostVel.x || 0),
-        y: ctx.flight.s.v.y - (hostVel.y || 0),
-        z: (ctx.flight.s.v.z || 0) - (hostVel.z || 0)
-      };
-      let best = null;
-      const arrivalEpochMs = tHohmann * 1000;
-      // The craft keeps orbiting while we scan, so its longitude advances by
-      // n·t (n = mean motion). Holding it fixed would under-sample the real
-      // set of TLI opportunities and inflate the minimum Δv.
-      const craftR = Math.max(r1, fromP.radius_m + 1e5);
-      const nCraft = Math.sqrt(mu / (craftR * craftR * craftR));
+      const lambda0 = Math.atan2(craftOff.y, craftOff.x);
+      // Fine scan: resolve the craft's fast mean motion (~one lap / 90 min) so
+      // the apogee longitude can be matched to the moon's to well inside the
+      // SOI at lunar distance.
+      const stepSec = Math.max(2, (2 * Math.PI / nCraft) / 300);
+      const total = Math.min(searchDays * 86400, moonPeriod * 1.1);
+      const cands = [];
       for (let t = 0; t <= total; t += stepSec) {
-        const d = new Date(startMs + t * 1000);
-        // Lambert's problem: r1 and r2 are both relative to the CENTRAL body
-        // (the planet), each sampled at ITS OWN epoch. Subtracting a later
-        // moon position from an earlier planet position mixes in the planet's
-        // own heliocentric motion and produces a garbage vector.
-        const hostDep = worldAtDate(fromId, d);
-        const hostArr = worldAtDate(fromId, new Date(+d + arrivalEpochMs));
-        const moonPos = worldAtDate(toId, new Date(+d + arrivalEpochMs));
-        if (!hostDep || !hostArr || !moonPos) continue;
-        // Advance the craft's offset along its own orbit by n·t.
-        const ang = nCraft * t;
-        const ca = Math.cos(ang), sa = Math.sin(ang);
-        const ox = craftOff.x * ca - craftOff.y * sa, oy = craftOff.x * sa + craftOff.y * ca;
-        const craftAbs = { x: hostDep.x + ox, y: hostDep.y + oy, z: (hostDep.z || 0) + craftOff.z };
-        const r1 = { x: craftAbs.x - hostDep.x, y: craftAbs.y - hostDep.y, z: (craftAbs.z || 0) - (hostDep.z || 0) };
-        const r2 = { x: moonPos.x - hostArr.x, y: moonPos.y - hostArr.y, z: (moonPos.z || 0) - (hostArr.z || 0) };
-        const sol = lambertSolve(r1, r2, tHohmann, mu, 80, 1e-10, craftVelNow, null);
-        if (!sol || !Number.isFinite(sol.dv1)) continue;
-        if (!best || sol.dv1 < best.sol.dv1) best = { sol, t, d };
+        // The Hohmann apogee is antipodal to the departure point: angle λ0 + n·t + π.
+        const arrAng = lambda0 + nCraft * t + Math.PI;
+        const ax = aimApo * Math.cos(arrAng), ay = aimApo * Math.sin(arrAng);
+        // Moon's position relative to the planet at the arrival epoch
+        const m = window.ExolineOrbit.moonAt(toId, new Date(startMs + (t + tHohmann) * 1000));
+        if (!m) continue;
+        const mx = m.x * AU, my = m.y * AU, mz = (m.z || 0) * AU;
+        cands.push({ t, arrAng, miss: Math.hypot(ax - mx, ay - my, mz) });
       }
-      if (!best) return null;
-      windows.push({
-        date: best.d, departureBody: fromId, arrivalBody: toId,
-        dvDeparture: best.sol.dv1, dvArrival: best.sol.dv2, totalDv: best.sol.totalDv,
-        tof: tHohmann, method: 'LAMBERT', moonTransfer: true
-      });
+      if (!cands.length) return null;
+      cands.sort((a, b) => a.miss - b.miss);
+      // ---- True closest approach (forward propagation) ----
+      // The scan above scores a window by where the ideal Hohmann apogee lands
+      // relative to the Moon's ephemeris: mean-motion phasing, an impulsive
+      // departure and no lunar gravity. Those approximations are not academic —
+      // a window the model scored at 21,000 km actually flew past at 65,000 km,
+      // outside the Moon's 58,106 km sphere of influence, so the craft was never
+      // captured. Re-fly the best candidates for real (planet two-body coast,
+      // then RK4 through the approach with the Moon's own gravity) and keep the
+      // departures that genuinely pass inside the sphere of influence.
+      const moonMu = constants.G * toP.mass;
+      const trueMiss = depT => {
+        const ang = lambda0 + nCraft * depT;
+        const vBurn = vCirc1 + dvDeparture;
+        // Departure opens a conic with its perigee exactly at the burn point, so
+        // the whole coast is available in closed form (Kepler) — no need to
+        // integrate the 660 km-per-step perigee passage, where a fixed-step
+        // march wrecks the apogee and the arrival geometry with it.
+        const aOrb = 1 / (2 / r1 - vBurn * vBurn / mu);
+        if (!(aOrb > 0)) return Infinity;               // escapes the planet outright
+        const eOrb = Math.max(0, 1 - r1 / aOrb);
+        const nOrb = Math.sqrt(mu / (aOrb * aOrb * aOrb));
+        const pOrb = aOrb * (1 - eOrb * eOrb);
+        const stateAt = dtSec => {
+          const M = nOrb * dtSec;
+          let E = M;
+          for (let k = 0; k < 30; k++) { E -= (E - eOrb * Math.sin(E) - M) / (1 - eOrb * Math.cos(E)); }
+          const nu = 2 * Math.atan2(Math.sqrt(1 + eOrb) * Math.sin(E / 2), Math.sqrt(1 - eOrb) * Math.cos(E / 2));
+          const r = aOrb * (1 - eOrb * Math.cos(E)), th = ang + nu;
+          const vr = Math.sqrt(mu / pOrb) * eOrb * Math.sin(nu);
+          const vt = Math.sqrt(mu / pOrb) * (1 + eOrb * Math.cos(nu));
+          return { x: r * Math.cos(th), y: r * Math.sin(th), vx: vr * Math.cos(th) - vt * Math.sin(th), vy: vr * Math.sin(th) + vt * Math.cos(th) };
+        };
+        // Integrate only the close approach, where lunar gravity matters.
+        const lead = 2.0 * 86400, dt = 30;
+        const start = stateAt(tHohmann - lead);
+        let x = start.x, y = start.y, z = 0, vx = start.vx, vy = start.vy, vz = 0;
+        let best = Infinity, bestI = 0, bestVx = 0, bestVy = 0, bestVz = 0;
+        const steps = Math.round((2 * lead) / dt);
+        for (let i = 0; i <= steps; i++) {
+          const m = window.ExolineOrbit.moonAt(toId, new Date(startMs + (depT + tHohmann - lead + i * dt) * 1000));
+          if (!m) break;
+          const mx = m.x * AU, my = m.y * AU, mz = (m.z || 0) * AU;
+          const ddx = x - mx, ddy = y - my, ddz = z - mz;
+          const d = Math.hypot(ddx, ddy, ddz);
+          if (d < best) { best = d; bestI = i; bestVx = vx; bestVy = vy; bestVz = vz; }
+          const rr = Math.hypot(x, y, z) || 1, rr3 = rr * rr * rr;
+          const dd = Math.max(d, 1), dd3 = dd * dd * dd;
+          const ax = -mu * x / rr3 - moonMu * ddx / dd3;
+          const ay = -mu * y / rr3 - moonMu * ddy / dd3;
+          const az = -mu * z / rr3 - moonMu * ddz / dd3;
+          vx += ax * dt; vy += ay * dt; vz += az * dt;
+          x += vx * dt; y += vy * dt; z += vz * dt;
+        }
+        // The Moon's velocity at the closest approach. The capture burn must
+        // cancel the craft's speed relative to THIS: a close flyby whips past
+        // the Moon several times faster than the distant Hohmann arrival speed
+        // (~830 m/s), so the old figure could never bind the craft.
+        const tCA = depT + tHohmann - lead + bestI * dt;
+        const mm0 = window.ExolineOrbit.moonAt(toId, new Date(startMs + (tCA - 0.5) * 1000));
+        const mm1 = window.ExolineOrbit.moonAt(toId, new Date(startMs + (tCA + 0.5) * 1000));
+        const vrel = (mm0 && mm1)
+          ? Math.hypot(bestVx - (mm1.x - mm0.x) * AU, bestVy - (mm1.y - mm0.y) * AU, bestVz - ((mm1.z || 0) - (mm0.z || 0)) * AU)
+          : Infinity;
+        return { d: best, vrel };
+      };
+      const probe = cands.slice(0, 30);
+      for (const c of probe) { const r = trueMiss(c.t); c.trueMiss = r.d; c.relSpeed = r.vrel; }
+      probe.sort((a, b) => a.trueMiss - b.trueMiss);
+      // A window is only usable as a captured arrival if the craft actually
+      // passes INSIDE the sphere of influence AND clears the surface with room
+      // to fly a capture orbit. The raw closest approach happily returns a
+      // 141 km "hit" — a lunar impact, not a rendezvous — so require a real
+      // flyby altitude.
+      const minMiss = (toP.radius_m || 1.737e6) + 3e5;
+      let pool = probe.filter(c => c.trueMiss <= soiLim && c.trueMiss >= minMiss);
+      if (!pool.length) pool = probe.filter(c => c.trueMiss <= soiLim);
+      if (!pool.length) pool = probe.slice(0, 1);
+      // Spread the returned windows apart in time (>= 6 h) so the list shows
+      // distinct opportunities rather than one clustered burst.
+      const chosen = [];
+      for (const c of pool) {
+        if (chosen.every(o => Math.abs(o.t - c.t) >= 21600)) chosen.push(c);
+        if (chosen.length >= maxWindows) break;
+      }
+      chosen.sort((a, b) => a.t - b.t);
+      // Capture Δv: the moon-relative speed (v-infinity) at arrival. The
+      // auto-burn fires retrograde in the moon's frame with progradeDv =
+      // -|v_rel|, which exactly cancels the approach velocity and leaves the
+      // craft co-moving with the moon — i.e. captured. This is a true
+      // planet-frame relative speed, NOT the planet-relative arrival speed the
+      // Lambert path returned (wrong frame, mis-sized capture).
+      for (const c of chosen) {
+        // Craft apogee velocity: tangential, prograde, in the craft's plane.
+        const cpx = -vArr * Math.sin(c.arrAng), cpy = vArr * Math.cos(c.arrAng);
+        // Moon's planet-frame velocity at arrival (finite difference of its
+        // parent-relative position over 1 s).
+        const tA = c.t + tHohmann;
+        const m0 = window.ExolineOrbit.moonAt(toId, new Date(startMs + (tA - 0.5) * 1000));
+        const m1 = window.ExolineOrbit.moonAt(toId, new Date(startMs + (tA + 0.5) * 1000));
+        const mvx = (m1.x - m0.x) * AU, mvy = (m1.y - m0.y) * AU, mvz = ((m1.z || 0) - (m0.z || 0)) * AU;
+        // Capture Δv sized from the ACTUAL encounter: burn the craft's speed
+        // relative to the Moon down to the local circular speed, leaving a
+        // closed lunar orbit. The old distant-Hohmann figure (~830 m/s) is far
+        // too small for a close flyby and let the craft sail straight past.
+        const dvArrival = (Number.isFinite(c.relSpeed) && Number.isFinite(c.trueMiss) && c.trueMiss > 0)
+          ? Math.max(0, c.relSpeed - Math.sqrt(moonMu / c.trueMiss))
+          : Math.hypot(cpx - mvx, cpy - mvy, mvz) * 1.05;
+        windows.push({
+          date: new Date(startMs + c.t * 1000), departureBody: fromId, arrivalBody: toId,
+          dvDeparture, dvArrival, totalDv: dvDeparture + dvArrival,
+          tof: tHohmann, method: 'HOHMANN-NODE', moonTransfer: true,
+          miss: (c.trueMiss != null ? c.trueMiss : c.miss)
+        });
+      }
       return windows;
     }
 

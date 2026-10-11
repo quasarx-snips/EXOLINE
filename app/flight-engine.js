@@ -83,15 +83,18 @@ window.ExolineFlight = (() => {
           if (typeof constants.bodies[id].solidSurface !== 'boolean') constants.bodies[id].solidSurface = isSolidSurface(id);
         }
       }
-      this.thrust = 20000;
-      this.specificImpulse = 320;
-      this.dryMass = 500;
-      // Propellant budget sized for interplanetary transfers: with 3000 kg of
-      // propellant the craft can deliver ~6100 m/s of Δv, enough for a lunar
-      // transfer (~3100 m/s) and a Mars-class heliocentric transfer (~5600 m/s
-      // including escape). The previous 500 kg capped Δv at 2178 m/s, which
-      // could not even reach GEO.
-      this.propellantCapacity = 3000;
+      // Staging system: array of stage definitions
+      // Each stage: { id, dryMass, propellant, thrust, isp }
+      this.stages = [];
+      this.currentStage = 0;
+      // Payload mass (constant, not dropped during staging)
+      this.payloadMass = 50;
+      // Ascent automation (gravity turn)
+      this.ascentMode = false;
+      // Engine config derived from active stage (set in updateStageProperties)
+      this.thrust = 0;
+      this.specificImpulse = 0;
+      this.dryMass = 0;
       this.infiniteFuel = false;
       this.circularHold = null;
       this.progradeLock = true;   // powered flight tracks orbital prograde unless overridden
@@ -101,23 +104,58 @@ window.ExolineFlight = (() => {
       this.landedBody = null;     // body id the craft is sitting on, or null
       this.landedDir = null;      // body-relative surface direction, unit vector
       this.prevThrottle = 0;
-      this.s = { r: { x: 0, y: 0, z: 0 }, v: { x: 0, y: 0, z: 0 }, m: this.dryMass + this.propellantCapacity, propellant: this.propellantCapacity, heading: 0, throttle: 0, crashed: false, landed: false };
-    // Reentry tracking state (per dominant body)
-    this.reentryState = { bodyId: null, phase: 'EXO', q: 0, rho: 0, heating: 0, gLoad: 0, alt: 0, peakHeating: 0, peakG: 0 };
+      this.s = { r: { x: 0, y: 0, z: 0 }, v: { x: 0, y: 0, z: 0 }, m: 0, propellant: 0, heading: 0, throttle: 0, crashed: false, landed: false };
+      // Reentry tracking state (per dominant body)
+      this.reentryState = { bodyId: null, phase: 'EXO', q: 0, rho: 0, heating: 0, gLoad: 0, alt: 0, peakHeating: 0, peakG: 0 };
+    }
+
+    // Update thrust, specificImpulse, dryMass, and mass from the active stage
+    updateStageProperties() {
+      const stage = this.stages[this.currentStage];
+      if (!stage) return;
+      this.thrust = stage.thrust;
+      this.specificImpulse = stage.isp;
+      this.dryMass = stage.dryMass;
+      // Total mass = stage dryMass + stage propellant + payloadMass
+      this.s.m = stage.dryMass + stage.propellant + this.payloadMass;
+      this.s.propellant = stage.propellant;
     }
     launch(id, bodies) {
+      // Initialize default stages if not already set
+      if (!this.stages.length) {
+        this.stages = [
+          { id: 0, dryMass: 400, propellant: 400, thrust: 25000, isp: 290 },
+          { id: 1, dryMass: 100, propellant: 100, thrust: 5000, isp: 350 }
+        ];
+        this.currentStage = 0;
+        this.updateStageProperties();
+      }
+      this.ascentMode = false;
       const body = bodies[id], physical = this.c.bodies[id];
       const atmosphere = ATMOSPHERES[id];
       // Start above the air where there is one (plus a lift margin), else well
       // clear of the ground. Sets the circular-hold radius directly.
       const radius = physical.radius_m + (atmosphere ? atmosphere.top + 20000 : 180000);
       const speed = Math.sqrt(this.c.G * physical.mass / radius);
-      this.s = { r: { x: body.x, y: body.y + radius, z: body.z || 0 }, v: { x: body.vx - speed, y: body.vy, z: body.vz || 0 }, m: this.dryMass + this.propellantCapacity, propellant: this.propellantCapacity, heading: Math.PI, throttle: 0, crashed: false, landed: false };
+      this.s = { r: { x: body.x, y: body.y + radius, z: body.z || 0 }, v: { x: body.vx - speed, y: body.vy, z: body.vz || 0 }, m: this.s.m, propellant: this.s.propellant, heading: Math.PI, throttle: 0, crashed: false, landed: false };
       this.circularHold = { id, radius, phase: Math.PI / 2, meanMotion: speed / radius };
       this.coast = null; this.prevThrottle = 0;
       this.landedBody = null; this.landedDir = null;
       // Reset reentry state on launch
       this.reentryState = { bodyId: null, phase: 'EXO', q: 0, rho: 0, heating: 0, gLoad: 0, alt: 0, peakHeating: 0, peakG: 0 };
+    }
+
+    // Staging: drop the previous stage's dry mass and remaining propellant
+    stage() {
+      if (this.currentStage >= this.stages.length - 1) {
+        console.info('[stage] No more stages');
+        return;
+      }
+      const prevStage = this.stages[this.currentStage];
+      const deadMass = prevStage.dryMass + prevStage.propellant;
+      this.currentStage++;
+      this.updateStageProperties();
+      console.info(`[stage] Stage separation: dropped ${deadMass} kg, now stage ${this.currentStage} (thrust=${this.thrust} N, isp=${this.specificImpulse} s, mass=${this.s.m} kg)`);
     }
     advanceCircularHold(seconds, bodies) {
       const hold = this.circularHold, body = bodies[hold.id], physical = this.c.bodies[hold.id];
@@ -450,16 +488,75 @@ window.ExolineFlight = (() => {
       if (this.s.throttle > 0) { this.circularHold = null; this.coast = null; }
       // A landed craft rides the moving body: re-pin to the surface each step
       // preserving the body-relative angle so it never drifts or sinks.
-      // Throttling up releases it.
+      // Throttling up releases it ONLY if TWR > 1.
       if (this.s.landed) {
         const lid = this.landedBody || this.referenceBody(bodies, this.s);
         const body = bodies[lid], physical = this.c.bodies[lid];
-        if (this.s.throttle > 0) { this.s.landed = false; this.landedBody = null; this.landedDir = null; }
-        else if (body && physical && this.landedDir) {
+        if (this.s.throttle > 0 && body && physical) {
+          // Compute TWR = thrust * throttle / (mass * local_g)
+          const local_g = this.c.G * physical.mass / (physical.radius_m * physical.radius_m);
+          const twr = (this.thrust * this.s.throttle) / (this.s.m * local_g);
+          if (twr > 1.0) {
+            // TWR > 1: liftoff! Un-pin and transition to flying
+            this.s.landed = false;
+            this.landedBody = null;
+            this.landedDir = null;
+            console.info(`[liftoff] TWR=${twr.toFixed(2)} > 1.0, transitioning to flight`);
+          } else {
+            // TWR <= 1: stay pinned, consume fuel/heat, v = body velocity
+            this.s.r = { x: body.x + this.landedDir.x * physical.radius_m, y: body.y + this.landedDir.y * physical.radius_m, z: (body.z || 0) + this.landedDir.z * physical.radius_m };
+            this.s.v = { x: body.vx || 0, y: body.vy || 0, z: body.vz || 0 };
+            this.prevThrottle = this.s.throttle;
+            return; // Skip physics integration, but fuel still burns in rk4
+          }
+        } else if (body && physical && this.landedDir) {
+          // No throttle: re-pin to surface
           this.s.r = { x: body.x + this.landedDir.x * physical.radius_m, y: body.y + this.landedDir.y * physical.radius_m, z: (body.z || 0) + this.landedDir.z * physical.radius_m };
           this.s.v = { x: body.vx || 0, y: body.vy || 0, z: body.vz || 0 };
           this.s.throttle = 0; this.prevThrottle = 0;
           return;
+        }
+      }
+
+      // Ascent Mode: gravity turn automation
+      if (this.ascentMode && !this.s.landed) {
+        const refId = this.referenceBody(bodies, this.s);
+        const refBody = bodies[refId];
+        const refPhysical = this.c.bodies[refId];
+        if (refBody && refPhysical) {
+          const rel = sub(this.s.r, refBody);
+          const distance = length(rel);
+          const altitude = distance - refPhysical.radius_m;
+          const atm = ATMOSPHERES[refId];
+          // Get prograde heading (velocity vector relative to body)
+          const vRel = sub(this.s.v, { x: refBody.vx || 0, y: refBody.vy || 0, z: refBody.vz || 0 });
+          const progradeHeading = Math.atan2(vRel.y, vRel.x);
+          // Surface normal heading (straight up)
+          const surfaceNormalHeading = Math.atan2(rel.y, rel.x) - Math.PI / 2;
+          let targetHeading;
+          if (altitude < 500) {
+            // Below 500m: go straight up
+            targetHeading = surfaceNormalHeading;
+          } else {
+            // Above 500m: smoothly interpolate toward prograde
+            const angleDiff = progradeHeading - this.s.heading;
+            // Normalize to [-PI, PI]
+            const normalizedDiff = Math.atan2(Math.sin(angleDiff), Math.cos(angleDiff));
+            // Interpolate factor based on altitude (smooth transition)
+            const interpFactor = Math.min(1, Math.max(0, (altitude - 500) / 5000));
+            targetHeading = this.s.heading + normalizedDiff * interpFactor;
+          }
+          // Pitch rate limit: max 5 deg/s = 0.0873 rad/s
+          const maxPitchRate = 0.0873;
+          let angleToTarget = targetHeading - this.s.heading;
+          angleToTarget = Math.atan2(Math.sin(angleToTarget), Math.cos(angleToTarget));
+          const limitedAngle = Math.max(-maxPitchRate, Math.min(maxPitchRate, angleToTarget));
+          this.s.heading += limitedAngle;
+          // Auto-disable ascent mode above atmosphere (or in vacuum)
+          if ((atm && altitude >= atm.top) || (!atm && altitude > refPhysical.radius_m)) {
+            this.ascentMode = false;
+            console.info('[ascent] Auto-disabled: above atmosphere');
+          }
         }
       }
       // Cache body accelerations for this whole step: every RK4 stage and every
@@ -542,6 +639,45 @@ window.ExolineFlight = (() => {
     propellantForDeltaV(deltaV) {
       if (!(deltaV > 0)) return 0;
       return this.s.m * (1 - Math.exp(-deltaV / (this.specificImpulse * 9.80665)));
+    }
+    serialize() {
+      return {
+        s: { ...this.s },
+        stages: this.stages.map(st => ({ ...st })),
+        currentStage: this.currentStage,
+        ascentMode: this.ascentMode,
+        landed: this.s.landed,
+        landedBody: this.landedBody,
+        landedDir: this.landedDir ? { ...this.landedDir } : null,
+        circularHold: this.circularHold ? { ...this.circularHold } : null,
+        coast: this.coast ? { ...this.coast } : null,
+        reentryState: { ...this.reentryState },
+        infiniteFuel: this.infiniteFuel,
+        progradeLock: this.progradeLock,
+        steerOverride: this.steerOverride,
+        manualSteer: this.manualSteer,
+        prevThrottle: this.prevThrottle,
+        payloadMass: this.payloadMass
+      };
+    }
+    deserialize(data) {
+      if (!data) return;
+      this.s = { ...data.s };
+      this.stages = (data.stages || []).map(st => ({ ...st }));
+      this.currentStage = data.currentStage || 0;
+      this.ascentMode = data.ascentMode || false;
+      this.landedBody = data.landedBody || null;
+      this.landedDir = data.landedDir ? { ...data.landedDir } : null;
+      this.circularHold = data.circularHold ? { ...data.circularHold } : null;
+      this.coast = data.coast ? { ...data.coast } : null;
+      this.reentryState = data.reentryState ? { ...data.reentryState } : { bodyId: null, phase: 'EXO', q: 0, rho: 0, heating: 0, gLoad: 0, alt: 0, peakHeating: 0, peakG: 0 };
+      this.infiniteFuel = data.infiniteFuel || false;
+      this.progradeLock = data.progradeLock !== undefined ? data.progradeLock : true;
+      this.steerOverride = data.steerOverride || false;
+      this.manualSteer = data.manualSteer || false;
+      this.prevThrottle = data.prevThrottle || 0;
+      this.payloadMass = data.payloadMass || 50;
+      this.updateStageProperties();
     }
   }
   return { Flight, rk4Step, atmosphericDrag, atmosphereDensity, atmosphereStepLimit, isSolidSurface, atmospheres: ATMOSPHERES, add, sub, mul, dot, length };

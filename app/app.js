@@ -7,7 +7,7 @@
   keys.pan = { up: false, down: false, left: false, right: false };
   let navSnap = null, activeNodeId = null, toastTimer = 0, autoBurn = null, nodeHitRegions = [], orbitHitRegions = [];
   const nodeAnchors = new Map();
-  const defaultBindings = { pause: 'Space', warpDown: 'BracketLeft', warpUp: 'BracketRight', focusCraft: 'KeyF', resetView: 'KeyR', addNode: 'KeyN', autoBurn: 'KeyB' };
+  const defaultBindings = { pause: 'Space', warpDown: 'BracketLeft', warpUp: 'BracketRight', focusCraft: 'KeyF', resetView: 'KeyR', addNode: 'KeyN', autoBurn: 'KeyB', stage: 'KeyX' };
   let bindings = { ...defaultBindings };
   try { bindings = { ...defaultBindings, ...JSON.parse(localStorage.getItem('exoline.keybinds') || '{}') }; } catch { /* use defaults */ }
   const bindingLabel = code => code === 'Space' ? 'Space' : code.replace(/^Key/, '').replace(/^Digit/, '');
@@ -90,7 +90,14 @@
     if (sprite.complete && sprite.naturalWidth) { X.save(); X.translate(screen.x, screen.y); X.rotate(rotationAngle(body)); X.drawImage(sprite, -drawHalfSize * 2 * anchor.anchor_x, -drawHalfSize * 2 * anchor.anchor_y, drawHalfSize * 2, drawHalfSize * 2); X.restore(); }
     else { X.fillStyle = '#94abb4'; X.beginPath(); X.arc(screen.x, screen.y, radius, 0, Math.PI * 2); X.fill(); }
     if (body.id !== 'sun' && radius > 2) {
-      const length = Math.hypot(point.x, point.y) || 1, lx = -point.x / length, ly = point.y / length;
+      // Shadow anchor: for moons, the com moves around the host on the rendered
+      // surrogate orbit, so a sunward/interplanetary light direction (host-less
+      // vector) is only loosely meaningful; using the radial from the host keeps
+      // the phase terminator consistent with the rendered orbit.
+      const hostPoint = body.parent && S[D.bodies.find(b => b.id === body.parent)?.id] || null;
+      const length = hostPoint ? Math.hypot(point.x - hostPoint.x, point.y - hostPoint.y) || 1 : (Math.hypot(point.x, point.y) || 1);
+      const lx = hostPoint ? -(point.x - hostPoint.x) / length : -point.x / length;
+      const ly = hostPoint ? (point.y - hostPoint.y) / length : point.y / length;
       const night = X.createLinearGradient(screen.x - lx * radius * 1.35, screen.y - ly * radius * 1.35, screen.x + lx * radius * 1.35, screen.y + ly * radius * 1.35);
       night.addColorStop(0, 'rgba(0,2,9,.96)'); night.addColorStop(.42, 'rgba(0,4,14,.78)'); night.addColorStop(.56, 'rgba(2,10,20,.20)'); night.addColorStop(.68, 'rgba(0,0,0,0)');
       X.save(); X.beginPath(); X.arc(screen.x, screen.y, radius, 0, Math.PI * 2); X.clip(); X.fillStyle = night; X.fillRect(screen.x - radius, screen.y - radius, radius * 2, radius * 2); X.restore();
@@ -770,6 +777,11 @@
     const burnTime = mdot > 0 ? needed / mdot : 0;
     const epoch = node.epoch || (+date + node.t * 1000);
     autoBurn = { nodeId: node.id, nodeTime: node.t, fireAt: epoch - burnTime * 0.5, delivered: 0, phase: 'COAST', initialMass: 0, estBurn: burnTime, burnSimStart: 0, appliedRate: 0, alignWindow: Math.max(90, Math.min(900, burnTime * 4)) };
+    // Cut the engine for the coast-to-node phase. Without this a throttle left
+    // on before arming keeps firing (prograde-locked) all the way to the node,
+    // which silently destroys the planned burn vector and looks like the craft
+    // "accelerating on its own". The burn window re-commands the throttle.
+    setThrottle(0, true);
     $('throttle').disabled = true; $('launchBtn').disabled = true;
     // Warp is KEPT while coasting to the node (so you can time-warp toward the
     // burn instead of idling at 1x). It drops to 1x only when the align window
@@ -789,20 +801,22 @@
     if (autoBurn.phase === 'COAST' && +date >= autoBurn.fireAt - (autoBurn.alignWindow || 15000)) { autoBurn.phase = 'ALIGN'; if (warpIndex !== 0) setWarp(0); }
     if (autoBurn.phase !== 'ALIGN' && autoBurn.phase !== 'BURN') return;
     // No forced 1x here: warp is only dropped when entering ALIGN above.
-    // Steer along the FROZEN inertial burn vector solved at node edit time:
-    // zero per-frame propagation, zero jitter.
     const burn = ExolineNav.calculateBurn(node);
     if (!burn || burn.total <= 0) { cancelAutoBurn('AUTO BURN · BAD Δv'); return; }
-    const frozen = node.dv_vec && (node.dv_vec.x || node.dv_vec.y) ? node.dv_vec : null;
-    let dv;
-    if (frozen) {
-      dv = { x: frozen.x, y: frozen.y };
-    } else {
-      const exec = ExolineNav.prepareExecution();
-      if (!exec.ok || !exec.frame) { cancelAutoBurn('AUTO BURN · ' + exec.reason); return; }
-      const frame = exec.frame;
-      dv = { x: frame.prograde.x * burn.prograde + frame.radial.x * burn.radial, y: frame.prograde.y * burn.prograde + frame.radial.y * burn.radial };
-    }
+    // Steer along the craft's LIVE local frame: the burn fires while the craft
+    // is sitting AT the node (inside the align window), so the live
+    // prograde/radial basis is exact. The frozen/predicted vector is only
+    // trustworthy when the pre-node coast was solved over its full length, but
+    // the step-budgeted preview cannot reach a node days away — its frame mixes
+    // epochs (craft state clipped to the step budget, reference body sampled at
+    // the true node epoch), which points the burn the wrong way and decays the
+    // craft into the planet instead of transferring to the target.
+    const frame = ExolineNav.getVelocityFrame(F.s, node.referenceBody, 0);
+    if (!frame) { cancelAutoBurn('AUTO BURN · BAD FRAME'); return; }
+    const dv = {
+      x: frame.prograde.x * burn.prograde + frame.radial.x * burn.radial,
+      y: frame.prograde.y * burn.prograde + frame.radial.y * burn.radial
+    };
     if (Math.hypot(dv.x, dv.y) < 1e-9) { cancelAutoBurn('AUTO BURN · BAD Δv'); return; }
     // Rate-limited slew that can NEVER overshoot: the applied rotation is
     // clamped to the remaining angle itself, so the heading error is
@@ -844,13 +858,33 @@
     const rate = autoBurn.appliedRate || 0;
     if (rate > 0 && physicsSeconds > 0) autoBurn.delivered = (autoBurn.delivered || 0) + rate * physicsSeconds;
     autoBurn.appliedRate = 0;
-    const tol = Math.max(0.05, rate * physicsSeconds * 0.5);
+    // Tight commit tolerance: the burn must land ON the planned Δv. An escape-
+    // class transfer (e.g. TLI) is hypersensitive near the parabolic energy, so
+    // even a ~1% early cutoff (tens of m/s) throws the apoapsis ~100,000 km
+    // short of the target and the craft never reaches it.
+    // Near-parabolic transfers magnify a Δv error by ~3,700 km per m/s, so the
+    // commit tolerance has to be a small fraction of a m/s: the old 2%-of-chunk
+    // window let the burn stop ~1.1 m/s early, which is ~4,000 km of apogee and
+    // tens of thousands of km of encounter error.
+    const tol = Math.max(0.01, rate * physicsSeconds * 0.002);
     if (autoBurn.delivered + tol < node.totalDv) return;
     const id = autoBurn.nodeId;
     setThrottle(0, true); nodeAnchors.delete(id); ExolineNav.commitExecution(id); ExolineNav.invalidate();
     autoBurn = null; $('throttle').disabled = false; $('launchBtn').disabled = false; $('navExecute').textContent = 'AUTO BURN';
     if (!ExolineNav.getNodes().length) $('navNode').classList.add('hidden');
     showToast(`AUTO BURN COMPLETE · Δv ${ExolineNav.fmtDv(node.totalDv)}`);
+    // Chain the maneuver sequence. A transfer is a DEPARTURE plus a CAPTURE —
+    // two nodes — but only the node that was armed ever fired, so the capture
+    // burn never executed and the craft sailed straight past the Moon, which
+    // reads as "bouncing off" its sphere of influence. Hand off to the next
+    // remaining node so the whole plan runs to completion on its own.
+    const next = ExolineNav.getNodes().slice().sort((a, b) => (a.epoch || 0) - (b.epoch || 0)).find(n => n.totalDv > .01);
+    if (next) {
+      activeNodeId = next.id;
+      $('navNode').classList.remove('hidden');
+      $('navPanel').classList.remove('hidden', 'collapsed');
+      setTimeout(() => startAutoBurn(), 0);
+    }
   }
   function updateWarp() { const button = $('warpBtn'); button.innerHTML = `${running ? pauseIcon : playIcon}<span>${running ? warpText(WARP[warpIndex]) : ''}</span>`; button.classList.toggle('is-paused', !running); button.setAttribute('aria-label', running ? `Pause at ${warpText(WARP[warpIndex])}` : 'Resume simulation'); }
   function setWarp(index) { warpIndex = Math.max(0, Math.min(WARP.length - 1, index)); simulationBacklog = 0; updateWarp(); }
@@ -935,7 +969,20 @@
   function closeMission() { $('missionScreen').classList.add('hidden'); $('app').classList.remove('mission-active'); }
   function renderChangelog(markdown) { const target = $('changelogContent'); target.replaceChildren(); let list; for (const line of markdown.split(/\r?\n/)) { if (line.startsWith('### ')) { list = null; const heading = document.createElement('h2'); heading.textContent = line.slice(4); target.append(heading); } else if (line.startsWith('- ')) { if (!list) { list = document.createElement('ul'); target.append(list); } const item = document.createElement('li'); item.textContent = line.slice(2); list.append(item); } else if (line.trim()) { list = null; const paragraph = document.createElement('p'); paragraph.textContent = line.replace(/^# /, ''); target.append(paragraph); } else list = null; } }
   function controls() {
-    $('exploreSolBtn').onclick = closeMission; $('continueMissionBtn').onclick = closeMission; $('missionEnter').onclick = closeMission;
+    $('exploreSolBtn').onclick = closeMission; $('continueMissionBtn').onclick = closeMission;
+    // ENTER sits directly under the initial-orbit selector, so it must honour
+    // it: if the chosen body differs from the current one, launch there; if it
+    // matches, just resume. (Previously ENTER only closed the menu, so the
+    // selector appeared to do nothing.)
+    const selectedOrbitId = () => { const v = $('orbitSelect') && $('orbitSelect').value; return v && P.bodies[v] ? v : null; };
+    const applySelectedOrbit = () => {
+      const id = selectedOrbitId();
+      if (id && id !== (F.circularHold?.id || ExolineNav.currentRefId())) {
+        F.launch(id, S); nodeAnchors.clear(); ExolineNav.onReset(); ExolineNav.invalidate(); cam.o = { x: F.s.r.x, y: F.s.r.y };
+      }
+      closeMission();
+    };
+    $('missionEnter').onclick = applySelectedOrbit;
     // Populate orbit selector with all bodies from physics_constants
     function populateOrbitSelect() {
       const select = $('orbitSelect');
@@ -954,7 +1001,7 @@
       select.value = saved && P.bodies[saved] ? saved : 'earth';
       select.onchange = () => localStorage.setItem('exoline.orbitSelect', select.value);
     }
-    $('newCampaignBtn').onclick = () => { const selId = $('orbitSelect').value || 'earth'; F.launch(selId, S); nodeAnchors.clear(); ExolineNav.onReset(); ExolineNav.invalidate(); cam.o = { x: F.s.r.x, y: F.s.r.y }; closeMission(); };
+    $('newCampaignBtn').onclick = () => { const selId = selectedOrbitId() || 'earth'; F.launch(selId, S); nodeAnchors.clear(); ExolineNav.onReset(); ExolineNav.invalidate(); cam.o = { x: F.s.r.x, y: F.s.r.y }; closeMission(); };
     // Populate orbit selector on mission screen open
     populateOrbitSelect();
     $('orbitSelect').onchange = () => localStorage.setItem('exoline.orbitSelect', $('orbitSelect').value);
@@ -977,7 +1024,7 @@
     $('resetKeybinds').onclick = () => { bindings = { ...defaultBindings }; saveBindings(); renderKeybinds(); showToast('KEYBINDS RESET'); };
     $('slower').innerHTML = rewindIcon; $('faster').innerHTML = forwardIcon; $('slower').onclick = e => { e.preventDefault(); e.stopPropagation(); setWarp(warpIndex - 1); }; $('faster').onclick = e => { e.preventDefault(); e.stopPropagation(); setWarp(warpIndex + 1); }; $('warpBtn').onclick = e => { e.preventDefault(); e.stopPropagation(); running = !running; updateWarp(); };
     $('throttle').oninput = e => setThrottle(e.target.value); $('turnLeft').onpointerdown = () => keys.right = true; $('turnRight').onpointerdown = () => keys.left = true; addEventListener('pointerup', () => { keys.left = false; keys.right = false; });
-    $('launchBtn').onclick = () => { if (autoBurn) { showToast('THROTTLE CONTROLLED BY AUTO BURN'); return; } craftSelected = true; lock = 'craft'; sel = null; focusCraftView(); setThrottle(F.s.throttle > 0 ? 0 : 100); $('launchBtn').textContent = F.s.throttle ? 'CUTOFF' : 'IGNITION'; }; $('rcsBtn').onclick = () => { rcs = !rcs; $('rcsBtn').classList.toggle('is-on', rcs); $('rcsBtn').setAttribute('aria-pressed', String(rcs)); };
+    $('launchBtn').onclick = () => { if (autoBurn) { showToast('THROTTLE CONTROLLED BY AUTO BURN'); return; } craftSelected = true; lock = 'craft'; sel = null; focusCraftView(); setThrottle(F.s.throttle > 0 ? 0 : 100); $('launchBtn').textContent = F.s.throttle ? 'CUTOFF' : 'IGNITION'; }; $('rcsBtn').onclick = () => { rcs = !rcs; $('rcsBtn').classList.toggle('is-on', rcs); $('rcsBtn').setAttribute('aria-pressed', String(rcs)); }; $('ascentBtn').onclick = () => { if (!F) return; F.ascentMode = !F.ascentMode; $('ascentBtn').classList.toggle('is-on', F.ascentMode); $('ascentBtn').setAttribute('aria-pressed', String(F.ascentMode)); showToast(F.ascentMode ? 'ASCENT MODE ON' : 'ASCENT MODE OFF'); };
     $('orbitNodeAdd').onclick = () => { const seconds = Number($('orbitNodeAdd').dataset.time) || 600; $('orbitNodeAdd').classList.add('hidden'); addNodeForCraft(seconds); };
     $('resetBtn').onclick = () => { lock = null; cam.o = { x: 0, y: 0 }; cam.k = innerHeight / (2.5 * AU); }; $('closeDetail').onclick = () => { $('detailPanel').classList.add('hidden'); sel = null; lock = null; }; $('openMapBtn').onclick = openMap; $('mapResetBtn').onclick = () => mapRenderer?.reset(); $('backBtn').onclick = () => { C.style.display = 'block'; $('mapCanvas').style.display = 'none'; $('mapCanvas').classList.add('hidden'); $('mapTopbar').classList.add('hidden'); };
     $('setTargetBtn').onclick = () => { if (sel && ExolineNav.setTarget(sel.id)) showToast(`TARGET: ${ExolineNav.bodyName(sel.id).toUpperCase()}`); else if (sel) showToast('TARGET UNAVAILABLE'); };
@@ -1124,6 +1171,7 @@
       if (matches(e, 'focusCraft')) { craftSelected = true; sel = null; lock = 'craft'; focusCraftView(); }
       if (matches(e, 'resetView')) resetView();
       if (matches(e, 'autoBurn')) { if (autoBurn) cancelAutoBurn(); else startAutoBurn(); }
+      if (matches(e, 'stage')) { e.preventDefault(); if (F) { F.stage(); showToast('STAGE SEPARATION'); } }
     });
     addEventListener('keyup', e => {
       if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
@@ -1186,7 +1234,7 @@
     }
     draw(); requestAnimationFrame(frame);
   }
-  async function start() { [D, P, A, minerals] = await Promise.all(['solar_system.json', 'physics_constants.json', 'render_anchors.json', 'mineral_profiles.json'].map(async file => (await fetch('../data/' + file)).json())); await ExolineOrbit.load(); await updateStates(); F = new ExolineFlight.Flight(P); F.launch('earth', S); ExolineNav.init({ catalog: D, constants: P, flight: F, getBodies: () => S, getDate: () => date, getRefId: () => soiBody()?.id || F.dominant(S) }); resize(); controls(); setWarp(0); setTimeout(() => { $('introScreen')?.classList.add('is-exiting'); setTimeout(() => { $('introScreen')?.remove(); $('missionScreen')?.classList.remove('hidden'); $('app')?.classList.add('mission-active'); }, 850); }, 4200); requestAnimationFrame(frame); }
+  async function start() { [D, P, A, minerals] = await Promise.all(['solar_system.json', 'physics_constants.json', 'render_anchors.json', 'mineral_profiles.json'].map(async file => (await fetch('../data/' + file)).json())); await ExolineOrbit.load(); await updateStates(); F = new ExolineFlight.Flight(P); const savedOrbit = (() => { try { return localStorage.getItem('exoline.orbitSelect'); } catch { return null; } })(); F.launch(savedOrbit && P.bodies[savedOrbit] ? savedOrbit : 'earth', S); ExolineNav.init({ catalog: D, constants: P, flight: F, getBodies: () => S, getDate: () => date, getRefId: () => soiBody()?.id || F.dominant(S) }); resize(); controls(); setWarp(0); setTimeout(() => { $('introScreen')?.classList.add('is-exiting'); setTimeout(() => { $('introScreen')?.remove(); $('missionScreen')?.classList.remove('hidden'); $('app')?.classList.add('mission-active'); }, 850); }, 4200); requestAnimationFrame(frame); }
   addEventListener('resize', resize);
   start().catch(error => {
     // Do not leave the player behind an opaque splash screen if data or a
