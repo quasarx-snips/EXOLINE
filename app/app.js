@@ -394,7 +394,7 @@
     marker(apoPoint, `AP ${altitude(apoF - physical.radius_m)}`, '#ffbd76');
   }
   function craft() { if (!F) return; const p = ws(F.s.r); X.save(); X.translate(p.x, p.y); X.rotate(-F.s.heading + Math.PI / 2); X.fillStyle = '#f8fdff'; X.strokeStyle = '#0b3040'; X.lineWidth = 2; X.beginPath(); X.moveTo(0, -15); X.lineTo(11, 11); X.lineTo(-11, 11); X.closePath(); X.fill(); X.stroke(); X.fillStyle = '#53ddff'; X.beginPath(); X.moveTo(0, -8); X.lineTo(3, 3); X.lineTo(-3, 3); X.closePath(); X.fill(); X.restore(); }
-  function hud() { $('flightHud').classList.toggle('hidden', !craftSelected); if (!craftSelected || !F) return; const d = F.diagnostics(S, sel?.id), name = D.bodies.find(b => b.id === d.body)?.name || 'Sun', radius = P.bodies[d.body]?.radius_m || 0; const fr = F.coast && F.coast.body === d.body ? F.coast : null, ecc = fr ? fr.e : d.e, apo = fr ? (fr.e < 1 ? fr.a * (1 + fr.e) : Infinity) : d.apo, peri = fr ? fr.a * (1 - fr.e) : d.peri; $('hudSoi').textContent = name.toUpperCase(); $('hudAlt').textContent = d.alt < 10000 ? `${Math.round(d.alt)} m` : `${(d.alt / 1000).toFixed(1)} km`; $('hudVel').textContent = d.speed < 1000 ? `${d.speed.toFixed(1)} m/s` : `${Math.round(d.speed).toLocaleString('en-US')} m/s`; $('hudApo').textContent = altitude(apo - radius); $('hudPeri').textContent = altitude(peri - radius); $('hudEcc').textContent = ecc.toFixed(4); $('hudDistance').textContent = altitude(d.target); $('launchBtn').textContent = F.s.throttle > 0 ? 'CUTOFF' : 'IGNITION'; updateBurnReadout();
+  function hud() { $('flightHud').classList.toggle('hidden', !craftSelected); if (!craftSelected || !F) return; const d = F.diagnostics(S, sel?.id), name = D.bodies.find(b => b.id === d.body)?.name || 'Sun', radius = P.bodies[d.body]?.radius_m || 0; const fr = F.coast && F.coast.body === d.body ? F.coast : null, ecc = fr ? fr.e : d.e, apo = fr ? (fr.e < 1 ? fr.a * (1 + fr.e) : Infinity) : d.apo, peri = fr ? fr.a * (1 - fr.e) : d.peri; $('hudSoi').textContent = name.toUpperCase(); $('hudAlt').textContent = d.alt < 10000 ? `${Math.round(d.alt)} m` : `${(d.alt / 1000).toFixed(1)} km`; $('hudVel').textContent = d.speed < 1000 ? `${d.speed.toFixed(1)} m/s` : `${Math.round(d.speed).toLocaleString('en-US')} m/s`; $('hudApo').textContent = altitude(apo - radius); $('hudPeri').textContent = altitude(peri - radius); $('hudEcc').textContent = ecc.toFixed(4); $('hudDistance').textContent = altitude(d.target); $('launchBtn').textContent = F.s.throttle > 0 ? 'CUTOFF' : 'IGNITION'; $('ascentBtn').classList.toggle('is-on', !!F.ascentMode); $('ascentBtn').setAttribute('aria-pressed', String(!!F.ascentMode)); updateBurnReadout();
 
     // Reentry HUD
     const rs = F.reentryState;
@@ -426,7 +426,21 @@
       label.textContent = `COASTING  BURN IN ${ExolineNav.fmtDur(Math.max(0, (autoBurn.fireAt - +date) / 1000))}`;
     }
   }
-  function vehicleReadout() { if (!F) return; $('shipMass').textContent = `${(F.s.m / 1000).toFixed(2)} t`; $('shipThrust').textContent = `${(F.thrust / 1000).toFixed(0)} kN`; $('shipTwr').textContent = (F.thrust * Math.max(F.s.throttle, .01) / (F.s.m * 9.80665)).toFixed(2); }
+  // Dynamic TWR for the status strip. While landed the throttle term is NOT
+  // floored, so a parked craft at 0% throttle reads T/W 0.00 and can flash the
+  // low-TWR warning; in flight the floor keeps the readout from flickering to
+  // zero during a cutoff.
+  function vehicleReadout() {
+    if (!F) return;
+    $('shipMass').textContent = `${(F.s.m / 1000).toFixed(2)} t`;
+    $('shipThrust').textContent = `${(F.thrust / 1000).toFixed(0)} kN`;
+    const gravity = 9.80665;
+    const throttleTerm = F.s.landed ? F.s.throttle : Math.max(F.s.throttle, .01);
+    const twr = F.s.m > 0 ? (F.thrust * throttleTerm) / (F.s.m * gravity) : 0;
+    $('shipTwr').textContent = twr.toFixed(2);
+    $('shipTwr').classList.toggle('twr-low', F.s.landed === true && twr < 1);
+    $('shipStage').textContent = `${Math.min(F.currentStage + 1, F.stages.length)}/${F.stages.length}`;
+  }
   // ---------- navigation rendering (world -> screen via the same ws() transform) ----------
   function drawLegPath(records, offset, colour, width, dashed) {
     if (!records || records.length < 2) return;
@@ -968,17 +982,30 @@
   async function openMap() { if (!sel) return; terrain ??= await (await fetch('../data/terrain_manifest.json')).json(); const manifest = terrain.bodies[sel.id]; if (!manifest) return; C.style.display = 'none'; $('mapCanvas').classList.remove('hidden'); $('mapCanvas').style.display = 'block'; $('mapTopbar').classList.remove('hidden'); if (!mapRenderer) mapRenderer = new ExolineMap.MapRenderer($('mapCanvas'), { terrainManifest: manifest, onZoom: zoom => { $('mapReadout').textContent = `MAP · ${zoom.toFixed(1)}×`; } }); await mapRenderer.open(sel, manifest); }
   function closeMission() { $('missionScreen').classList.add('hidden'); $('app').classList.remove('mission-active'); }
   function renderChangelog(markdown) { const target = $('changelogContent'); target.replaceChildren(); let list; for (const line of markdown.split(/\r?\n/)) { if (line.startsWith('### ')) { list = null; const heading = document.createElement('h2'); heading.textContent = line.slice(4); target.append(heading); } else if (line.startsWith('- ')) { if (!list) { list = document.createElement('ul'); target.append(list); } const item = document.createElement('li'); item.textContent = line.slice(2); list.append(item); } else if (line.trim()) { list = null; const paragraph = document.createElement('p'); paragraph.textContent = line.replace(/^# /, ''); target.append(paragraph); } else list = null; } }
+  // Launch-site presets that are not physical bodies, listed after them in the
+  // mission screen's launch-site dropdown. Both start inserted in a 400 km
+  // circular orbit instead of parked on a pad:
+  //   LEO = low Earth orbit · LOI = Lunar Orbit Insertion (around the Moon).
+  const ORBITAL_LAUNCH_SITES = {
+    leo: { body: 'earth', altitude: 400000, label: 'LEO' },
+    loi: { body: 'earth:moon', altitude: 400000, label: 'LOI' }
+  };
+  const launchSite = site => {
+    const preset = ORBITAL_LAUNCH_SITES[site];
+    if (preset) F.launchOrbit(preset.body, S, preset.altitude);
+    else F.launch(site, S);
+  };
   function controls() {
     $('exploreSolBtn').onclick = closeMission; $('continueMissionBtn').onclick = closeMission;
     // ENTER sits directly under the initial-orbit selector, so it must honour
     // it: if the chosen body differs from the current one, launch there; if it
     // matches, just resume. (Previously ENTER only closed the menu, so the
     // selector appeared to do nothing.)
-    const selectedOrbitId = () => { const v = $('orbitSelect') && $('orbitSelect').value; return v && P.bodies[v] ? v : null; };
+    const selectedOrbitId = () => { const v = $('orbitSelect') && $('orbitSelect').value; return v && (P.bodies[v] || ORBITAL_LAUNCH_SITES[v]) ? v : null; };
     const applySelectedOrbit = () => {
       const id = selectedOrbitId();
       if (id && id !== (F.circularHold?.id || ExolineNav.currentRefId())) {
-        F.launch(id, S); nodeAnchors.clear(); ExolineNav.onReset(); ExolineNav.invalidate(); cam.o = { x: F.s.r.x, y: F.s.r.y };
+        launchSite(id); nodeAnchors.clear(); ExolineNav.onReset(); ExolineNav.invalidate(); cam.o = { x: F.s.r.x, y: F.s.r.y };
       }
       closeMission();
     };
@@ -996,12 +1023,19 @@
         opt.textContent = ExolineNav.bodyName(id);
         select.appendChild(opt);
       }
+      // Non-body presets (LOI …) follow the physical launch sites.
+      for (const [key, preset] of Object.entries(ORBITAL_LAUNCH_SITES)) {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = preset.label;
+        select.appendChild(opt);
+      }
       // Restore saved selection, defaulting to Earth.
       const saved = localStorage.getItem('exoline.orbitSelect');
-      select.value = saved && P.bodies[saved] ? saved : 'earth';
+      select.value = saved && (P.bodies[saved] || ORBITAL_LAUNCH_SITES[saved]) ? saved : 'earth';
       select.onchange = () => localStorage.setItem('exoline.orbitSelect', select.value);
     }
-    $('newCampaignBtn').onclick = () => { const selId = selectedOrbitId() || 'earth'; F.launch(selId, S); nodeAnchors.clear(); ExolineNav.onReset(); ExolineNav.invalidate(); cam.o = { x: F.s.r.x, y: F.s.r.y }; closeMission(); };
+    $('newCampaignBtn').onclick = () => { const selId = selectedOrbitId() || 'earth'; launchSite(selId); nodeAnchors.clear(); ExolineNav.onReset(); ExolineNav.invalidate(); cam.o = { x: F.s.r.x, y: F.s.r.y }; closeMission(); };
     // Populate orbit selector on mission screen open
     populateOrbitSelect();
     $('orbitSelect').onchange = () => localStorage.setItem('exoline.orbitSelect', $('orbitSelect').value);
@@ -1076,12 +1110,12 @@
             if (!(w.dvDeparture > 0)) { showToast('NO VIABLE BURN'); return; }
             const refId = ExolineNav.currentRefId();
             // Departure burn: prograde at the craft's reference body.
-            const node = ExolineNav.addNode({ t: tSec, referenceBody: refId, progradeDv: Math.round(w.dvDeparture), radialDv: 0, normalDv: 0 });
+            const node = ExolineNav.addNode({ t: tSec, referenceBody: refId, progradeDv: w.dvDeparture, radialDv: 0, normalDv: 0 });
             if (!node) { showToast('NODE CREATION FAILED'); return; }
             // Capture burn at the target, one TOF later: retrograde relative to
             // the target's own frame so it circularises instead of flying past.
             if (w.dvArrival > 0) {
-              ExolineNav.addNode({ t: tSec + w.tof, referenceBody: w.arrivalBody, progradeDv: -Math.round(w.dvArrival), radialDv: 0, normalDv: 0 });
+              ExolineNav.addNode({ t: tSec + w.tof, referenceBody: w.arrivalBody, progradeDv: -w.dvArrival, radialDv: 0, normalDv: 0 });
             }
             activeNodeId = node.id;
             $('navNode').classList.remove('hidden');
@@ -1171,7 +1205,7 @@
       if (matches(e, 'focusCraft')) { craftSelected = true; sel = null; lock = 'craft'; focusCraftView(); }
       if (matches(e, 'resetView')) resetView();
       if (matches(e, 'autoBurn')) { if (autoBurn) cancelAutoBurn(); else startAutoBurn(); }
-      if (matches(e, 'stage')) { e.preventDefault(); if (F) { F.stage(); showToast('STAGE SEPARATION'); } }
+      if (matches(e, 'stage')) { e.preventDefault(); if (F) { const separated = F.stage(); showToast(separated ? 'STAGE SEPARATION' : 'FINAL STAGE — NO SEPARATION'); } }
     });
     addEventListener('keyup', e => {
       if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
@@ -1206,7 +1240,7 @@
           // Analytic circular hold: exact at any warp, single step.
           updateAutoBurn(physicsSeconds); F.step(physicsSeconds, S); finishAutoBurn(physicsSeconds);
           date = new Date(+date + physicsSeconds * 1000);
-          await updateStates(); F.syncCircularHold(S);
+          await updateStates(); F.syncCircularHold(S); F.syncLanded(S);
         } else {
           // Perturbed flight: split into <=120 s chunks with a fresh ephemeris
           // each chunk, so high warp can't inject energy via stale body
@@ -1224,7 +1258,7 @@
             const chunk = Math.min(autoActive ? 2 : powered ? 5 : 120, remaining);
             updateAutoBurn(chunk); F.step(chunk, S); finishAutoBurn(chunk);
             date = new Date(+date + chunk * 1000);
-            await updateStates(); F.syncCircularHold(S);
+            await updateStates(); F.syncCircularHold(S); F.syncLanded(S);
             remaining -= chunk;
             if (!running) break;
           }
@@ -1234,7 +1268,7 @@
     }
     draw(); requestAnimationFrame(frame);
   }
-  async function start() { [D, P, A, minerals] = await Promise.all(['solar_system.json', 'physics_constants.json', 'render_anchors.json', 'mineral_profiles.json'].map(async file => (await fetch('../data/' + file)).json())); await ExolineOrbit.load(); await updateStates(); F = new ExolineFlight.Flight(P); const savedOrbit = (() => { try { return localStorage.getItem('exoline.orbitSelect'); } catch { return null; } })(); F.launch(savedOrbit && P.bodies[savedOrbit] ? savedOrbit : 'earth', S); ExolineNav.init({ catalog: D, constants: P, flight: F, getBodies: () => S, getDate: () => date, getRefId: () => soiBody()?.id || F.dominant(S) }); resize(); controls(); setWarp(0); setTimeout(() => { $('introScreen')?.classList.add('is-exiting'); setTimeout(() => { $('introScreen')?.remove(); $('missionScreen')?.classList.remove('hidden'); $('app')?.classList.add('mission-active'); }, 850); }, 4200); requestAnimationFrame(frame); }
+  async function start() { [D, P, A, minerals] = await Promise.all(['solar_system.json', 'physics_constants.json', 'render_anchors.json', 'mineral_profiles.json'].map(async file => (await fetch('../data/' + file)).json())); await ExolineOrbit.load(); await updateStates(); F = new ExolineFlight.Flight(P); const savedOrbit = (() => { try { return localStorage.getItem('exoline.orbitSelect'); } catch { return null; } })(); launchSite(savedOrbit && (P.bodies[savedOrbit] || ORBITAL_LAUNCH_SITES[savedOrbit]) ? savedOrbit : 'earth'); ExolineNav.init({ catalog: D, constants: P, flight: F, getBodies: () => S, getDate: () => date, getRefId: () => soiBody()?.id || F.dominant(S) }); resize(); controls(); setWarp(0); setTimeout(() => { $('introScreen')?.classList.add('is-exiting'); setTimeout(() => { $('introScreen')?.remove(); $('missionScreen')?.classList.remove('hidden'); $('app')?.classList.add('mission-active'); }, 850); }, 4200); requestAnimationFrame(frame); }
   addEventListener('resize', resize);
   start().catch(error => {
     // Do not leave the player behind an opaque splash screen if data or a

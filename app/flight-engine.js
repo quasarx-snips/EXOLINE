@@ -58,17 +58,28 @@ window.ExolineFlight = (() => {
     let limit = Infinity;
     for (const [id, body] of Object.entries(bodies)) {
       const physical = constants.bodies[id]; if (!physical) continue;
-      if (!ATMOSPHERES[id]) continue;
+      const atm = ATMOSPHERES[id]; if (!atm) continue;
+      // Check proximity to atmosphere top even in vacuum, to pre-limit step
+      // before density becomes significant. This prevents a huge warp step
+      // from jumping completely through the upper atmosphere in one go.
+      const altitude = length(sub(position, body)) - physical.radius_m;
+      if (altitude > atm.top * 1.5) continue; // far outside atmosphere
       const rho = atmosphereDensity(position, body, { ...physical, id });
-      // Only meaningful once the air is dense enough to bite; above that, cap
-      // the step by sqrt(m / (0.5·ρ·Cd·A·|v|)) · 0.5 so a reentry can never
-      // outrun the integrator at high warp.
-      if (!rho || rho <= 1e-4) continue;
-      const speed = length(sub(velocity, { x: body.vx || 0, y: body.vy || 0, z: body.vz || 0 }));
-      if (!(speed > 1)) continue;
-      const decay = 0.5 * rho * DRAG_CD * DRAG_AREA * speed;   // force per unit velocity
-      const cap = Math.sqrt(Math.max(mass, 1) / Math.max(decay, 1e-12)) * 0.5;
-      limit = Math.min(limit, Math.max(.002, Math.min(300, cap)));
+      // Once we are inside or near the atmosphere, hard-cap the step at 5 s
+      // regardless of density so the integrator always resolves the exponential
+      // density gradient and avoids the "skipping stone" bounce.
+      if (altitude < atm.top) {
+        // Inside atmosphere: cap based on aerodynamic time-constant, minimum 0.25 s
+        const speed = length(sub(velocity, { x: body.vx || 0, y: body.vy || 0, z: body.vz || 0 }));
+        if (rho && rho > 1e-6 && speed > 1) {
+          const decay = 0.5 * rho * DRAG_CD * DRAG_AREA * speed;
+          const cap = Math.sqrt(Math.max(mass, 1) / Math.max(decay, 1e-12)) * 0.4;
+          limit = Math.min(limit, Math.max(0.25, Math.min(5, cap)));
+        } else {
+          // Upper tenuous atmosphere: limit to 5 s so density gradient is sampled
+          limit = Math.min(limit, 5);
+        }
+      }
     }
     return limit;
   }
@@ -121,41 +132,87 @@ window.ExolineFlight = (() => {
       this.s.propellant = stage.propellant;
     }
     launch(id, bodies) {
-      // Initialize default stages if not already set
-      if (!this.stages.length) {
-        this.stages = [
-          { id: 0, dryMass: 400, propellant: 400, thrust: 25000, isp: 290 },
-          { id: 1, dryMass: 100, propellant: 100, thrust: 5000, isp: 350 }
-        ];
-        this.currentStage = 0;
-        this.updateStageProperties();
-      }
+      // Every launch starts a FRESH vehicle: rebuild the default stage stack
+      // unconditionally. The old guard (`if (!this.stages.length)`) built it
+      // once per session, so relaunching from the mission screen after a
+      // depleted flight kept empty tanks — and the fuel-blind TWR gate then
+      // released the craft with no thrust available, dropping it straight off
+      // the pad. Resuming a saved flight goes through deserialize() and never
+      // calls launch().
+      this.stages = [
+        { id: 0, dryMass: 400, propellant: 400, thrust: 25000, isp: 290 },
+        { id: 1, dryMass: 100, propellant: 100, thrust: 5000, isp: 350 }
+      ];
+      this.currentStage = 0;
+      this.updateStageProperties();
       this.ascentMode = false;
       const body = bodies[id], physical = this.c.bodies[id];
       const atmosphere = ATMOSPHERES[id];
+      this.coast = null; this.prevThrottle = 0;
+      // Reset reentry state on launch
+      this.reentryState = { bodyId: null, phase: 'EXO', q: 0, rho: 0, heating: 0, gLoad: 0, alt: 0, peakHeating: 0, peakG: 0 };
+      // Solid bodies are impenetrable: their surface is the ground AND the
+      // launchpad, so a mission always begins parked on it. Gas giants have no
+      // surface, so they keep the orbital start.
+      if (physical.solidSurface) {
+        const radius = physical.radius_m;
+        const dir = { x: 0, y: 1, z: 0 };
+        // heading = atan2(dir): thrust points along (cos h, sin h) — see acc()
+        // — so nose-out at this spawn point is +PI/2. The renderer agrees
+        // (rotation -h + PI/2 = 0 draws the nose away from the planet).
+        this.s = { r: { x: body.x, y: body.y + radius, z: body.z || 0 }, v: { x: body.vx || 0, y: body.vy || 0, z: body.vz || 0 }, m: this.s.m, propellant: this.s.propellant, heading: Math.atan2(dir.y, dir.x), throttle: 0, crashed: false, landed: true };
+        this.circularHold = null;
+        this.landedBody = id;
+        this.landedDir = dir;
+        // Same reentry state a touchdown produces, so the HUD reads LANDED.
+        this.reentryState.bodyId = id;
+        this.reentryState.phase = 'LANDED';
+        this.reentryState.alt = 0;
+        console.info(`[launch] ${id} surface is the launchpad; craft parked at altitude 0 (radius ${radius} m)`);
+        return;
+      }
       // Start above the air where there is one (plus a lift margin), else well
       // clear of the ground. Sets the circular-hold radius directly.
       const radius = physical.radius_m + (atmosphere ? atmosphere.top + 20000 : 180000);
       const speed = Math.sqrt(this.c.G * physical.mass / radius);
       this.s = { r: { x: body.x, y: body.y + radius, z: body.z || 0 }, v: { x: body.vx - speed, y: body.vy, z: body.vz || 0 }, m: this.s.m, propellant: this.s.propellant, heading: Math.PI, throttle: 0, crashed: false, landed: false };
       this.circularHold = { id, radius, phase: Math.PI / 2, meanMotion: speed / radius };
-      this.coast = null; this.prevThrottle = 0;
       this.landedBody = null; this.landedDir = null;
-      // Reset reentry state on launch
+    }
+    // Orbital-insertion launch preset (mission-screen "LOI"): start the fresh
+    // vehicle in a CIRCULAR orbit `altitudeMeters` above `id`'s surface instead
+    // of on the pad. Mirrors launch()'s orbital branch exactly — same on-rails
+    // circularHold contract (phase PI/2 matches the +y spawn point, velocity
+    // tangent), so the hold is numerically exact until the player thrusts.
+    launchOrbit(id, bodies, altitudeMeters) {
+      this.launch(id, bodies); // fresh stage stack, ascent/reentry reset
+      const body = bodies[id], physical = this.c.bodies[id];
+      if (!body || !physical) return; // launch() already placed a valid state
+      const radius = physical.radius_m + Math.max(0, altitudeMeters);
+      const speed = Math.sqrt(this.c.G * physical.mass / radius);
+      this.s = { r: { x: body.x, y: body.y + radius, z: body.z || 0 }, v: { x: body.vx - speed, y: body.vy, z: body.vz || 0 }, m: this.s.m, propellant: this.s.propellant, heading: Math.PI, throttle: 0, crashed: false, landed: false };
+      this.circularHold = { id, radius, phase: Math.PI / 2, meanMotion: speed / radius };
+      this.landedBody = null;
+      this.landedDir = null;
       this.reentryState = { bodyId: null, phase: 'EXO', q: 0, rho: 0, heating: 0, gLoad: 0, alt: 0, peakHeating: 0, peakG: 0 };
+      console.info(`[launch] ${id} orbital insertion: ${Math.round(altitudeMeters / 1000)} km circular, radius=${radius} m, speed=${speed.toFixed(1)} m/s`);
     }
 
-    // Staging: drop the previous stage's dry mass and remaining propellant
+    // Staging: drop the previous stage's dry mass and remaining propellant.
+    // updateStageProperties() rebuilds s.m from the NEW active stage plus the
+    // retained payload, so mass falls instantly while velocity (momentum
+    // direction) is untouched — both in flight and while pinned on the surface.
     stage() {
       if (this.currentStage >= this.stages.length - 1) {
         console.info('[stage] No more stages');
-        return;
+        return false;
       }
       const prevStage = this.stages[this.currentStage];
       const deadMass = prevStage.dryMass + prevStage.propellant;
       this.currentStage++;
       this.updateStageProperties();
       console.info(`[stage] Stage separation: dropped ${deadMass} kg, now stage ${this.currentStage} (thrust=${this.thrust} N, isp=${this.specificImpulse} s, mass=${this.s.m} kg)`);
+      return true;
     }
     advanceCircularHold(seconds, bodies) {
       const hold = this.circularHold, body = bodies[hold.id], physical = this.c.bodies[hold.id];
@@ -175,6 +232,28 @@ window.ExolineFlight = (() => {
       const cos = Math.cos(hold.phase), sin = Math.sin(hold.phase), speed = hold.meanMotion * hold.radius;
       this.s.r = { x: body.x + hold.radius * cos, y: body.y + hold.radius * sin, z: body.z || 0 };
       this.s.v = { x: (body.vx || 0) - speed * sin, y: (body.vy || 0) + speed * cos, z: body.vz || 0 };
+    }
+    // A landed craft rides its body the same way the circular hold does. The
+    // ephemeris is re-synced AFTER step() each chunk (see the frame loop), so
+    // without a matching surface sync the pinned position is read against a
+    // body that has already moved: Earth sweeps ~496 m per 16 ms frame at
+    // 29.78 km/s, which is exactly the false "-456 m" altitude on the pad.
+    // Snapping r and v to the fresh body state keeps altitude at exactly 0
+    // for every solid body, at any warp, in both the readout and the render.
+    syncLanded(bodies) {
+      if (!this.s.landed || this.s.crashed) return false;
+      const id = this.landedBody || this.referenceBody(bodies, this.s);
+      const body = bodies[id], physical = this.c.bodies[id];
+      if (!body || !physical) return false;
+      // Defensive: a loaded save can carry landed=true without a direction —
+      // same rebuild as step()'s landed branch.
+      if (!this.landedDir) {
+        const rel = sub(this.s.r, body), d = length(rel);
+        this.landedDir = d > 1e-6 ? { x: rel.x / d, y: rel.y / d, z: rel.z / d } : { x: 0, y: 1, z: 0 };
+      }
+      this.s.r = { x: body.x + this.landedDir.x * physical.radius_m, y: body.y + this.landedDir.y * physical.radius_m, z: (body.z || 0) + this.landedDir.z * physical.radius_m };
+      this.s.v = { x: body.vx || 0, y: body.vy || 0, z: body.vz || 0 };
+      return true;
     }
     // ---------- second-order ephemeris extrapolation ----------
     // Body positions are re-synced from the ephemeris once per chunk, so within
@@ -279,8 +358,27 @@ window.ExolineFlight = (() => {
         if (window.ExolineNav && typeof window.ExolineNav.soiRadius === 'function') soi = window.ExolineNav.soiRadius(id);
       } catch (error) { soi = null; }
       if (soi && Number.isFinite(soi)) {
-        const apoapsis = hyp ? Infinity : a * (1 + e);
-        if (apoapsis > soi) return false;
+        if (hyp) {
+          // Hyperbolic trajectory: only reject if the craft is OUTSIDE the SOI
+          // (it has already escaped). If R < soi the craft is on an inbound
+          // hyperbolic approach — freeze it as an analytic conic so the SOI
+          // entry coast is numerically exact and the body cannot "push away".
+          if (R >= soi) return false;
+        } else {
+          // Elliptic trajectory: reject if apoapsis escapes the SOI.
+          const apoapsis = a * (1 + e);
+          if (apoapsis > soi) return false;
+        }
+      }
+      // Periapsis-inside-atmosphere guard: if the orbit's periapsis would dip
+      // below the reference body's atmosphere top, the frozen 2-body conic is
+      // wrong — it ignores drag and causes the "skipping stone" reentry bounce
+      // where the craft re-captures a conic each time drag pops it back above
+      // the atmosphere, then drops back through the tenuous top, repeating.
+      if (!hyp) {
+        const periapsis = a * (1 - e);
+        const atmRef = ATMOSPHERES[id];
+        if (atmRef && periapsis - physical.radius_m < atmRef.top) return false;
       }
       const Wx = hx / h, Wy = hy / h, Wz = hz / h;
       let Px, Py, Pz;
@@ -318,6 +416,10 @@ window.ExolineFlight = (() => {
         elapsed += dt;
         const body = bodies[c.body];
         if (!body) { this.coast = null; return false; }
+        // SOI changed: drop the frozen conic and let the caller fall through
+        // to RK4 for the remaining time.  Do NOT return false immediately —
+        // that would skip physics entirely for the rest of this frame and
+        // inject a sudden velocity discontinuity that reads as "pushed away".
         if (this.referenceBody(bodies, this.s) !== c.body) { this.coast = null; return false; }
         c.M += c.n * dt;
         let E = c.E;
@@ -349,7 +451,20 @@ window.ExolineFlight = (() => {
         for (const [bid, b] of Object.entries(bodies)) {
           const p = this.c.bodies[bid]; if (!p) continue;
           // Gas bodies have no surface: an analytic coast passes through them.
-          if (p.solidSurface && length(sub(this.s.r, this.bodyAt(b, elapsed, accels, bid))) < p.radius_m) { this.s.crashed = true; this.s.throttle = 0; this.coast = null; return true; }
+          if (p.solidSurface) {
+            const crashAt = this.bodyAt(b, elapsed, accels, bid);
+            const crashRel = sub(this.s.r, crashAt), crashDist = length(crashRel);
+            if (crashDist < p.radius_m) {
+              // Impenetrable crust: an analytic arc that crosses the surface
+              // stops with the wreck ON the crust, never buried inside.
+              this.s.crashed = true; this.s.throttle = 0; this.coast = null;
+              const cx = crashDist > 1e-6 ? crashRel.x / crashDist : 0;
+              const cy = crashDist > 1e-6 ? crashRel.y / crashDist : 1;
+              const cz = crashDist > 1e-6 ? crashRel.z / crashDist : 0;
+              this.s.r = { x: crashAt.x + cx * p.radius_m, y: crashAt.y + cy * p.radius_m, z: (crashAt.z || 0) + cz * p.radius_m };
+              return true;
+            }
+          }
         }
         const atm = ATMOSPHERES[c.body];
         if (atm && R1 - c.radius < atm.top) { this.coast = null; return false; }
@@ -365,7 +480,8 @@ window.ExolineFlight = (() => {
         const displacement = sub(position, at), squared = dot(displacement, displacement);
         if (squared <= 1) continue;
         acceleration = add(acceleration, mul(displacement, -this.c.G * physical.mass / (squared * Math.sqrt(squared))));
-        acceleration = add(acceleration, atmosphericDrag(position, velocity, at, { ...physical, id }, this.s.m));
+        const velAt = this.bodyVelAt(initial, time, accels, id);
+        acceleration = add(acceleration, atmosphericDrag(position, velocity, { ...at, vx: velAt.x, vy: velAt.y, vz: velAt.z }, { ...physical, id }, this.s.m));
       }
       const usableThrottle = (this.infiniteFuel || this.s.propellant > 0) && !this.s.crashed ? this.s.throttle : 0;
       const safeMass = Math.max(this.s.m, 1);
@@ -382,9 +498,12 @@ window.ExolineFlight = (() => {
         console.warn('[FlightEngine] NaN detected in state. Setting crashed.');
         return;
       }
-      if (!this.infiniteFuel) {
+      // Guard on valid stage thrust/Isp: an unlaunched engine (0/0) would
+      // compute NaN here, poison s.propellant/s.m, and cascade NaN into the
+      // next acceleration call.
+      if (!this.infiniteFuel && this.thrust > 0 && this.specificImpulse > 0) {
         const burn = this.thrust * Math.max(0, state.throttle) / (this.specificImpulse * 9.80665) * dt;
-        const used = Math.min(state.propellant, burn); state.propellant -= used; state.m = this.dryMass + state.propellant;
+        const used = Math.min(state.propellant, burn); state.propellant -= used; state.m = this.dryMass + state.propellant + this.payloadMass;
         state.propellant = Math.max(0, state.propellant);
         if (used < burn) state.throttle = 0;
       }
@@ -464,6 +583,16 @@ window.ExolineFlight = (() => {
         if (!(distance < physical.radius_m)) continue;
         if (!physical.solidSurface) continue;             // gas body: pass through
         const vRel = sub(this.s.v, this.bodyVelAt(body, tAbs, accels, id));
+        const vRadial = dot(vRel, rel);
+        if (vRadial > 0) {
+          // Ascending/climbing away from body: keep craft above crust if sub-meter
+          // ephemeris jitter dipped below surface during liftoff.
+          const nx = distance > 1e-6 ? rel.x / distance : 0;
+          const ny = distance > 1e-6 ? rel.y / distance : 1;
+          const nz = distance > 1e-6 ? rel.z / distance : 0;
+          this.s.r = { x: at.x + nx * physical.radius_m, y: at.y + ny * physical.radius_m, z: (at.z || 0) + nz * physical.radius_m };
+          continue;
+        }
         this.reentryState.bodyId = id;
         if (length(vRel) < 10) {
           // Soft touchdown: clamp exactly to the surface and ride the body.
@@ -478,6 +607,12 @@ window.ExolineFlight = (() => {
           this.s.crashed = true;
           this.s.throttle = 0;
           this.reentryState.phase = 'CRASHED';
+          // Impenetrable crust: park the wreck exactly ON the surface so a
+          // craft is never left buried inside a solid body after an impact.
+          const nx = distance > 1e-6 ? rel.x / distance : 0;
+          const ny = distance > 1e-6 ? rel.y / distance : 1;
+          const nz = distance > 1e-6 ? rel.z / distance : 0;
+          this.s.r = { x: at.x + nx * physical.radius_m, y: at.y + ny * physical.radius_m, z: (at.z || 0) + nz * physical.radius_m };
         }
         return true;
       }
@@ -492,22 +627,49 @@ window.ExolineFlight = (() => {
       if (this.s.landed) {
         const lid = this.landedBody || this.referenceBody(bodies, this.s);
         const body = bodies[lid], physical = this.c.bodies[lid];
+        // Defensive: a loaded save can carry landed=true with no direction.
+        // Rebuild it from the current radius instead of dereferencing null.
+        if (!this.landedDir && body && physical) {
+          const rel = sub(this.s.r, body), d = length(rel);
+          this.landedDir = d > 1e-6 ? { x: rel.x / d, y: rel.y / d, z: rel.z / d } : { x: 0, y: 1, z: 0 };
+        }
         if (this.s.throttle > 0 && body && physical) {
-          // Compute TWR = thrust * throttle / (mass * local_g)
+          // TWR = thrust * throttle / (mass * local_g) — gated on the EFFECTIVE
+          // throttle. A dry tank produces zero thrust regardless of the engine's
+          // rating, so a fuel-blind check would release the pin (TWR > 1 on
+          // paper) with nothing pushing up and the craft free-falls into the
+          // pad. With no propellant the gate now reads TWR = 0 and holds.
           const local_g = this.c.G * physical.mass / (physical.radius_m * physical.radius_m);
-          const twr = (this.thrust * this.s.throttle) / (this.s.m * local_g);
+          const effectiveThrottle = (this.infiniteFuel || this.s.propellant > 0) ? this.s.throttle : 0;
+          const twr = (this.thrust * effectiveThrottle) / (this.s.m * local_g);
           if (twr > 1.0) {
             // TWR > 1: liftoff! Un-pin and transition to flying
+            this.s.r = { x: body.x + this.landedDir.x * physical.radius_m, y: body.y + this.landedDir.y * physical.radius_m, z: (body.z || 0) + this.landedDir.z * physical.radius_m };
+            this.s.v = { x: body.vx || 0, y: body.vy || 0, z: body.vz || 0 };
             this.s.landed = false;
             this.landedBody = null;
             this.landedDir = null;
             console.info(`[liftoff] TWR=${twr.toFixed(2)} > 1.0, transitioning to flight`);
           } else {
-            // TWR <= 1: stay pinned, consume fuel/heat, v = body velocity
+            // TWR <= 1: remain pinned (no upward translation at all) but the
+            // engine keeps burning propellant exactly as rk4 would — holding
+            // on the pad is not free. Aerodynamic heating stays 0 by the
+            // existing model (q/heating scale with airspeed; a parked craft
+            // has none — there is no thrust-heating model).
             this.s.r = { x: body.x + this.landedDir.x * physical.radius_m, y: body.y + this.landedDir.y * physical.radius_m, z: (body.z || 0) + this.landedDir.z * physical.radius_m };
             this.s.v = { x: body.vx || 0, y: body.vy || 0, z: body.vz || 0 };
+            if (!this.infiniteFuel && this.thrust > 0 && this.specificImpulse > 0) {
+              const burn = this.thrust * Math.max(0, this.s.throttle) / (this.specificImpulse * 9.80665) * seconds;
+              const used = Math.min(this.s.propellant, burn);
+              this.s.propellant = Math.max(0, this.s.propellant - used);
+              this.s.m = this.dryMass + this.s.propellant + this.payloadMass;
+              // Cut the throttle when the tank runs dry OR was already dry, so
+              // the IGNITION button flips back and the T/W readout can't show
+              // a healthy value for an engine that cannot fire.
+              if (used < burn || this.s.propellant <= 0) this.s.throttle = 0;
+            }
             this.prevThrottle = this.s.throttle;
-            return; // Skip physics integration, but fuel still burns in rk4
+            return; // Pinned: skip integration entirely.
           }
         } else if (body && physical && this.landedDir) {
           // No throttle: re-pin to surface
@@ -531,8 +693,11 @@ window.ExolineFlight = (() => {
           // Get prograde heading (velocity vector relative to body)
           const vRel = sub(this.s.v, { x: refBody.vx || 0, y: refBody.vy || 0, z: refBody.vz || 0 });
           const progradeHeading = Math.atan2(vRel.y, vRel.x);
-          // Surface normal heading (straight up)
-          const surfaceNormalHeading = Math.atan2(rel.y, rel.x) - Math.PI / 2;
+          // Surface normal heading (straight up). Thrust aims along
+          // (cos h, sin h) — see acc() — so the heading that points the nose
+          // radially outward IS the normal's own angle. (The old -PI/2 offset
+          // aimed 90 degrees off: tangential along the surface.)
+          const surfaceNormalHeading = Math.atan2(rel.y, rel.x);
           let targetHeading;
           if (altitude < 500) {
             // Below 500m: go straight up
@@ -547,10 +712,10 @@ window.ExolineFlight = (() => {
             targetHeading = this.s.heading + normalizedDiff * interpFactor;
           }
           // Pitch rate limit: max 5 deg/s = 0.0873 rad/s
-          const maxPitchRate = 0.0873;
+          const maxTurn = 0.0873 * seconds;
           let angleToTarget = targetHeading - this.s.heading;
           angleToTarget = Math.atan2(Math.sin(angleToTarget), Math.cos(angleToTarget));
-          const limitedAngle = Math.max(-maxPitchRate, Math.min(maxPitchRate, angleToTarget));
+          const limitedAngle = Math.max(-maxTurn, Math.min(maxTurn, angleToTarget));
           this.s.heading += limitedAngle;
           // Auto-disable ascent mode above atmosphere (or in vacuum)
           if ((atm && altitude >= atm.top) || (!atm && altitude > refPhysical.radius_m)) {
@@ -566,23 +731,34 @@ window.ExolineFlight = (() => {
       this._accMap = this.bodyAccelerations(bodies);
       // Prograde lock tracks the orbit as it curves, re-snapping every RK4
       // substep so long high-warp frames can't go stale mid-burn.
-      const lock = this.progradeLock && !this.steerOverride && !this.manualSteer && this.s.throttle > 0 && !this.s.crashed;
+      const lock = this.progradeLock && !this.ascentMode && !this.steerOverride && !this.manualSteer && this.s.throttle > 0 && !this.s.crashed;
       const lockId = lock ? this.referenceBody(bodies, this.s) : null;
       const lockBody = lock && lockId ? bodies[lockId] : null;
+      const lockPhysical = lock && lockId ? this.c.bodies[lockId] : null;
       const powered = this.s.throttle > 0;
       if (!powered && !this.circularHold && !this.coast && !this.s.crashed) this.captureCoast(bodies);
       if (this.coast && !powered && !this.s.crashed) {
         const ok = this.advanceCoast(seconds, bodies);
         this.prevThrottle = this.s.throttle;
-        if (!ok && !this.s.crashed) { this.coast = null; this.captureCoast(bodies); }
-        return;
+        if (ok || this.s.crashed) return;
+        // advanceCoast bailed (SOI transition, atmosphere entry, etc.).
+        // Try re-capturing a coast in the new reference body's frame. If that
+        // succeeds we're done for this step; if it fails the craft drops into
+        // the RK4 integrator below so physics always advances — never skipped.
+        this.coast = null;
+        if (this.captureCoast(bodies)) return;
+        // Fall through to RK4 for numerical integration.
       }
       if (this.circularHold && this.s.throttle === 0) { this.advanceCircularHold(seconds, bodies); this.prevThrottle = this.s.throttle; return; }
       const step = this.maximumStep(bodies), count = Math.max(1, Math.ceil(seconds / step)), dt = seconds / count;
       for (let index = 0; index < count; index++) {
         if (lockBody) {
+          const ldx = this.s.r.x - lockBody.x, ldy = this.s.r.y - lockBody.y, ldz = (this.s.r.z || 0) - (lockBody.z || 0);
+          const lDist = Math.hypot(ldx, ldy, ldz);
+          const lAlt = lockPhysical ? lDist - lockPhysical.radius_m : Infinity;
           const lvx = this.s.v.x - (lockBody.vx || 0), lvy = this.s.v.y - (lockBody.vy || 0);
-          if (Math.hypot(lvx, lvy) > 1e-9) this.s.heading = Math.atan2(lvy, lvx);
+          const lSpeed = Math.hypot(lvx, lvy);
+          if (lAlt >= 500 && lSpeed >= 50) this.s.heading = Math.atan2(lvy, lvx);
         }
         this.rk4(dt, bodies, index * dt);
         if (this.resolveContacts(bodies, (index + 1) * dt)) break;
@@ -594,11 +770,13 @@ window.ExolineFlight = (() => {
       const refPhysical = this.c.bodies[refId];
       if (refBody && refPhysical) {
         const atm = ATMOSPHERES[refId];
-        const rel = sub(this.s.r, refBody);
+        const endBody = this.bodyAt(refBody, seconds, this._accMap, refId);
+        const endVel = this.bodyVelAt(refBody, seconds, this._accMap, refId);
+        const rel = sub(this.s.r, endBody);
         const distance = length(rel);
         const altitude = distance - refPhysical.radius_m;
-        const vRel = length(sub(this.s.v, { x: refBody.vx || 0, y: refBody.vy || 0, z: refBody.vz || 0 }));
-        const rho = atm ? (atmosphereDensity(this.s.r, refBody, { ...refPhysical, id: refId }) || 0) : 0;
+        const vRel = length(sub(this.s.v, endVel));
+        const rho = atm ? (atmosphereDensity(this.s.r, endBody, { ...refPhysical, id: refId }) || 0) : 0;
 
         // Reset tracking when the dominant body changes.
         if (this.reentryState.bodyId !== refId) {
@@ -678,6 +856,14 @@ window.ExolineFlight = (() => {
       this.prevThrottle = data.prevThrottle || 0;
       this.payloadMass = data.payloadMass || 50;
       this.updateStageProperties();
+      // updateStageProperties seeds s.m from the ACTIVE stage's nominal
+      // propellant; a save carries the real remaining amount, so restore it
+      // AFTER mass is rebuilt. Without this a loaded pad save starts at 0
+      // propellant and can never reach TWR > 1 to lift off.
+      if (data.s && Number.isFinite(data.s.propellant)) {
+        this.s.propellant = Math.max(0, data.s.propellant);
+        this.s.m = this.dryMass + this.s.propellant + this.payloadMass;
+      }
     }
   }
   return { Flight, rk4Step, atmosphericDrag, atmosphereDensity, atmosphereStepLimit, isSolidSurface, atmospheres: ATMOSPHERES, add, sub, mul, dot, length };

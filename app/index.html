@@ -13,7 +13,6 @@
     <canvas id="mapCanvas" class="hidden" aria-label="EXOLINE Planet Map"></canvas>
 
     <nav class="flight-top-actions" aria-label="Settings and view">
-      <button class="icon-btn" id="ascentBtn" aria-pressed="false" title="Ascent mode (gravity turn automation)">ASCENT</button>
         <button class="icon-btn" id="settingsBtn" title="Settings" aria-label="Settings"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       <button class="small-btn" id="viewBtn" title="View" aria-label="View"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>VIEW</span></button>
     </nav>
@@ -26,6 +25,7 @@
       <div><span>MASS</span><b id="shipMass">1.00 t</b></div>
       <div><span>THRUST</span><b id="shipThrust">20 kN</b></div>
       <div><span>T/W</span><b id="shipTwr">2.04</b></div>
+      <div><span>STAGE</span><b id="shipStage">1/2</b></div>
       <div><span>PARTS</span><b>1</b></div>
     </section>
 
@@ -161,6 +161,7 @@
             <div class="flight-controls">
               <button id="launchBtn">IGNITION</button>
               <button id="rcsBtn" aria-pressed="false" title="Fine attitude control">RCS</button>
+              <button id="ascentBtn" aria-pressed="false" title="Ascent mode (gravity turn automation)">ASCENT</button>
             </div>
           </div>
           <div class="hud-readout"><span>Height</span><b id="hudAlt">—</b></div>

@@ -938,16 +938,20 @@ function createManeuverNode(opts = {}) {
       const craftEl = getOrbitalElements(ctx.flight.s, fromId);
       if (!el || !(el.aAU > 0)) return null;
       const moonA = el.aAU * AU;
-      // Aim the apogee a little ABOVE the Moon's mean orbit. A transfer that
-      // tops out exactly on the mean radius arrives below the Moon whenever the
-      // Moon is near its own apogee (up to ~28,000 km farther out), and the
-      // encounter then starts from underneath — a few m/s of under-delivery at
-      // these energies costs thousands of km, which is how a "correct" transfer
-      // ends up skimming past outside the sphere of influence. A small overshoot
-      // makes the craft CROSS the Moon's orbit rather than stop short of it.
-      const aimApo = moonA + 1.2e7;
+      // Sphere of influence of the Moon: we need this before computing aimApo
+      // because the overshoot must be calibrated to reliably land INSIDE the
+      // SOI, not just above the mean orbital radius. The old fixed +12,000 km
+      // could still miss when the Moon is near apogee and the orbit is tilted.
+      let moonSoi = null;
+      try { if (window.ExolineNav && typeof window.ExolineNav.soiRadius === 'function') moonSoi = window.ExolineNav.soiRadius(toId); } catch (e) { moonSoi = null; }
+      if (!moonSoi || !Number.isFinite(moonSoi)) moonSoi = 6.6e7; // ~66,000 km fallback for Earth:Moon
+      // Target apogee: Moon mean distance + 40% of SOI radius. This ensures the
+      // Hohmann arc crosses the Moon's orbit even when it is near its own apogee
+      // (~406,700 km from Earth), while not over-shooting so much that arrival
+      // Δv is miscalculated from an extreme flyby geometry.
+      const aimApo = moonA + moonSoi * 0.40;
       const r1 = craftEl && craftEl.distance > EPS ? craftEl.distance : fromP.radius_m + 180000;
-      if (!(moonA > r1) || r1 <= fromP.radius_m) return null;
+      if (!(moonA > r1) || r1 < fromP.radius_m) return null;
       // ---- Planar Hohmann transfer timed to a moon node crossing ----
       // The craft flies strictly in the departure body's plane: the flight
       // engine applies thrust only in x/y and launches with vz = 0, so the
@@ -1057,25 +1061,53 @@ function createManeuverNode(opts = {}) {
           return { x: r * Math.cos(th), y: r * Math.sin(th), vx: vr * Math.cos(th) - vt * Math.sin(th), vy: vr * Math.sin(th) + vt * Math.cos(th) };
         };
         // Integrate only the close approach, where lunar gravity matters.
+        // Use RK4 rather than Euler to avoid numerical dispersion corrupting
+        // the close-approach distance (30 s Euler steps at 1 km/s = 30 km per
+        // step error, which dominated the trueMiss estimate and led to wrong
+        // window selection and miscalibrated capture Δv).
         const lead = 2.0 * 86400, dt = 30;
         const start = stateAt(tHohmann - lead);
         let x = start.x, y = start.y, z = 0, vx = start.vx, vy = start.vy, vz = 0;
         let best = Infinity, bestI = 0, bestVx = 0, bestVy = 0, bestVz = 0;
         const steps = Math.round((2 * lead) / dt);
-        for (let i = 0; i <= steps; i++) {
-          const m = window.ExolineOrbit.moonAt(toId, new Date(startMs + (depT + tHohmann - lead + i * dt) * 1000));
-          if (!m) break;
+        const rk4acc = (px, py, pz, pvx, pvy, pvz, iStep) => {
+          const m = window.ExolineOrbit.moonAt(toId, new Date(startMs + (depT + tHohmann - lead + iStep * dt) * 1000));
+          if (!m) return { ax: 0, ay: 0, az: 0 };
           const mx = m.x * AU, my = m.y * AU, mz = (m.z || 0) * AU;
-          const ddx = x - mx, ddy = y - my, ddz = z - mz;
-          const d = Math.hypot(ddx, ddy, ddz);
+          const ddx = px - mx, ddy = py - my, ddz = pz - mz;
+          const d = Math.hypot(ddx, ddy, ddz) || 1, dd3 = d * d * d;
+          const rr = Math.hypot(px, py, pz) || 1, rr3 = rr * rr * rr;
+          return { ax: -mu * px / rr3 - moonMu * ddx / dd3, ay: -mu * py / rr3 - moonMu * ddy / dd3, az: -mu * pz / rr3 - moonMu * ddz / dd3 };
+        };
+        for (let i = 0; i < steps; i++) {
+          // Check distance at current position
+          const mCheck = window.ExolineOrbit.moonAt(toId, new Date(startMs + (depT + tHohmann - lead + i * dt) * 1000));
+          if (!mCheck) break;
+          const mxC = mCheck.x * AU, myC = mCheck.y * AU, mzC = (mCheck.z || 0) * AU;
+          const d = Math.hypot(x - mxC, y - myC, z - mzC);
           if (d < best) { best = d; bestI = i; bestVx = vx; bestVy = vy; bestVz = vz; }
-          const rr = Math.hypot(x, y, z) || 1, rr3 = rr * rr * rr;
-          const dd = Math.max(d, 1), dd3 = dd * dd * dd;
-          const ax = -mu * x / rr3 - moonMu * ddx / dd3;
-          const ay = -mu * y / rr3 - moonMu * ddy / dd3;
-          const az = -mu * z / rr3 - moonMu * ddz / dd3;
-          vx += ax * dt; vy += ay * dt; vz += az * dt;
-          x += vx * dt; y += vy * dt; z += vz * dt;
+          // RK4: k-stages for position and velocity simultaneously.
+          // k1: at current (x,v)
+          const a1 = rk4acc(x, y, z, vx, vy, vz, i);
+          // k2: at (x + vx·h/2, v + a1·h/2)
+          const x2 = x + vx * dt / 2, y2 = y + vy * dt / 2, z2 = z + vz * dt / 2;
+          const vx2 = vx + a1.ax * dt / 2, vy2 = vy + a1.ay * dt / 2, vz2 = vz + a1.az * dt / 2;
+          const a2 = rk4acc(x2, y2, z2, vx2, vy2, vz2, i);
+          // k3: at (x + vx2·h/2, v + a2·h/2)
+          const x3 = x + vx2 * dt / 2, y3 = y + vy2 * dt / 2, z3 = z + vz2 * dt / 2;
+          const vx3 = vx + a2.ax * dt / 2, vy3 = vy + a2.ay * dt / 2, vz3 = vz + a2.az * dt / 2;
+          const a3 = rk4acc(x3, y3, z3, vx3, vy3, vz3, i);
+          // k4: at (x + vx3·h, v + a3·h)
+          const x4 = x + vx3 * dt, y4 = y + vy3 * dt, z4 = z + vz3 * dt;
+          const vx4 = vx + a3.ax * dt, vy4 = vy + a3.ay * dt, vz4 = vz + a3.az * dt;
+          const a4 = rk4acc(x4, y4, z4, vx4, vy4, vz4, i + 1);
+          // Combine: update position (using k-velocities) and velocity (using k-accels) simultaneously
+          x += (vx + 2 * vx2 + 2 * vx3 + vx4) * dt / 6;
+          y += (vy + 2 * vy2 + 2 * vy3 + vy4) * dt / 6;
+          z += (vz + 2 * vz2 + 2 * vz3 + vz4) * dt / 6;
+          vx += (a1.ax + 2 * a2.ax + 2 * a3.ax + a4.ax) * dt / 6;
+          vy += (a1.ay + 2 * a2.ay + 2 * a3.ay + a4.ay) * dt / 6;
+          vz += (a1.az + 2 * a2.az + 2 * a3.az + a4.az) * dt / 6;
         }
         // The Moon's velocity at the closest approach. The capture burn must
         // cancel the craft's speed relative to THIS: a close flyby whips past
