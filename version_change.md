@@ -1,3 +1,26 @@
+### v0.1.1 — Launch pads, staging, ascent profiles, and LEO/LOI starts
+
+- Every mission now starts on the launchpad: solid planets and moons are impenetrable surfaces that double as the pad, with the craft parked at exactly 0 m altitude. Throttling up releases it only when TWR exceeds 1; below that it stays pinned while still burning propellant.
+- Added staging: `X` separates the active stage (drops spent dry mass and leftover propellant, keeps momentum), with a STAGE n/m readout on the status strip, a low-TWR warning flash on the pad, and ASCENT mode that flies a gravity turn — straight up to 500 m, smooth pitch toward prograde (max 5°/s), auto-off above the atmosphere.
+- Added LEO and LOI launch-site presets: start inserted in a 400 km circular orbit around Earth (LEO) or the Moon (LOI) instead of on the pad.
+- Fixed the pad readout showing a false negative altitude (e.g. -456 m on Earth): the landed craft now rides its body exactly, re-synced after every ephemeris update the same way the parking orbit does.
+- Fixed rockets dropping off the pad with empty tanks: every launch refuels and restages the vehicle, and the liftoff gate uses fuel-aware thrust, so a dry craft stays pinned instead of free-falling.
+- Fixed ASCENT steering aiming 90° off the surface normal, the first-burn mass discontinuity (vehicle mass now always includes the payload), and impacts leaving wrecks buried inside bodies — impacts now always stop on the crust.
+- Repaired the offline test harness (truncated since v0.1.0): pad/liftoff, impenetrability, fuel-floor, NaN-guard, drag, and orbital-insertion tests (A3–A10) on a corrected multi-body fixture.
+
+### v0.1.0x — Physics rework
+
+- Reworked the flight physics core around a staged-vehicle model: per-stage dry mass, propellant, thrust, and Isp with a constant payload, engine properties derived from the active stage, and per-body reentry tracking state.
+- Added the offline Node test harness (`tools/run_tests.js`, Tier A suite) with a saved results snapshot (`tools/tier_b_results.json`).
+- Added the long-form project manuals under `docs/manuals/` (briefing, phase 1–4 plans, and the agent-prompt roadmaps).
+
+### v0.1.0 — Atmosphere
+
+- Added atmospheric drag to live flight and to every maneuver prediction (per-body exponential density model), so planned trajectories account for air.
+- Added reentry phase tracking with live telemetry: EXO / ENTRY / DESCENT / LANDED / CRASHED / PASSTHROUGH, plus dynamic pressure, heating, and g-load with peak hold.
+- Added the launch-site orbit selector on the mission screen, the solid-surface border ring, and a planet ring/disk render fix.
+- Surface contacts now resolve as either a soft landing or a pass-through (gas giants have no surface), instead of a single impact rule.
+
 ### v0.0.5 — Physics stability, frozen node planning, and assisted-burn overhaul
 
 - Added a read-only physics validation agent (`app/physics-agent.js`, 20 checks across light/deep tiers: state finiteness, mass/throttle sanity, vis-viva, energy and momentum conservation, SOI/rocket-equation/fuel-flow/TWR/atmosphere/drag checks, Kepler/RK4/collision/warp/prediction/ephemeris checks) with a `?physics-debug` overlay. It never mutates game state.
