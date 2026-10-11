@@ -290,7 +290,27 @@ window.ExolineNav = (() => {
       if (pull > greatest) greatest = pull;
     }
     const floor = greatest * 1e-5;
-    return pulls.filter(p => p.pull >= floor).map(p => p.id);
+    const kept = pulls.filter(p => p.pull >= floor).map(p => p.id);
+    // The pull floor is evaluated ONCE at the start position, and a transfer's
+    // target routinely sits below it there: from LEO the Moon pulls only
+    // ~3.3e-5 m/s^2 versus Earth's ~8.7, i.e. under the 1e-5 floor — so the
+    // Moon was dropped from the grid and its gravity never acted on the
+    // predicted craft. The translunar arc then integrated Earth-only, read as
+    // near-escape ("ESCAPE"), and the capture node was solved against a Moon
+    // that wasn't in the model — while the live integrator (which loops every
+    // body) felt the Moon and curved into it. That split is the trajectory
+    // mismatch, the frame-to-frame "keeps varying", and the node miss. Force
+    // the target and its parent chain into the grid so the patched-conic
+    // handoff is physical and the prediction matches the flown path.
+    if (target) {
+      let id = target;
+      while (id && id !== 'sun') {
+        if (!kept.includes(id)) kept.push(id);
+        const parentId = constants.bodies[id] && constants.bodies[id].parent;
+        id = parentId;
+      }
+    }
+    return kept;
   }
   function gridDominant(grid, craftState, tAbs) {
     let id = grid.ids[0], greatest = 0;

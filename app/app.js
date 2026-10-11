@@ -279,8 +279,24 @@
       const lq = pts[pts.length - 1], scale = physical.radius_m / Math.max(1, Math.hypot(lq.x, lq.y));
       marker({ x: origin.x + lq.x * scale, y: origin.y + lq.y * scale }, 'IMPACT', '#ff7373');
     } else {
-      const lq = pts[pts.length - 1], end = ws({ x: origin.x + lq.x, y: origin.y + lq.y });
-      X.fillStyle = '#ffcf9c'; X.font = '9px sans-serif'; X.fillText('ESCAPE', end.x + 7, end.y - 7);
+      // Label the endpoint only when the integrated arc is genuinely UNBOUND
+      // relative to the reference body. A translunar injection is a huge but
+      // still-bound ellipse (apoapsis near the Moon, specific energy < 0); the
+      // old code stamped "ESCAPE" on every non-impact leg, which mislabeled a
+      // normal Moon transfer and read as a broken prediction. Compute the end
+      // state's specific energy and flag escape only when it is >= 0.
+      const endR = leg.endState && leg.endState.r, endV = leg.endState && leg.endState.v;
+      let unbound = false;
+      if (endR && endV) {
+        const rx = endR.x - origin.x, ry = endR.y - origin.y;
+        const vx = endV.x - (origin.vx || 0), vy = endV.y - (origin.vy || 0);
+        const R = Math.max(1, Math.hypot(rx, ry)), V2 = vx * vx + vy * vy, mu = P.G * physical.mass;
+        unbound = (V2 / 2 - mu / R) >= 0;
+      }
+      if (unbound) {
+        const lq = pts[pts.length - 1], end = ws({ x: origin.x + lq.x, y: origin.y + lq.y });
+        X.fillStyle = '#ffcf9c'; X.font = '9px sans-serif'; X.fillText('ESCAPE', end.x + 7, end.y - 7);
+      }
     }
     return true;
   }
@@ -319,11 +335,43 @@
     // the trajectory stays physical past the green rim.
     const refSoi = (id && id !== 'sun') ? ExolineNav.soiRadius(id) : null;
     const crossesSoi = !!(refSoi && finite(refSoi) && apoF > refSoi);
+    // A transfer that dips into ANOTHER body's sphere of influence is drawn
+    // from the numerical N-body coast, not an osculating conic. Decide this from
+    // the PREDICTION's own integrated path (navSnap.heavy.base), NOT the
+    // frame-to-frame osculating apoapsis: near the target the osculating apsis
+    // swings wildly, which flipped the drawn line between the ellipse and the
+    // coast every frame — the "keeps varying" jitter. The prediction is rebuilt
+    // on a steady cadence and is self-consistent, so its SOI reach is a stable
+    // signal, and it is exactly the path captureCoast() lets the craft fly.
+    let entersForeignSoi = false;
+    if (!frozen && numerical && numerical.records && numerical.records.length > 1) {
+      const worldAt = window.ExolineNav?._internals?.worldAt;
+      const dtBuild = ((numerical.builtAt || +date) - +date) / 1000;
+      const recs = numerical.records, stride = Math.max(1, Math.floor(recs.length / 120));
+      outer:
+      for (let i = 0; i < recs.length; i += stride) {
+        const tSec = recs[i].t + dtBuild;
+        for (const bid of Object.keys(P.bodies)) {
+          if (bid === id || !S[bid]) continue;
+          const p = P.bodies[bid];
+          if (!p || !p.solidSurface) continue;
+          const soiB = ExolineNav.soiRadius(bid);
+          if (!soiB || !finite(soiB)) continue;
+          // Skip parents: a body whose SOI already encloses the reference body
+          // (e.g. Earth around the Moon) is normal, not a transfer boundary.
+          if (Math.hypot(S[id].x - S[bid].x, S[id].y - S[bid].y) < soiB) continue;
+          let bx, by;
+          if (worldAt && bid !== 'sun') { const bp = worldAt(bid, tSec); if (!bp) continue; bx = bp.x; by = bp.y; }
+          else { bx = S[bid].x; by = S[bid].y; }
+          if (Math.hypot(recs[i].r.x - bx, recs[i].r.y - by) < soiB) { entersForeignSoi = true; break outer; }
+        }
+      }
+    }
     // Do not substitute a vacuum ellipse/straight line for a drag, escape, or
     // SOI-crossing prediction.  The sampled curve also remains selectable for
     // ADD NODE.  Skipped on-rails: a clean coast arc can never impact, drag,
     // or exceed the SOI it was validated against when it was captured.
-    if (numerical && (numerical.impact || eF >= 1 || inAtmosphere || crossesSoi) && (!frozen || crossesSoi)) {
+    if (numerical && (numerical.impact || eF >= 1 || inAtmosphere || crossesSoi || entersForeignSoi) && (!frozen || crossesSoi || entersForeignSoi)) {
       if (drawNumericalCoast(numerical, id)) {
         marker({ x: F.s.r.x, y: F.s.r.y }, 'CURRENT', '#ffbd76');
         return;

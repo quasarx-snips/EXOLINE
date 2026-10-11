@@ -370,6 +370,34 @@ window.ExolineFlight = (() => {
           if (apoapsis > soi) return false;
         }
       }
+      // Patched-conic boundary vs OTHER bodies: a frozen 2-body conic is only
+      // valid while no third body perturbs the arc. Earth's Laplace SOI is
+      // ~1.5M km, so a TLI-class transfer (apoapsis ~400,000 km) sits well
+      // inside it and the SOI guard above happily freezes it — yet the arc
+      // passes straight through the Moon's Hill sphere, where the Moon bends
+      // the real trajectory. The prediction is full N-body, so the frozen Earth
+      // conic diverges from it near the Moon and the craft arrives on the wrong
+      // path, sailing past the capture node. Reject any elliptic arc whose
+      // apoapsis reaches into another body's SOI so it falls through to the RK4
+      // N-body integrator, which matches the prediction exactly. The
+      // reach = dB - soiB > 0 test skips the parent (its SOI encloses the arc),
+      // so LEO/GEO and normal lunar orbits still freeze — only transfers into
+      // another body's neighbourhood drop to integration.
+      if (!hyp) {
+        const apoapsis = a * (1 + e);
+        for (const [bid, b] of Object.entries(bodies)) {
+          if (bid === id) continue;
+          const p = this.c.bodies[bid];
+          if (!p || !p.solidSurface) continue;
+          let soiB = null;
+          try {
+            if (window.ExolineNav && typeof window.ExolineNav.soiRadius === 'function') soiB = window.ExolineNav.soiRadius(bid);
+          } catch (error) { soiB = null; }
+          if (!soiB || !Number.isFinite(soiB)) continue;
+          const dB = length(sub(b, body)), reach = dB - soiB;
+          if (reach > 0 && apoapsis > reach) return false;
+        }
+      }
       // Periapsis-inside-atmosphere guard: if the orbit's periapsis would dip
       // below the reference body's atmosphere top, the frozen 2-body conic is
       // wrong — it ignores drag and causes the "skipping stone" reentry bounce
@@ -401,8 +429,85 @@ window.ExolineFlight = (() => {
         E0 = Math.asinh(sh);
         M = e * Math.sinh(E0) - E0;
       }
-      this.coast = { body: id, mu, a, e, hyp, Px, Py, Pz, Qx, Qy, Qz, n, M, E: E0, radius: physical.radius_m };
+      const conic = { body: id, mu, a, e, hyp, Px, Py, Pz, Qx, Qy, Qz, n, M, E: E0, radius: physical.radius_m };
+      // Patched-conic boundary (accurate, forward-propagated) for ESCAPE arcs.
+      // The elliptic case above is gated by the apoapsis heuristic, but a
+      // hyperbolic transfer has no apoapsis — a TLI burn leaves Earth on an
+      // escape hyperbola that the old code froze as a straight 2-body conic,
+      // ignoring the Moon, while the prediction integrated full N-body and
+      // curved into it. That split is the "ESCAPE" mismatch and the reason the
+      // craft sailed past the capture node. Walk the conic forward and reject
+      // the freeze the instant it enters another solid body's SOI so the RK4
+      // N-body integrator (identical model to the prediction) flies the arc.
+      // BOTH elliptic and hyperbolic arcs are gated here. The elliptic apoapsis
+      // guard above only rejects arcs that escape the REFERENCE SOI; a sub-SOI
+      // translunar arc (apoapsis ~400k km, still < Earth's 1.5M km SOI) sails
+      // straight through the Moon's Hill sphere, so gating this on `hyp` alone
+      // froze it as a pure 2-body Earth conic that ignored the Moon — diverging
+      // from the N-body prediction near the Moon (the "ESCAPE" mismatch) and
+      // missing the capture node. _coastCrossesSoi already solves both conic
+      // types, so drop the `hyp &&` and let any SOI-entering arc fall through to
+      // the RK4 N-body integrator, which is the same model the prediction uses.
+      if (this._coastCrossesSoi(conic, bodies, id)) return false;
+      this.coast = conic;
       return true;
+    }
+    // Forward-propagate a frozen conic and report whether it enters any OTHER
+    // solid body's sphere of influence before leaving the reference body's SOI
+    // (or a bounded horizon). The prediction switches frames at exactly these
+    // boundaries; freezing a 2-body arc across one makes the live craft diverge
+    // from the dashed path, so captureCoast rejects it and lets RK4 take over.
+    // Coarse steps are fine — this is a yes/no SOI gate, not the trajectory,
+    // and it only ever errs toward integrating (which is always correct).
+    _coastCrossesSoi(conic, bodies, refId) {
+      const targets = [];
+      for (const bid of Object.keys(bodies)) {
+        if (bid === refId) continue;
+        const p = this.c.bodies[bid];
+        if (!p || !p.solidSurface) continue;
+        let soiB = null;
+        try { if (window.ExolineNav && typeof window.ExolineNav.soiRadius === 'function') soiB = window.ExolineNav.soiRadius(bid); } catch (error) { soiB = null; }
+        if (soiB && Number.isFinite(soiB) && soiB > p.radius_m) targets.push({ bid, soiB });
+      }
+      if (!targets.length) return false;
+      let refSoi = null;
+      try { if (window.ExolineNav && typeof window.ExolineNav.soiRadius === 'function') refSoi = window.ExolineNav.soiRadius(refId); } catch (error) { refSoi = null; }
+      const accels = this._accMap || this.bodyAccelerations(bodies);
+      const refBody0 = bodies[refId];
+      if (!refBody0) return false;
+      let M = conic.M, E = conic.E, elapsed = 0;
+      const dt = 900; // 15-min coarse steps
+      for (let step = 0; step < 640; step++) { // ~9.6-day horizon covers any transfer
+        M += conic.n * dt;
+        for (let i = 0; i < 20; i++) {
+          const d = conic.hyp
+            ? (conic.e * Math.sinh(E) - E - M) / Math.max(1e-12, conic.e * Math.cosh(E) - 1)
+            : (E - conic.e * Math.sin(E) - M) / Math.max(1e-12, 1 - conic.e * Math.cos(E));
+          E -= d;
+          if (Math.abs(d) < 1e-9) break;
+        }
+        if (!Number.isFinite(E)) return false;
+        let ox, oy;
+        if (!conic.hyp) {
+          const cE = Math.cos(E), sE = Math.sin(E), sq = Math.sqrt(Math.max(0, 1 - conic.e * conic.e));
+          ox = conic.a * (cE - conic.e); oy = conic.a * sq * sE;
+        } else {
+          const ch = Math.cosh(E), sh = Math.sinh(E), sq = Math.sqrt(conic.e * conic.e - 1), aa = Math.abs(conic.a);
+          ox = -aa * (ch - conic.e); oy = aa * sq * sh;
+        }
+        elapsed += dt;
+        const bp = this.bodyAt(refBody0, elapsed, accels, refId);
+        const px = bp.x + ox * conic.Px + oy * conic.Qx;
+        const py = bp.y + ox * conic.Py + oy * conic.Qy;
+        const pz = (bp.z || 0) + ox * conic.Pz + oy * conic.Qz;
+        // Left the reference SOI cleanly -> a valid single-body coast.
+        if (refSoi && Number.isFinite(refSoi) && Math.hypot(px - bp.x, py - bp.y, pz - (bp.z || 0)) > refSoi) return false;
+        for (const t of targets) {
+          const tb = this.bodyAt(bodies[t.bid], elapsed, accels, t.bid);
+          if (Math.hypot(px - tb.x, py - tb.y, pz - (tb.z || 0)) < t.soiB) return true;
+        }
+      }
+      return false;
     }
     advanceCoast(seconds, bodies) {
       const c = this.coast;
