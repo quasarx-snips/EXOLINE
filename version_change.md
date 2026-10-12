@@ -1,3 +1,12 @@
+### v0.1.2 — Aerodynamics, Thermal Stress & Descent Aids
+
+- Added lift from angle of attack: the signed angle between the craft heading and the relative wind now produces a lift acceleration (Cl clamped to ±1.2, halved past a 0.45 rad stall) perpendicular to the airflow, so holding a positive AoA through a shallow reentry glides downrange. A combined `aeroAccel` (drag + lift) now drives live flight and every prediction, and induced drag (Cd = 0.60 + 0.15·Cl²) replaces the constant drag coefficient. A deployed parachute forces Cl to 0.
+- Added a thermal model: heating scales with √ρ·|vrel|³, modulated by heat-shield orientation (shield within ~20° of the flow cuts heating to 25%), with live temperature that flashes OVERHEAT past 1500 K and accumulates irreversible heat damage past 2500 K until the craft breaks up.
+- Added aerobraking/aerocapture support: an atmospheric pass on an escape-energy trajectory is labeled AEROBRAKE, and emerging on the far side in a bound orbit fires an "AEROCAPTURE: BOUND ORBIT" confirmation.
+- Added a parachute (P / CHUTE button): deployable only with atmosphere and below 400 m/s, it balloons drag to settle Earth sea-level descent near a 15–20 m/s terminal velocity for a soft, fuel-free landing — or shreds on an over-speed deployment with a "CHUTE LOST" warning and no extra drag.
+- Persisted the new craft state (temperature, heat damage, chute deployed/alive) through save/load serialization.
+- Added HUD telemetry: a 0–3000 K temperature bar that turns amber past 1500 K and red past 2500 K, a SHIELDED/EXPOSED shield-status indicator inside the atmosphere, and a STOWED/DEPLOYED/LOST chute readout.
+
 ### v0.1.1 — Launch pads, staging, ascent profiles, and LEO/LOI starts
 
 - Every mission now starts on the launchpad: solid planets and moons are impenetrable surfaces that double as the pad, with the craft parked at exactly 0 m altitude. Throttling up releases it only when TWR exceeds 1; below that it stays pinned while still burning propellant.
@@ -7,6 +16,8 @@
 - Fixed rockets dropping off the pad with empty tanks: every launch refuels and restages the vehicle, and the liftoff gate uses fuel-aware thrust, so a dry craft stays pinned instead of free-falling.
 - Fixed ASCENT steering aiming 90° off the surface normal, the first-burn mass discontinuity (vehicle mass now always includes the payload), and impacts leaving wrecks buried inside bodies — impacts now always stop on the crust.
 - Repaired the offline test harness (truncated since v0.1.0): pad/liftoff, impenetrability, fuel-floor, NaN-guard, drag, and orbital-insertion tests (A3–A10) on a corrected multi-body fixture.
+- Fixed Moon-transfer predictions that lost the Moon: the transfer target and its parent chain are now kept in the prediction's gravity grid regardless of the pull cutoff, and the live craft and the prediction share the same N-body integrator, so the dashed path curves into the Moon instead of falsely reading ESCAPE and the craft arrives near the capture node.
+- Fixed reentry bouncing off the atmosphere and perigee climbing after impact: the RK4 integrator now recomputes its substep every iteration so the timestep collapses as density spikes, and the surface snap only lifts sub-10 m/s jitter, so a reentry craft descends monotonically into a clean LANDED/CRASHED result.
 
 ### v0.1.0x — Physics rework
 

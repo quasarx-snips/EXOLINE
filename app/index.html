@@ -127,7 +127,7 @@
         <label>PAUSE <input data-bind="pause" readonly></label><label>WARP DOWN <input data-bind="warpDown" readonly></label>
         <label>WARP UP <input data-bind="warpUp" readonly></label><label>FOCUS CRAFT <input data-bind="focusCraft" readonly></label>
         <label>RESET VIEW <input data-bind="resetView" readonly></label><label>ADD NODE <input data-bind="addNode" readonly></label>
-        <label>AUTO BURN <input data-bind="autoBurn" readonly></label>
+        <label>AUTO BURN <input data-bind="autoBurn" readonly></label><label>STAGE <input data-bind="stage" readonly></label><label>CHUTE <input data-bind="chute" readonly></label>
       </div>
       <button class="small-btn full" id="resetKeybinds">RESET KEYBINDS</button>
     </aside>
@@ -148,6 +148,10 @@
     <aside class="flight-hud" id="flightHud">
       <div class="hud-grid"><span>SOI <b id="hudSoi">EARTH</b></span><span>APO <b id="hudApo">—</b></span><span>PERI <b id="hudPeri">—</b></span><span>ECC <b id="hudEcc">—</b></span><span>DST <b id="hudDistance">—</b></span><span>REENTRY <b id="hudReentry" class="hidden">—</b></span></div>
       <div id="hudBurn" class="hidden" style="margin:6px 0 2px"><div style="height:6px;border-radius:3px;background:rgba(120,180,200,.18);overflow:hidden"><i id="hudBurnFill" style="display:block;height:100%;width:0%;background:linear-gradient(90deg,#53ddff,#78e5ff);border-radius:3px"></i></div><b id="hudBurnText" style="display:block;margin-top:3px;font-size:10px;letter-spacing:.08em;color:#cfeefc">—</b></div>
+      <div id="hudThermal" class="hud-therm hidden">
+        <div class="hud-therm-row"><span class="lbl">TEMP</span><div class="hud-therm-bar"><i id="hudTempFill"></i></div><b class="hud-therm-val" id="hudTempVal">290 K</b></div>
+        <div class="hud-therm-row2"><span>SHIELD <b id="hudShield">—</b></span><span>CHUTE <b id="hudChute">STOWED</b></span></div>
+      </div>
       <div class="hud-row">
         <button class="pitch-btn" id="turnLeft" aria-label="Pitch left" title="Pitch left"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></button>
         <div class="hud-deck">
@@ -162,6 +166,7 @@
               <button id="launchBtn">IGNITION</button>
               <button id="rcsBtn" aria-pressed="false" title="Fine attitude control">RCS</button>
               <button id="ascentBtn" aria-pressed="false" title="Ascent mode (gravity turn automation)">ASCENT</button>
+              <button id="chuteBtn" aria-pressed="false" title="Deploy parachute (P)">CHUTE</button>
             </div>
           </div>
           <div class="hud-readout"><span>Height</span><b id="hudAlt">—</b></div>
