@@ -7,7 +7,7 @@
   keys.pan = { up: false, down: false, left: false, right: false };
   let navSnap = null, activeNodeId = null, toastTimer = 0, autoBurn = null, nodeHitRegions = [], orbitHitRegions = [];
   const nodeAnchors = new Map();
-  const defaultBindings = { pause: 'Space', warpDown: 'BracketLeft', warpUp: 'BracketRight', focusCraft: 'KeyF', resetView: 'KeyR', addNode: 'KeyN', autoBurn: 'KeyB', stage: 'KeyX' };
+  const defaultBindings = { pause: 'Space', warpDown: 'BracketLeft', warpUp: 'BracketRight', focusCraft: 'KeyF', resetView: 'KeyR', addNode: 'KeyN', autoBurn: 'KeyB', stage: 'KeyX', chute: 'KeyP' };
   let bindings = { ...defaultBindings };
   try { bindings = { ...defaultBindings, ...JSON.parse(localStorage.getItem('exoline.keybinds') || '{}') }; } catch { /* use defaults */ }
   const bindingLabel = code => code === 'Space' ? 'Space' : code.replace(/^Key/, '').replace(/^Digit/, '');
@@ -453,7 +453,49 @@
     } else {
       $('hudReentry').classList.add('hidden');
     }
-}
+    // v0.1.2 thermal + chute telemetry (same throttled hud() cadence).
+    if (F.reentryState.aerocapturePing) { F.reentryState.aerocapturePing = false; showToast('AEROCAPTURE: BOUND ORBIT'); }
+    thermalReadout();
+  }
+  // v0.1.2: skin-temperature bar (0-3000 K; amber past 1500 K, red past
+  // 2500 K), SHIELDED/EXPOSED while inside air, STOWED/DEPLOYED/LOST chute.
+  // Shown only when it means something: in-air, chute out, or the skin is
+  // above ambient. Guards every lookup so a missing node can't break hud().
+  function thermalReadout() {
+    if (!F) return;
+    const box = $('hudThermal'), fill = $('hudTempFill'), val = $('hudTempVal'), shieldEl = $('hudShield'), chuteEl = $('hudChute');
+    if (!box || !fill || !val || !shieldEl || !chuteEl) return;
+    const T = Number.isFinite(F.s.temperature) ? F.s.temperature : 290;
+    const inAir = Number(F.reentryState && F.reentryState.rho) > 0;
+    const show = inAir || !!F.s.chuteDeployed || T > 302;
+    box.classList.toggle('hidden', !show);
+    if (!show) return;
+    fill.style.width = Math.max(0, Math.min(100, T / 3000 * 100)).toFixed(1) + '%';
+    const warn = T > 1500 && T <= 2500, crit = T > 2500;
+    fill.classList.toggle('warn', warn);
+    fill.classList.toggle('crit', crit);
+    val.textContent = `${Math.round(T)} K`;
+    val.classList.toggle('hot', warn);
+    val.classList.toggle('crit', crit);
+    if (inAir) {
+      shieldEl.textContent = F.s.shieldFacing ? 'SHIELDED' : 'EXPOSED';
+      shieldEl.className = F.s.shieldFacing ? 'ok' : 'bad';
+    } else { shieldEl.textContent = '—'; shieldEl.className = ''; }
+    if (F.s.chuteDeployed && F.s.chuteAlive) { chuteEl.textContent = 'DEPLOYED'; chuteEl.className = 'ok'; }
+    else if (F.s.chuteDeployed) { chuteEl.textContent = 'LOST'; chuteEl.className = 'bad'; }
+    else { chuteEl.textContent = 'STOWED'; chuteEl.className = ''; }
+    syncChuteBtn();
+  }
+  // Keep the CHUTE button's pressed state in step with the flight state after
+  // deploys, jettisons, loads, and fresh launches.
+  function syncChuteBtn() {
+    if (!F) return;
+    const btn = $('chuteBtn');
+    if (!btn) return;
+    const live = !!(F.s.chuteDeployed && F.s.chuteAlive);
+    btn.classList.toggle('is-on', live);
+    btn.setAttribute('aria-pressed', String(live));
+  }
   // Burn progress lives in the HUD (always visible with the craft selected) so
   // a collapsed navigation panel can never hide the auto-burn progress.
   function updateBurnReadout() {
@@ -1106,7 +1148,7 @@
     $('resetKeybinds').onclick = () => { bindings = { ...defaultBindings }; saveBindings(); renderKeybinds(); showToast('KEYBINDS RESET'); };
     $('slower').innerHTML = rewindIcon; $('faster').innerHTML = forwardIcon; $('slower').onclick = e => { e.preventDefault(); e.stopPropagation(); setWarp(warpIndex - 1); }; $('faster').onclick = e => { e.preventDefault(); e.stopPropagation(); setWarp(warpIndex + 1); }; $('warpBtn').onclick = e => { e.preventDefault(); e.stopPropagation(); running = !running; updateWarp(); };
     $('throttle').oninput = e => setThrottle(e.target.value); $('turnLeft').onpointerdown = () => keys.right = true; $('turnRight').onpointerdown = () => keys.left = true; addEventListener('pointerup', () => { keys.left = false; keys.right = false; });
-    $('launchBtn').onclick = () => { if (autoBurn) { showToast('THROTTLE CONTROLLED BY AUTO BURN'); return; } craftSelected = true; lock = 'craft'; sel = null; focusCraftView(); setThrottle(F.s.throttle > 0 ? 0 : 100); $('launchBtn').textContent = F.s.throttle ? 'CUTOFF' : 'IGNITION'; }; $('rcsBtn').onclick = () => { rcs = !rcs; $('rcsBtn').classList.toggle('is-on', rcs); $('rcsBtn').setAttribute('aria-pressed', String(rcs)); }; $('ascentBtn').onclick = () => { if (!F) return; F.ascentMode = !F.ascentMode; $('ascentBtn').classList.toggle('is-on', F.ascentMode); $('ascentBtn').setAttribute('aria-pressed', String(F.ascentMode)); showToast(F.ascentMode ? 'ASCENT MODE ON' : 'ASCENT MODE OFF'); };
+    $('launchBtn').onclick = () => { if (autoBurn) { showToast('THROTTLE CONTROLLED BY AUTO BURN'); return; } craftSelected = true; lock = 'craft'; sel = null; focusCraftView(); setThrottle(F.s.throttle > 0 ? 0 : 100); $('launchBtn').textContent = F.s.throttle ? 'CUTOFF' : 'IGNITION'; }; $('rcsBtn').onclick = () => { rcs = !rcs; $('rcsBtn').classList.toggle('is-on', rcs); $('rcsBtn').setAttribute('aria-pressed', String(rcs)); }; $('ascentBtn').onclick = () => { if (!F) return; F.ascentMode = !F.ascentMode; $('ascentBtn').classList.toggle('is-on', F.ascentMode); $('ascentBtn').setAttribute('aria-pressed', String(F.ascentMode)); showToast(F.ascentMode ? 'ASCENT MODE ON' : 'ASCENT MODE OFF'); }; $('chuteBtn').onclick = () => { if (!F) return; showToast(F.deployChute(S)); syncChuteBtn(); };
     $('orbitNodeAdd').onclick = () => { const seconds = Number($('orbitNodeAdd').dataset.time) || 600; $('orbitNodeAdd').classList.add('hidden'); addNodeForCraft(seconds); };
     $('resetBtn').onclick = () => { lock = null; cam.o = { x: 0, y: 0 }; cam.k = innerHeight / (2.5 * AU); }; $('closeDetail').onclick = () => { $('detailPanel').classList.add('hidden'); sel = null; lock = null; }; $('openMapBtn').onclick = openMap; $('mapResetBtn').onclick = () => mapRenderer?.reset(); $('backBtn').onclick = () => { C.style.display = 'block'; $('mapCanvas').style.display = 'none'; $('mapCanvas').classList.add('hidden'); $('mapTopbar').classList.add('hidden'); };
     $('setTargetBtn').onclick = () => { if (sel && ExolineNav.setTarget(sel.id)) showToast(`TARGET: ${ExolineNav.bodyName(sel.id).toUpperCase()}`); else if (sel) showToast('TARGET UNAVAILABLE'); };
@@ -1254,6 +1296,7 @@
       if (matches(e, 'resetView')) resetView();
       if (matches(e, 'autoBurn')) { if (autoBurn) cancelAutoBurn(); else startAutoBurn(); }
       if (matches(e, 'stage')) { e.preventDefault(); if (F) { const separated = F.stage(); showToast(separated ? 'STAGE SEPARATION' : 'FINAL STAGE — NO SEPARATION'); } }
+      if (matches(e, 'chute')) { e.preventDefault(); if (F) { showToast(F.deployChute(S)); syncChuteBtn(); } }
     });
     addEventListener('keyup', e => {
       if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;

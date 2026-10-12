@@ -339,9 +339,27 @@ window.ExolineNav = (() => {
         const k = -gm[id] / (squared * Math.sqrt(squared));
         acc.x += dx * k; acc.y += dy * k; acc.z += dz * k;
         // Avoid an allocation for every non-atmospheric body in the preview.
-        if (window.ExolineFlight.atmospheres?.[id] && window.ExolineFlight.atmosphericDrag) {
-          const drag = window.ExolineFlight.atmosphericDrag(position, velocity, body, { ...constants.bodies[id], id }, craftMass);
-          acc.x += drag.x; acc.y += drag.y; acc.z += drag.z;
+        // v0.1.2: identical combined aerodynamics to the live integrator — same
+        // body drag (base + induced), same AoA lift off the craft's CURRENT
+        // heading, same chute drag while a live chute flies. Active-stage
+        // values only (mass/heading/chute frozen at the live snapshot); the
+        // preview never evaluates mid-horizon staging or pitch programs, so
+        // the dashed path stays NaN-free and matches the first flown seconds.
+        if (window.ExolineFlight.atmospheres?.[id] && window.ExolineFlight.aeroAccel) {
+          const snap = (ctx.flight && ctx.flight.s) || {};
+          const aero = window.ExolineFlight.aeroAccel(
+            position, velocity, body, { ...constants.bodies[id], id },
+            craftMass,
+            Number.isFinite(snap.heading) ? snap.heading : 0,
+            !!snap.chuteAlive);
+          if (aero && Number.isFinite(aero.x) && Number.isFinite(aero.y) && Number.isFinite(aero.z || 0)) {
+            acc.x += aero.x; acc.y += aero.y; acc.z += aero.z || 0;
+          } else if (window.ExolineFlight.atmosphericDrag) {
+            const drag = window.ExolineFlight.atmosphericDrag(position, velocity, body, { ...constants.bodies[id], id }, craftMass);
+            if (drag && Number.isFinite(drag.x) && Number.isFinite(drag.y) && Number.isFinite(drag.z || 0)) {
+              acc.x += drag.x; acc.y += drag.y; acc.z += drag.z || 0;
+            }
+          }
         }
       }
       return acc;

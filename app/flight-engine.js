@@ -31,6 +31,24 @@ window.ExolineFlight = (() => {
   };
   const DRAG_CD = 0.60;
   const DRAG_AREA = 10.0;
+  // v0.1.2 thermal + parachute constants. Ambient skin temperature (K),
+  // OVERHEAT flash threshold, irreversible damage threshold, hard display
+  // cap, convective cooling time constant, and heat-shield half-angle (20 deg
+  // = 0.349 rad). Heating follows the reentry steady state
+  // heatRate = K_HEAT * sqrt(rho) * vrel^3, shielded at 25% when the nose
+  // sits within SHIELD_HALF of the relative wind; the craft relaxes toward
+  // ambient with tau = COOL_TAU s once the flux drops.
+  const AMBIENT_K = 290;
+  const K_HEAT = 2.5e-7;
+  const OVERHEAT_K = 1500;
+  const BREAKUP_K = 2500;
+  const TEMP_MAX_K = 3200;
+  const COOL_TAU = 2.0;
+  const SHIELD_HALF = 0.349;
+  const SHIELD_FACTOR = 0.25;
+  const CHUTE_SPEED_LIMIT = 400;
+  const CHUTE_CD = 1.5, CHUTE_AREA = 40.0;
+  const DAMAGE_RATE = 0.06;
   // A body is "solid" unless its atmosphere entry says otherwise (the four
   // gas giants). This is the single source of truth for landing lines and for
   // impact termination in the predictions — the Sun is collidable and has no
@@ -46,13 +64,52 @@ window.ExolineFlight = (() => {
     if (!(altitude >= 0 && altitude < atmosphere.top)) return null;
     return atmosphere.surfaceDensity * Math.exp(-altitude / atmosphere.scaleHeight);
   }
-  function atmosphericDrag(position, velocity, body, physical, mass) {
+  const clamp = (value, lo, hi) => Math.max(lo, Math.min(hi, value));
+  // perp(v) = (-v.y, v.x) — the in-plane unit perpendicular used for lift.
+  const perp2d = v => ({ x: -v.y, y: v.x, z: 0 });
+  // Wrap an angle to [-PI, PI].
+  function wrapAngle(a) { return Math.atan2(Math.sin(a), Math.cos(a)); }
+  // aerodynamicDrag is retained for backward compatibility (physics-agent and
+  // any external callers). It now accepts an optional induced drag coefficient;
+  // with no override it uses the base DRAG_CD, so old behavior is unchanged.
+  // Internally it is only ever called by aeroAccel (v0.1.2).
+  function atmosphericDrag(position, velocity, body, physical, mass, cd = DRAG_CD) {
     const rho = atmosphereDensity(position, body, physical);
     if (!rho) return { x: 0, y: 0, z: 0 };
     const v = sub(velocity, { x: body.vx || 0, y: body.vy || 0, z: body.vz || 0 }), speed = length(v);
     if (!(speed > 0)) return { x: 0, y: 0, z: 0 };
     // Drag acceleration opposite to relative velocity vector
-    return mul(v, -0.5 * rho * DRAG_CD * DRAG_AREA * speed / Math.max(mass, 1));
+    return mul(v, -0.5 * rho * cd * DRAG_AREA * speed / Math.max(mass, 1));
+  }
+  // v0.1.2 combined aerodynamics: drag (base + induced) plus lift from AoA.
+  //   AoA  = signed wrapped angle between the craft heading and vrel.
+  //   Cl   = clamp(4.0 * AoA, -1.2, 1.2), halved past the 0.45 rad stall AoA.
+  //   Lift = 0.5 * rho * |vrel|^2 * Cl * A / m along unit(perp(vrel))*sign(AoA).
+  //   Cd   = 0.60 + 0.15 * Cl^2  (induced drag).
+  // heading is the craft nose direction (radians); chuteAlive forces Cl = 0 so a
+  // parachute produces pure drag with no lift. Returns {x, y, z}.
+  function aeroAccel(position, velocity, body, physical, craftMass, heading, chuteAlive = false) {
+    const drag = atmosphericDrag(position, velocity, body, physical, craftMass);
+    const rho = atmosphereDensity(position, body, physical);
+    if (!rho) return drag; // vacuum: no lift, and drag already returned as-is
+    const vx = velocity.x - (body.vx || 0), vy = velocity.y - (body.vy || 0);
+    const speed = Math.hypot(vx, vy);
+    if (!(speed > 1e-6)) return drag;
+    // Signed AoA in [-PI, PI] between heading vector and vrel.
+    const hx = Math.cos(heading), hy = Math.sin(heading);
+    const aoa = wrapAngle(Math.atan2(hx * vy - hy * vx, hx * vx + hy * vy));
+    let cl = clamp(4.0 * aoa, -1.2, 1.2);
+    if (Math.abs(aoa) > 0.45) cl *= 0.5; // stalled: lift collapses
+    if (chuteAlive) cl = 0;              // parachute: no lift
+    // Lift magnitude along unit(perp(vrel)) * sign(AoA).
+    const liftMag = 0.5 * rho * speed * speed * cl * DRAG_AREA / Math.max(craftMass, 1);
+    const sign = aoa >= 0 ? 1 : -1;
+    const unitPerp = { x: -vy / speed, y: vx / speed, z: 0 };
+    const lift = mul(unitPerp, liftMag * sign);
+    // Induced drag replaces the base-drag-only result.
+    const cd = 0.60 + 0.15 * cl * cl;
+    const inducedDrag = atmosphericDrag(position, velocity, body, physical, craftMass, cd);
+    return add(inducedDrag, lift);
   }
   function atmosphereStepLimit(position, velocity, bodies, constants, mass) {
     let limit = Infinity;
@@ -115,9 +172,34 @@ window.ExolineFlight = (() => {
       this.landedBody = null;     // body id the craft is sitting on, or null
       this.landedDir = null;      // body-relative surface direction, unit vector
       this.prevThrottle = 0;
-      this.s = { r: { x: 0, y: 0, z: 0 }, v: { x: 0, y: 0, z: 0 }, m: 0, propellant: 0, heading: 0, throttle: 0, crashed: false, landed: false };
+      // v0.1.2 thermal + parachute state (persisted in s / serialize).
+      //   temperature (K, ambient 290), heatDamage (0..1, never heals),
+      //   chuteDeployed / chuteAlive, shieldFacing (HUD), _overheated latch.
+      this.s = this.freshCraftState({ heading: 0, landed: false });
       // Reentry tracking state (per dominant body)
       this.reentryState = { bodyId: null, phase: 'EXO', q: 0, rho: 0, heating: 0, gLoad: 0, alt: 0, peakHeating: 0, peakG: 0 };
+    }
+
+    // One place that builds a zeroed craft state so every fresh start —
+    // pad, gas-giant orbit, LOI/LEO preset — carries the thermal/chute
+    // fields the constructor defines. opts override r/v/m/propellant/
+    // heading/throttle/landed only; everything else stays at its default.
+    freshCraftState(opts = {}) {
+      return {
+        r: opts.r || { x: 0, y: 0, z: 0 },
+        v: opts.v || { x: 0, y: 0, z: 0 },
+        m: opts.m || 0,
+        propellant: opts.propellant || 0,
+        heading: opts.heading || 0,
+        throttle: opts.throttle || 0,
+        crashed: false,
+        landed: !!opts.landed,
+        temperature: AMBIENT_K,
+        heatDamage: 0,
+        chuteDeployed: false,
+        chuteAlive: false,
+        shieldFacing: false
+      };
     }
 
     // Update thrust, specificImpulse, dryMass, and mass from the active stage
@@ -160,7 +242,7 @@ window.ExolineFlight = (() => {
         // heading = atan2(dir): thrust points along (cos h, sin h) — see acc()
         // — so nose-out at this spawn point is +PI/2. The renderer agrees
         // (rotation -h + PI/2 = 0 draws the nose away from the planet).
-        this.s = { r: { x: body.x, y: body.y + radius, z: body.z || 0 }, v: { x: body.vx || 0, y: body.vy || 0, z: body.vz || 0 }, m: this.s.m, propellant: this.s.propellant, heading: Math.atan2(dir.y, dir.x), throttle: 0, crashed: false, landed: true };
+        this.s = this.freshCraftState({ r: { x: body.x, y: body.y + radius, z: body.z || 0 }, v: { x: body.vx || 0, y: body.vy || 0, z: body.vz || 0 }, m: this.s.m, propellant: this.s.propellant, heading: Math.atan2(dir.y, dir.x), landed: true });
         this.circularHold = null;
         this.landedBody = id;
         this.landedDir = dir;
@@ -175,7 +257,7 @@ window.ExolineFlight = (() => {
       // clear of the ground. Sets the circular-hold radius directly.
       const radius = physical.radius_m + (atmosphere ? atmosphere.top + 20000 : 180000);
       const speed = Math.sqrt(this.c.G * physical.mass / radius);
-      this.s = { r: { x: body.x, y: body.y + radius, z: body.z || 0 }, v: { x: body.vx - speed, y: body.vy, z: body.vz || 0 }, m: this.s.m, propellant: this.s.propellant, heading: Math.PI, throttle: 0, crashed: false, landed: false };
+      this.s = this.freshCraftState({ r: { x: body.x, y: body.y + radius, z: body.z || 0 }, v: { x: body.vx - speed, y: body.vy, z: body.vz || 0 }, m: this.s.m, propellant: this.s.propellant, heading: Math.PI, landed: false });
       this.circularHold = { id, radius, phase: Math.PI / 2, meanMotion: speed / radius };
       this.landedBody = null; this.landedDir = null;
     }
@@ -190,7 +272,7 @@ window.ExolineFlight = (() => {
       if (!body || !physical) return; // launch() already placed a valid state
       const radius = physical.radius_m + Math.max(0, altitudeMeters);
       const speed = Math.sqrt(this.c.G * physical.mass / radius);
-      this.s = { r: { x: body.x, y: body.y + radius, z: body.z || 0 }, v: { x: body.vx - speed, y: body.vy, z: body.vz || 0 }, m: this.s.m, propellant: this.s.propellant, heading: Math.PI, throttle: 0, crashed: false, landed: false };
+      this.s = this.freshCraftState({ r: { x: body.x, y: body.y + radius, z: body.z || 0 }, v: { x: body.vx - speed, y: body.vy, z: body.vz || 0 }, m: this.s.m, propellant: this.s.propellant, heading: Math.PI, landed: false });
       this.circularHold = { id, radius, phase: Math.PI / 2, meanMotion: speed / radius };
       this.landedBody = null;
       this.landedDir = null;
@@ -213,6 +295,72 @@ window.ExolineFlight = (() => {
       this.updateStageProperties();
       console.info(`[stage] Stage separation: dropped ${deadMass} kg, now stage ${this.currentStage} (thrust=${this.thrust} N, isp=${this.specificImpulse} s, mass=${this.s.m} kg)`);
       return true;
+    }
+    // v0.1.2 parachute. Toggle-deploy from UI (P / CHUTE). Gates per spec:
+    //   — needs live bodies to read atmosphere + airspeed; without them noop.
+    //   — jettisons if a live chute is already flying (toggle), reports a
+    //     shredded chute as already lost, refuses vacuum with an inert note.
+    //   — inside air: airspeed < 400 m/s deploys intact; >= 400 shreds it
+    //     (chuteAlive=false, no extra drag — see acc/aeroAccel).
+    deployChute(bodies) {
+      if (!bodies || this.s.crashed) return 'CRAFT LOST';
+      if (this.s.chuteDeployed && this.s.chuteAlive) {
+        this.s.chuteDeployed = false;
+        this.s.chuteAlive = false;
+        console.info('[chute] jettisoned');
+        return 'CHUTE JETTISONED';
+      }
+      if (this.s.chuteDeployed) return 'CHUTE ALREADY LOST';
+      const refId = this.referenceBody(bodies, this.s);
+      const body = refId && bodies[refId], physical = refId && this.c.bodies[refId];
+      if (!body || !physical) return 'CHUTE INERT';
+      const rho = atmosphereDensity(this.s.r, { x: body.x, y: body.y, z: body.z || 0 }, { ...physical, id: refId }) || 0;
+      if (!(rho > 0)) { console.info('[chute] no atmosphere — deploy refused'); return 'NO ATMOSPHERE — CHUTE INERT'; }
+      const vRel = sub(this.s.v, { x: body.vx || 0, y: body.vy || 0, z: body.vz || 0 });
+      const airspeed = length(vRel);
+      this.s.chuteDeployed = true;
+      if (airspeed >= CHUTE_SPEED_LIMIT) {
+        this.s.chuteAlive = false;
+        console.info(`[chute] deployed at ${airspeed.toFixed(0)} m/s — SHREDDED (limit ${CHUTE_SPEED_LIMIT} m/s)`);
+        return 'CHUTE LOST — DEPLOYED TOO FAST';
+      }
+      this.s.chuteAlive = true;
+      console.info(`[chute] deployed at ${airspeed.toFixed(0)} m/s`);
+      return 'CHUTE DEPLOYED';
+    }
+    // v0.1.2 thermal integration for one substep of dt seconds, driven by the
+    // reference-body air density rho and the relative-wind vector (vx, vy).
+    //   — heatRate = K_HEAT * sqrt(rho) * vrel^3 (steady reentry scaling),
+    //     cut to SHIELD_FACTOR (25%) while the nose faces the wind within
+    //     SHIELD_HALF (~20 deg); chute-out flight is never shielded.
+    //   — temperature relaxes toward ambient with COOL_TAU, hard-capped at
+    //     TEMP_MAX so a ballistic entry saturates a full bar, not Infinity.
+    //   — past BREAKUP the damage counter climbs with excess temperature
+    //     until 1.0, when the craft breaks up (crashed, phase BURNUP).
+    thermalStep(rho, vx, vy, dt) {
+      const s = this.s;
+      const airspeed = Math.hypot(vx, vy);
+      const facing = !(airspeed > 0) ? true : (() => {
+        const wind = Math.atan2(vy, vx);              // oncoming-flow axis
+        const off = Math.abs(wrapAngle(s.heading - wind));
+        return !s.chuteAlive && off < SHIELD_HALF;
+      })();
+      s.shieldFacing = facing;
+      if (!(rho > 0) || !(airspeed > 0) || !(dt > 0) || s.crashed || s.landed) return;
+      const factor = facing ? SHIELD_FACTOR : 1;
+      const heatRate = K_HEAT * Math.sqrt(rho) * airspeed * airspeed * airspeed * factor;
+      const coolRate = (s.temperature - AMBIENT_K) / COOL_TAU;
+      s.temperature = clamp(s.temperature + (heatRate - coolRate) * dt, AMBIENT_K, TEMP_MAX_K);
+      if (s.temperature <= OVERHEAT_K) return;
+      if (s.temperature > BREAKUP_K) {
+        s.heatDamage = clamp(s.heatDamage + ((s.temperature - BREAKUP_K) / 1000) * DAMAGE_RATE * dt, 0, 1);
+        if (s.heatDamage >= 1) {
+          s.crashed = true;
+          s.throttle = 0;
+          this.reentryState.phase = 'BURNUP';
+          console.warn(`[thermal] breakup at ${s.temperature.toFixed(0)} K — craft destroyed`);
+        }
+      }
     }
     advanceCircularHold(seconds, bodies) {
       const hold = this.circularHold, body = bodies[hold.id], physical = this.c.bodies[hold.id];
@@ -586,7 +734,24 @@ window.ExolineFlight = (() => {
         if (squared <= 1) continue;
         acceleration = add(acceleration, mul(displacement, -this.c.G * physical.mass / (squared * Math.sqrt(squared))));
         const velAt = this.bodyVelAt(initial, time, accels, id);
-        acceleration = add(acceleration, atmosphericDrag(position, velocity, { ...at, vx: velAt.x, vy: velAt.y, vz: velAt.z }, { ...physical, id }, this.s.m));
+        const bodyFrame = { ...at, vx: velAt.x, vy: velAt.y, vz: velAt.z };
+        // v0.1.2: combined drag (base + induced) plus AoA lift. Bodies without
+        // an atmosphere return {0,0,0} from aeroAccel, so no double counting.
+        acceleration = add(acceleration, aeroAccel(position, velocity, bodyFrame, { ...physical, id }, this.s.m, this.s.heading, this.s.chuteAlive));
+        // Parachute: extra drag opposite vrel while deployed and intact. Uses
+        // its own Cd*A = CHUTE_CD * CHUTE_AREA (= 1.5*40 = 60) on top of the
+        // (lift-free) body drag.
+        if (this.s.chuteDeployed && this.s.chuteAlive) {
+          const cvx = velocity.x - velAt.x, cvy = velocity.y - velAt.y;
+          const cspeed = Math.hypot(cvx, cvy);
+          if (cspeed > 1e-6) {
+            const crho = atmosphereDensity(position, bodyFrame, { ...physical, id });
+            if (crho > 0) {
+              const chuteAccel = 0.5 * crho * cspeed * cspeed * (CHUTE_CD * CHUTE_AREA) / Math.max(this.s.m, 1);
+              acceleration = add(acceleration, { x: -cvx / cspeed * chuteAccel, y: -cvy / cspeed * chuteAccel, z: 0 });
+            }
+          }
+        }
       }
       const usableThrottle = (this.infiniteFuel || this.s.propellant > 0) && !this.s.crashed ? this.s.throttle : 0;
       const safeMass = Math.max(this.s.m, 1);
@@ -910,6 +1075,22 @@ window.ExolineFlight = (() => {
         }
         this.rk4(dt, bodies, elapsed);
         elapsed += dt;
+        // v0.1.2: heat the skin every substep off the same interpolated
+        // ephemeris the integrator used, so temperature tracks the actual
+        // density profile instead of the coarser per-chunk sample. Uses the
+        // post-push state and the extrapolated reference-body frame.
+        try {
+          const hId = this.referenceBody(bodies, this.s);
+          const hBody = hId && bodies[hId], hPhys = hId && this.c.bodies[hId];
+          if (hBody && hPhys && ATMOSPHERES[hId]) {
+            const hAt = this.bodyAt(hBody, elapsed, this._accMap, hId);
+            const hVel = this.bodyVelAt(hBody, elapsed, this._accMap, hId);
+            const hRho = atmosphereDensity(this.s.r, hAt, { ...hPhys, id: hId }) || 0;
+            if (hRho > 0) this.thermalStep(hRho, this.s.v.x - hVel.x, this.s.v.y - hVel.y, dt);
+            else this.s.shieldFacing = false;
+          } else this.s.shieldFacing = false;
+        } catch (e) { /* thermal is display-only: never break the step */ }
+        if (this.s.crashed) break; // thermal breakup ends the chunk early
         if (this.resolveContacts(bodies, elapsed)) break;
       }
 
@@ -954,6 +1135,27 @@ window.ExolineFlight = (() => {
         } else {
           rs.q = 0; rs.heating = 0; rs.gLoad = 0;
         }
+        // v0.1.2 aerobraking / aerocapture. An in-air pass on escape-energy
+        // reads AEROBRAKE (never ENTRY/DESCENT) and latches wasAero; leaving
+        // the air still latched but now bound raises the one-shot
+        // aerocapturePing that the HUD toasts as "AEROCAPTURE: BOUND ORBIT".
+        // Energy is the live specific orbital energy vs the reference body —
+        // >= 0 is escape/hyperbolic, < 0 is bound. Clears whenever the craft
+        // is terminal (LANDED / CRASHED / BURNUP) or out of the air and bound.
+        try {
+          const muRef = this.c.G * refPhysical.mass;
+          const escaping = vRel * vRel / 2 - muRef / Math.max(distance, 1) >= 0;
+          if (rs.phase !== 'BURNUP' && !this.s.crashed && !this.s.landed && rho > 0 && vRel > 1000 && escaping && rs.phase !== 'AEROBRAKE') {
+            rs.phase = 'AEROBRAKE';
+          }
+          if (rs.phase === 'AEROBRAKE') rs.wasAero = true;
+          if (rs.wasAero && !escaping && (!(rho > 0) || rs.phase === 'EXO')) {
+            rs.wasAero = false;
+            rs.aerocapturePing = true;
+            console.info(`[aerocapture] ${refId} AEROCAPTURE: BOUND ORBIT  vrel=${vRel.toFixed(0)} m/s  alt=${altitude.toFixed(0)} m`);
+          }
+          if ((this.s.landed || this.s.crashed) && rs.phase !== 'AEROBRAKE') rs.wasAero = false;
+        } catch (e) { /* aerobrake is advisory: never touch the phase chain */ }
         if (rs.phase !== prevPhase) console.info(`[reentry] ${refId} ${prevPhase} -> ${rs.phase}  rho=${rho.toExponential(2)} kg/m3  q=${rs.q.toFixed(1)}  vrel=${vRel.toFixed(0)} m/s  alt=${altitude.toFixed(0)} m`);
       }
 
@@ -990,6 +1192,14 @@ window.ExolineFlight = (() => {
     deserialize(data) {
       if (!data) return;
       this.s = { ...data.s };
+      // v0.1.2: pre-v0.1.2 saves carry none of the thermal/chute fields —
+      // backfill them to pad-fresh defaults so temperature math, shield and
+      // chute reads never see undefined/NaN on a loaded game.
+      if (!Number.isFinite(this.s.temperature)) this.s.temperature = AMBIENT_K;
+      if (!Number.isFinite(this.s.heatDamage)) this.s.heatDamage = 0;
+      if (typeof this.s.chuteDeployed !== 'boolean') this.s.chuteDeployed = false;
+      if (typeof this.s.chuteAlive !== 'boolean') this.s.chuteAlive = false;
+      if (typeof this.s.shieldFacing !== 'boolean') this.s.shieldFacing = false;
       this.stages = (data.stages || []).map(st => ({ ...st }));
       this.currentStage = data.currentStage || 0;
       this.ascentMode = data.ascentMode || false;
@@ -1015,5 +1225,5 @@ window.ExolineFlight = (() => {
       }
     }
   }
-  return { Flight, rk4Step, atmosphericDrag, atmosphereDensity, atmosphereStepLimit, isSolidSurface, atmospheres: ATMOSPHERES, add, sub, mul, dot, length };
+  return { Flight, rk4Step, aeroAccel, atmosphericDrag, atmosphereDensity, atmosphereStepLimit, isSolidSurface, atmospheres: ATMOSPHERES, add, sub, mul, dot, length };
 })();
