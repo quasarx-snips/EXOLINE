@@ -398,7 +398,7 @@ window.ExolineNav = (() => {
     const acc = gravityAcc(grid);
     const state = copyState(startState);
     const records = [];
-    let t = 0, steps = 0, impact = false;
+    let t = 0, steps = 0, impact = false, impactBodyId = null;
     let targetGrid = null;
     if (track && target) targetGrid = buildGrid([target], tStart, horizon);
     let best = null; // { index, distance }
@@ -423,9 +423,9 @@ window.ExolineNav = (() => {
       for (const id of ids) {
         const phys = ctx.constants.bodies[id];
         const pos = gridAt(grid, id, tAbs + dt);
-        if (phys && len(sub(state.r, pos)) < phys.radius_m) { 
+        if (phys && len(sub(state.r, pos)) < phys.radius_m) {
           // Only register impact for solid surface bodies; gas giants allow pass-through
-          if (phys.solidSurface) { impact = true; break; }
+          if (phys.solidSurface) { impact = true; impactBodyId = id; break; }
         }
       }
       if (targetGrid) {
@@ -446,7 +446,7 @@ window.ExolineNav = (() => {
     return {
       records, points, endState: copyState(state), tStart, tEnd: tStart + t,
       startR: { x: startState.r.x, y: startState.r.y, z: startState.r.z || 0 },
-      steps, impact, truncated: steps >= MAX_STEPS, approach, horizon, targetId: target,
+      steps, impact, impactBodyId: impactBodyId || null, truncated: steps >= MAX_STEPS, approach, horizon, targetId: target,
       dominantBody: domId, // final dominant body
       soiCrossings: [] // will be filled by patched conic wrapper
     };
@@ -724,12 +724,14 @@ function createManeuverNode(opts = {}) {
       const stride = Math.max(1, Math.ceil(seg.records.length / 700));
       for (let i = 0; i < seg.records.length; i += stride) {
         const rec = seg.records[i], q = segRel(rec.r, rec.t);
-        if (q) allRelRecords.push({ ...q, refId: segRefId, segIndex: patchedSegments.indexOf(seg) });
+        // v0.1.3 atmosphere tint: carry the raw sample alongside the frozen
+        // offset so the plan draw can recolor in-air segments by q.
+        if (q) allRelRecords.push({ ...q, refId: segRefId, segIndex: patchedSegments.indexOf(seg), r: rec.r, v: rec.v });
       }
       const last = seg.records[seg.records.length - 1];
       if (last) {
         const q = segRel(last.r, last.t);
-        if (q) { allRelRecords.push({ ...q, refId: segRefId, segIndex: patchedSegments.indexOf(seg) }); if (seg.impact) allRelImpact = { ...q, refId: segRefId }; }
+        if (q) { allRelRecords.push({ ...q, refId: segRefId, segIndex: patchedSegments.indexOf(seg), r: last.r, v: last.v }); if (seg.impact) allRelImpact = { ...q, refId: segRefId }; }
       }
       if (seg.approach && seg.approach.point) {
         allRelApproach = segRel(seg.approach.point, seg.tStart + (seg.approach.tSec || 0));

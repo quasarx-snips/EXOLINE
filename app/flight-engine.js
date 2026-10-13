@@ -20,14 +20,14 @@ window.ExolineFlight = (() => {
     // Density model: rho(h) = surfaceDensity * exp(-h/scaleHeight) for 0 <= h <= top, else 0
     // Drag acceleration = 0.5 * rho * |vrel|^2 * Cd * A / m, opposite vrel
     // Cd = 0.60, A = 10.0 m2
-    earth:   { surfaceDensity: 1.225,  scaleHeight: 8500,   top: 100000,  solidSurface: true  },
-    venus:   { surfaceDensity: 65.0,    scaleHeight: 15900,  top: 250000, solidSurface: true  },
-    mars:    { surfaceDensity: 0.020,   scaleHeight: 11100,  top: 120000, solidSurface: true  },
-    'saturn:titan': { surfaceDensity: 5.40, scaleHeight: 20700, top: 200000, solidSurface: true },
-    jupiter: { surfaceDensity: 0.16,    scaleHeight: 27000,  top: 1000000, solidSurface: false },
-    saturn:  { surfaceDensity: 0.19,    scaleHeight: 59500,  top: 1000000, solidSurface: false },
-    uranus:  { surfaceDensity: 0.42,    scaleHeight: 27700,  top: 1000000, solidSurface: false },
-    neptune: { surfaceDensity: 0.45,    scaleHeight: 19700,  top: 1000000, solidSurface: false },
+    earth:   { surfaceDensity: 1.225,  scaleHeight: 8500,   top: 100000,  solidSurface: true,  soundSpeed: 340 },
+    venus:   { surfaceDensity: 65.0,    scaleHeight: 15900,  top: 250000, solidSurface: true,  soundSpeed: 400 },
+    mars:    { surfaceDensity: 0.020,   scaleHeight: 11100,  top: 120000, solidSurface: true,  soundSpeed: 240 },
+    'saturn:titan': { surfaceDensity: 5.40, scaleHeight: 20700, top: 200000, solidSurface: true,  soundSpeed: 200 },
+    jupiter: { surfaceDensity: 0.16,    scaleHeight: 27000,  top: 1000000, solidSurface: false, soundSpeed: 900 },
+    saturn:  { surfaceDensity: 0.19,    scaleHeight: 59500,  top: 1000000, solidSurface: false, soundSpeed: 850 },
+    uranus:  { surfaceDensity: 0.42,    scaleHeight: 27700,  top: 1000000, solidSurface: false, soundSpeed: 700 },
+    neptune: { surfaceDensity: 0.45,    scaleHeight: 19700,  top: 1000000, solidSurface: false, soundSpeed: 750 },
   };
   const DRAG_CD = 0.60;
   const DRAG_AREA = 10.0;
@@ -136,6 +136,16 @@ window.ExolineFlight = (() => {
           // Upper tenuous atmosphere: limit to 5 s so density gradient is sampled
           limit = Math.min(limit, 5);
         }
+        // v0.1.3 thermal cap: bound the skin-temperature rate per substep.
+        // heat_flux scales with sqrt(rho)*vrel^3 (same steady reentry model as
+        // the live thermal update); a 50 K budget per substep keeps extreme
+        // entries resolved without NaN or runaway temperature.
+        const tSpeed = length(sub(velocity, { x: body.vx || 0, y: body.vy || 0, z: body.vz || 0 }));
+        let heat_flux = K_HEAT * Math.sqrt(Math.max(rho || 0, 0)) * tSpeed * tSpeed * tSpeed;
+        if (!Number.isFinite(heat_flux)) heat_flux = 0;
+        const dTdt = heat_flux * 10 / (Math.max(mass, 1) * 900);
+        const dt_cap_thermal = 50 / Math.max(dTdt, 1e-9);
+        limit = Math.min(limit, Math.max(0.02, Math.min(5, dt_cap_thermal)));
       }
     }
     return limit;
@@ -159,6 +169,10 @@ window.ExolineFlight = (() => {
       this.payloadMass = 50;
       // Ascent automation (gravity turn)
       this.ascentMode = false;
+      // v0.1.3 powered descent guidance (suicide-burn autopilot)
+      this.descentMode = false;
+      // v0.1.3 max dynamic pressure tracker (Pa, reset on launch)
+      this.maxQ = 0;
       // Engine config derived from active stage (set in updateStageProperties)
       this.thrust = 0;
       this.specificImpulse = 0;
@@ -228,6 +242,9 @@ window.ExolineFlight = (() => {
       this.currentStage = 0;
       this.updateStageProperties();
       this.ascentMode = false;
+      // v0.1.3: fresh guidance guards and max-Q on every New Campaign/launch
+      this.descentMode = false;
+      this.maxQ = 0;
       const body = bodies[id], physical = this.c.bodies[id];
       const atmosphere = ATMOSPHERES[id];
       this.coast = null; this.prevThrottle = 0;
@@ -280,6 +297,29 @@ window.ExolineFlight = (() => {
       console.info(`[launch] ${id} orbital insertion: ${Math.round(altitudeMeters / 1000)} km circular, radius=${radius} m, speed=${speed.toFixed(1)} m/s`);
     }
 
+    // v0.1.3 powered-descent toggle. Gas bodies have no surface to descend
+    // to, so the request is ignored there with a console note; the caller
+    // (app) pairs enabling with auto-burn cancellation and ascent exclusion.
+    setDescentMode(flag) {
+      const on = !!flag;
+      if (on && !this.s.landed) {
+        try {
+          const bodies = this._bodies;
+          if (bodies) {
+            const refId = this.referenceBody(bodies, this.s);
+            const refPhysical = refId && this.c.bodies[refId];
+            if (refPhysical && refPhysical.solidSurface === false) {
+              console.info('[descent] No surface to descend to');
+              return false;
+            }
+          }
+        } catch (e) { /* gas check is advisory; a null bodies map means allow */ }
+      }
+      this.descentMode = on;
+      if (on) this.ascentMode = false;
+      console.info(`[descent] ${on ? 'ENGAGED' : 'DISENGAGED'}`);
+      return on;
+    }
     // Staging: drop the previous stage's dry mass and remaining propellant.
     // updateStageProperties() rebuilds s.m from the NEW active stage plus the
     // retained payload, so mass falls instantly while velocity (momentum
@@ -830,6 +870,58 @@ window.ExolineFlight = (() => {
       return id;
     }
     dominant(bodies, state = this.s) { let id = 'sun', greatest = 0; for (const [key, body] of Object.entries(bodies)) { const physical = this.c.bodies[key]; if (!physical) continue; const distance = length(sub(state.r, body)), pull = this.c.G * physical.mass / (distance * distance); if (pull > greatest) { greatest = pull; id = key; } } return id; }
+    // v0.1.3 suicide-burn evaluator. Called once per RK4 substep BEFORE the
+    // push, off live (never cached) stage thrust/mass so a mid-descent stage
+    // separation retunes the law on the very next substep. Only acts while
+    // descentMode is on, the craft is airborne, and the dominant body is a
+    // solid world; gas giants are a hard no-op (setDescentMode already
+    // refuses them, this is the belt-and-braces twin).
+    descentStep(bodies, dt) {
+      if (!this.descentMode || this.s.landed || this.s.crashed) return;
+      let refId = null;
+      try { refId = this.referenceBody(bodies, this.s); } catch (e) { return; }
+      const body = refId && bodies[refId], physical = refId && this.c.bodies[refId];
+      if (!body || !physical || physical.solidSurface === false) return;
+      const rel = sub(this.s.r, body);
+      const d = length(rel);
+      if (!(d > 0) || !Number.isFinite(d)) return;
+      const rUnit = { x: rel.x / d, y: rel.y / d, z: (rel.z || 0) / d };
+      const mu = this.c.G * physical.mass;
+      const gLocal = mu / (d * d);
+      // Live stage capability, never cached: staging mid-descent is safe.
+      const stageThrust = Number.isFinite(this.thrust) ? this.thrust : 0;
+      const mass = Math.max(this.s.m, 1);
+      const aMax = stageThrust / mass;
+      if (!(aMax > 0)) { this.s.throttle = 0; return; } // no push available
+      const aAvail = Math.max(0.5, aMax - gLocal);
+      const vRel = sub(this.s.v, { x: body.vx || 0, y: body.vy || 0, z: body.vz || 0 });
+      const radial = (vRel.x * rUnit.x + vRel.y * rUnit.y + (vRel.z || 0) * rUnit.z);
+      const vDown = Math.max(0, -radial);
+      const hvx = vRel.x - rUnit.x * radial, hvy = vRel.y - rUnit.y * radial;
+      const hv = Math.hypot(hvx, hvy);
+      const h = d - physical.radius_m;
+      if (!(h > 0)) return; // at/below crust: contact logic owns the outcome
+      // Ignition gate: coast (or ride the chute) until the burn fits.
+      const hSb = (vDown * vDown / (2 * aAvail)) * 1.15 + 30;
+      if (h > hSb) { this.s.throttle = 0; return; }
+      // Throttle law: kill exactly the remaining fall energy by h = 2 m.
+      const aReq = vDown * vDown / (2 * Math.max(h - 2, 0.5));
+      let thr = (aReq + gLocal) / aMax;
+      thr = Math.max(0, Math.min(1, thr));
+      if (!Number.isFinite(thr)) thr = 0;
+      this.s.throttle = thr;
+      // Heading law: retrograde blended toward surface-normal as horizontal
+      // speed vanishes. 10 deg/s slew cap keeps it a believable gimbal.
+      const k = Math.max(0, Math.min(1.5, hv / Math.max(vDown, 0.5)));
+      let ux = -hvx * k - rUnit.x, uy = -hvy * k - rUnit.y;
+      const um = Math.hypot(ux, uy);
+      if (!(um > 1e-9)) { ux = -rUnit.x; uy = -rUnit.y; }
+      else { ux /= um; uy /= um; }
+      const targetHeading = Math.atan2(uy, ux);
+      const diff = Math.atan2(Math.sin(targetHeading - this.s.heading), Math.cos(targetHeading - this.s.heading));
+      const maxTurn = (10 * Math.PI / 180) * Math.max(dt, 1e-6);
+      this.s.heading += Math.max(-maxTurn, Math.min(maxTurn, diff));
+    }
     maximumStep(bodies, state = this.s) {
       const id = this.referenceBody(bodies, state), body = bodies[id], physical = this.c.bodies[id], radius = length(sub(state.r, body)), period = 2 * Math.PI * Math.sqrt(radius ** 3 / (this.c.G * physical.mass));
       // A tighter orbital step keeps osculating PE/AP stable after a coast or
@@ -921,6 +1013,9 @@ window.ExolineFlight = (() => {
     }
     step(seconds, bodies) {
       if (!seconds || this.s.crashed) return;
+      // v0.1.3: cache the live bodies map so UI-driven toggles (descent mode
+      // gas check) can consult the reference body outside a step.
+      this._bodies = bodies;
       if (this.s.throttle > 0) { this.circularHold = null; this.coast = null; }
       // A landed craft rides the moving body: re-pin to the surface each step
       // preserving the body-relative angle so it never drifts or sinks.
@@ -1032,7 +1127,7 @@ window.ExolineFlight = (() => {
       this._accMap = this.bodyAccelerations(bodies);
       // Prograde lock tracks the orbit as it curves, re-snapping every RK4
       // substep so long high-warp frames can't go stale mid-burn.
-      const lock = this.progradeLock && !this.ascentMode && !this.steerOverride && !this.manualSteer && this.s.throttle > 0 && !this.s.crashed;
+      const lock = this.progradeLock && !this.ascentMode && !this.descentMode && !this.steerOverride && !this.manualSteer && this.s.throttle > 0 && !this.s.crashed;
       const lockId = lock ? this.referenceBody(bodies, this.s) : null;
       const lockBody = lock && lockId ? bodies[lockId] : null;
       const lockPhysical = lock && lockId ? this.c.bodies[lockId] : null;
@@ -1065,6 +1160,10 @@ window.ExolineFlight = (() => {
       while (elapsed < seconds - 1e-9) {
         const step = this.maximumStep(bodies);
         const dt = Math.min(step, seconds - elapsed);
+        // v0.1.3 descent guidance runs BEFORE the push so this substep's
+        // thrust/heading are the solved ones. Live stage values are read
+        // fresh every substep — staging mid-descent is immediately safe.
+        this.descentStep(bodies, dt);
         if (lockBody) {
           const ldx = this.s.r.x - lockBody.x, ldy = this.s.r.y - lockBody.y, ldz = (this.s.r.z || 0) - (lockBody.z || 0);
           const lDist = Math.hypot(ldx, ldy, ldz);
@@ -1090,8 +1189,41 @@ window.ExolineFlight = (() => {
             else this.s.shieldFacing = false;
           } else this.s.shieldFacing = false;
         } catch (e) { /* thermal is display-only: never break the step */ }
+        // v0.1.3: track max dynamic pressure off the same interpolated
+        // ephemeris/final state the chunk used. Only q>0 extends the record.
+        try {
+          const qId = this.referenceBody(bodies, this.s);
+          const qBody = qId && bodies[qId], qPhys = qId && this.c.bodies[qId];
+          if (qBody && qPhys && ATMOSPHERES[qId]) {
+            const qAt = this.bodyAt(qBody, elapsed, this._accMap, qId);
+            const qVel = this.bodyVelAt(qBody, elapsed, this._accMap, qId);
+            const qRho = atmosphereDensity(this.s.r, qAt, { ...qPhys, id: qId }) || 0;
+            if (qRho > 0) {
+              const qv = Math.hypot(this.s.v.x - qVel.x, this.s.v.y - qVel.y);
+              const qNow = 0.5 * qRho * qv * qv;
+              if (Number.isFinite(qNow) && qNow > this.maxQ) this.maxQ = qNow;
+            }
+          }
+        } catch (e) { /* maxQ is telemetry: never break the step */ }
         if (this.s.crashed) break; // thermal breakup ends the chunk early
-        if (this.resolveContacts(bodies, elapsed)) break;
+        if (this.resolveContacts(bodies, elapsed)) {
+          // v0.1.3: touchdown disarms descent guidance and kills the engine.
+          if (this.s.landed && this.descentMode) {
+            this.descentMode = false;
+            this.s.throttle = 0;
+            console.info('[descent] TOUCHDOWN — guidance off');
+          }
+          break;
+        }
+        // v0.1.3: fuel-out disarm. No thrust means no suicide burn; surface
+        // contact below will resolve as crash/landing on its own. The UI
+        // layers its toast on the descentAbort ping.
+        if (this.descentMode && !this.infiniteFuel && !(this.s.propellant > 0)) {
+          this.descentMode = false;
+          this.s.throttle = 0;
+          this.descentAbort = true; // one-shot, consumed by the HUD toast
+          console.warn('[descent] ABORT: propellant exhausted');
+        }
       }
 
       // --- Reentry phase tracking (per dominant body) ---
@@ -1175,6 +1307,8 @@ window.ExolineFlight = (() => {
         stages: this.stages.map(st => ({ ...st })),
         currentStage: this.currentStage,
         ascentMode: this.ascentMode,
+        descentMode: this.descentMode,
+        maxQ: Number.isFinite(this.maxQ) ? this.maxQ : 0,
         landed: this.s.landed,
         landedBody: this.landedBody,
         landedDir: this.landedDir ? { ...this.landedDir } : null,
@@ -1203,6 +1337,11 @@ window.ExolineFlight = (() => {
       this.stages = (data.stages || []).map(st => ({ ...st }));
       this.currentStage = data.currentStage || 0;
       this.ascentMode = data.ascentMode || false;
+      // v0.1.3: v0.1.2 saves carry no descent fields — default them (off/0)
+      // so a loaded game never errors on the guidance law or q bar.
+      this.descentMode = data.descentMode || false;
+      this.descentAbort = false;
+      this.maxQ = Number.isFinite(data.maxQ) ? Math.max(0, data.maxQ) : 0;
       this.landedBody = data.landedBody || null;
       this.landedDir = data.landedDir ? { ...data.landedDir } : null;
       this.circularHold = data.circularHold ? { ...data.circularHold } : null;

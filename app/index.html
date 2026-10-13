@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
   <meta name="theme-color" content="#06090d">
   <title>EXOLINE v0.0.5 — Solar System</title>
-  <link rel="stylesheet" href="style.css?v=10">
+  <link rel="stylesheet" href="style.css?v=11">
 </head>
 <body>
   <div id="app">
@@ -127,7 +127,7 @@
         <label>PAUSE <input data-bind="pause" readonly></label><label>WARP DOWN <input data-bind="warpDown" readonly></label>
         <label>WARP UP <input data-bind="warpUp" readonly></label><label>FOCUS CRAFT <input data-bind="focusCraft" readonly></label>
         <label>RESET VIEW <input data-bind="resetView" readonly></label><label>ADD NODE <input data-bind="addNode" readonly></label>
-        <label>AUTO BURN <input data-bind="autoBurn" readonly></label><label>STAGE <input data-bind="stage" readonly></label><label>CHUTE <input data-bind="chute" readonly></label>
+        <label>AUTO BURN <input data-bind="autoBurn" readonly></label><label>STAGE <input data-bind="stage" readonly></label><label>CHUTE <input data-bind="chute" readonly></label><label>DESCENT <input data-bind="descent" readonly></label>
       </div>
       <button class="small-btn full" id="resetKeybinds">RESET KEYBINDS</button>
     </aside>
@@ -138,6 +138,8 @@
         <div class="nav-extra hidden" id="navExtra"><div class="nav-grid"><div><span>RADIAL</span><b id="navRadial">—</b></div><div><span>CLOSING</span><b id="navClosing">—</b></div><div><span>TCA</span><b id="navTca">—</b></div><div><span>MISS</span><b id="navMiss">—</b></div><div><span>PERIOD</span><b id="navPeriod">—</b></div><div><span>V ESC</span><b id="navVEsc">—</b></div><div><span>ENERGY</span><b id="navEnergy">—</b></div><div><span>INCL</span><b id="navInc">—</b></div></div><div class="nav-sub">TRANSFER · <b id="navTransferTitle">—</b></div><div class="nav-grid"><div><span>DEP Δv</span><b id="navTransferDep">—</b></div><div><span>ARR Δv</span><b id="navTransferArr">—</b></div><div><span>XFER TIME</span><b id="navTransferTime">—</b></div><div><span>Δv TOTAL</span><b id="navDvTotal">—</b></div></div></div>
       <div class="nav-actions"><button id="navDetailBtn">DETAIL</button><button id="navNodeBtn">+ NODE</button><button id="navClearTarget">CLEAR</button></div><div class="nav-actions"><button id="navFocusCraft">FOCUS</button><button id="navFocusTarget">FOCUS TGT</button><button id="navFit">FIT</button></div>
         <div class="nav-xfer" id="navXfer">
+          <div class="nav-sub">LANDING PREDICTION</div>
+          <div class="nav-grid"><div><span>IMPACT</span><b id="navImpact">—</b></div></div>
           <div class="nav-sub">TRANSFER WINDOWS</div>
           <button class="small-btn full" id="navComputeXfer">COMPUTE WINDOWS</button>
           <div class="xfer-list hidden" id="navXferList"></div>
@@ -146,7 +148,8 @@
       </div>
     </aside>
     <aside class="flight-hud" id="flightHud">
-      <div class="hud-grid"><span>SOI <b id="hudSoi">EARTH</b></span><span>APO <b id="hudApo">—</b></span><span>PERI <b id="hudPeri">—</b></span><span>ECC <b id="hudEcc">—</b></span><span>DST <b id="hudDistance">—</b></span><span>REENTRY <b id="hudReentry" class="hidden">—</b></span></div>
+      <div class="hud-grid"><span>SOI <b id="hudSoi">EARTH</b></span><span>APO <b id="hudApo">—</b></span><span>PERI <b id="hudPeri">—</b></span><span>ECC <b id="hudEcc">—</b></span><span>DST <b id="hudDistance">—</b></span><span>REENTRY <b id="hudReentry" class="hidden">—</b></span><span id="hudCallout" class="hidden hud-callout">—</span></div>
+      <div class="hud-grid hud-atmo"><span>VS <b id="hudVs">—</b></span><span>FPA <b id="hudFpa">—</b></span><span>MACH <b id="hudMach">—</b></span><span>G <b id="hudG">—</b></span><span class="hud-qwrap">Q <b id="hudQ">—</b><span class="hud-qbar"><i id="hudQFill"></i><em id="hudQTick"></em></span></span></div>
       <div id="hudBurn" class="hidden" style="margin:6px 0 2px"><div style="height:6px;border-radius:3px;background:rgba(120,180,200,.18);overflow:hidden"><i id="hudBurnFill" style="display:block;height:100%;width:0%;background:linear-gradient(90deg,#53ddff,#78e5ff);border-radius:3px"></i></div><b id="hudBurnText" style="display:block;margin-top:3px;font-size:10px;letter-spacing:.08em;color:#cfeefc">—</b></div>
       <div id="hudThermal" class="hud-therm hidden">
         <div class="hud-therm-row"><span class="lbl">TEMP</span><div class="hud-therm-bar"><i id="hudTempFill"></i></div><b class="hud-therm-val" id="hudTempVal">290 K</b></div>
@@ -166,6 +169,7 @@
               <button id="launchBtn">IGNITION</button>
               <button id="rcsBtn" aria-pressed="false" title="Fine attitude control">RCS</button>
               <button id="ascentBtn" aria-pressed="false" title="Ascent mode (gravity turn automation)">ASCENT</button>
+              <button id="descentBtn" aria-pressed="false" title="Descent mode (suicide-burn autopilot, V)">DESCENT</button>
               <button id="chuteBtn" aria-pressed="false" title="Deploy parachute (P)">CHUTE</button>
             </div>
           </div>
@@ -175,11 +179,11 @@
       </div>
     </aside>
   </div>
-  <script src="orbit-engine.js?v=23"></script>
-  <script src="flight-engine.js?v=23"></script>
-  <script src="map-renderer.js?v=23"></script>
-  <script src="navigation-engine.js?v=23"></script>
-  <script src="physics-agent.js?v=23"></script>
-  <script src="app.js?v=23"></script>
+  <script src="orbit-engine.js?v=24"></script>
+  <script src="flight-engine.js?v=24"></script>
+  <script src="map-renderer.js?v=24"></script>
+  <script src="navigation-engine.js?v=24"></script>
+  <script src="physics-agent.js?v=24"></script>
+  <script src="app.js?v=24"></script>
 </body>
 </html>
