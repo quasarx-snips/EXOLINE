@@ -9,6 +9,7 @@ window.ExolineMap = (() => {
       this.opts=opts;
       this.body=null;
       this.manifest=null;
+      this.assetVersion=null;
       this.images=new Map();
       this.tileImages=new Map();
       this.width=1; this.height=1;
@@ -92,6 +93,10 @@ window.ExolineMap = (() => {
     wrap01(v){v%=1;if(v<0)v+=1;return v}
     async open(body,manifest){
       this.body=body; this.manifest=manifest||null;
+      // Surface assets are not cache-busted by index.html, so a regenerated
+      // map would otherwise keep showing the browser's stale copy forever.
+      // The terrain manifest's version is the cache key.
+      this.assetVersion=(manifest&&manifest.version)||this.assetVersion||null;
       this.zoom=1; this.cx=.5; this.cy=.5; this.vx=this.vy=0;
       this.images.clear(); this.tileImages.clear();
       this.opts.onZoom?.(this.zoom);
@@ -101,16 +106,28 @@ window.ExolineMap = (() => {
     }
     load(src){
       if(this.images.has(src)) return this.images.get(src);
-      const p=new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>rej(new Error('Asset failed: '+src));im.src='../'+src});
+      const v=this.assetVersion?('?'+(/\?/.test(src)?'&':'')+'v='+encodeURIComponent(this.assetVersion)):'';
+      const p=new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>rej(new Error('Asset failed: '+src));im.src='../'+src+v});
       this.images.set(src,p); return p;
     }
+    // Pick the LOWEST pyramid level whose native width still covers the map's
+    // on-screen width, so tiles are never upscaled while a sharper level is
+    // available. (The old fixed zoom thresholds could hand back a level far
+    // COARSER than the master, painting a blur over a sharp image at mid
+    // zoom.) Falls back to the finest level when the map is magnified past
+    // every level, and null when the body has no pyramid.
     levelForZoom(){
-      if(!this.manifest?.levels)return null;
-      const levels=Object.keys(this.manifest.levels).map(Number).sort((a,b)=>a-b);
+      const m=this.manifest;
+      if(!m?.levels)return null;
+      const levels=Object.keys(m.levels).map(Number).filter(Number.isFinite).sort((a,b)=>a-b);
       if(!levels.length)return null;
-      if(this.zoom<1.45)return this.manifest.levels[String(levels[0])];
-      if(this.zoom<3)return this.manifest.levels[String(levels[Math.min(1,levels.length-1)])];
-      return this.manifest.levels[String(levels[levels.length-1])];
+      const tile=(m.tile_size|0)||128;
+      const need=this.mapWidth();
+      for(const k of levels){
+        const level=m.levels[String(k)];
+        if(level&&tile*(level.tiles_x|0)>=need)return level;
+      }
+      return m.levels[String(levels[levels.length-1])];
     }
     mapWidth(){return Math.min(this.width*0.96,this.height*1.62)*this.zoom}
     mapRect(){const w=this.mapWidth();const h=w/2;return{x:this.width/2-w*this.cx+this.xOffset(),y:this.height/2-h*this.cy+this.yOffset(),w,h}}
@@ -121,26 +138,31 @@ window.ExolineMap = (() => {
       const ctx=this.ctx;
       const baseW=level.tiles_x, baseH=level.tiles_y;
       const tw=rect.w/baseW, th=rect.h/baseH;
+      const vw=this.width, vh=this.height;
+      // Same scale-matched filtering as _drawMaster: tiles are 128px, so a tile
+      // drawn narrower than that is a minification.
+      ctx.imageSmoothingEnabled=tw<128;
+      if(tw<128)ctx.imageSmoothingQuality='high';
       const tasks=[];
-      for(let y=0;y<baseH;y++){
-        for(let x=0;x<baseW;x++){
-          const tile=level.tiles.find(t=>t.x===x&&t.y===y);
-          if(!tile)continue;
-          const drawX=rect.x+x*tw, drawY=rect.y+y*th;
-          const src=this.tileSrc(tile);
+      // Only tiles that actually touch the viewport are drawn. A hero body's
+      // finest level can hold hundreds of tiles and a deep zoom shows a
+      // handful of them, so this culling keeps high-resolution pyramids cheap
+      // without changing a single pixel of what ends up on screen.
+      for(const tile of level.tiles){
+        const src=this.tileSrc(tile);
+        const x0=rect.x+tile.x*tw, y0=rect.y+tile.y*th;
+        // The map wraps in x, so a tile can land at up to three horizontal
+        // positions; draw whichever copies are visible.
+        for(const k of [-1,0,1]){
+          const dx=x0+k*rect.w;
+          if(dx+tw<=0||dx>=vw||y0+th<=0||y0>=vh)continue;
           tasks.push(this.load(src).then(im=>{
-            ctx.drawImage(im,drawX,drawY,tw,th);
+            ctx.drawImage(im,dx,y0,tw,th);
           }).catch(()=>{}));
         }
       }
       await Promise.all(tasks);
-      // Wrapped copy when the map straddles viewport edges.
-      if(rect.x>0) {
-        for(const tile of level.tiles){const src=tile.path; const x=rect.x+(tile.x-baseW)*tw; const y=rect.y+tile.y*th; try{const im=await this.load(src);ctx.drawImage(im,x,y,tw,th)}catch{}}
-      }
-      if(rect.x+rect.w<this.width) {
-        for(const tile of level.tiles){const src=tile.path; const x=rect.x+(tile.x+baseW)*tw; const y=rect.y+tile.y*th; try{const im=await this.load(src);ctx.drawImage(im,x,y,tw,th)}catch{}}
-      }
+      ctx.imageSmoothingEnabled=false;
     }
     async draw(){
       const token=++this.pending;
@@ -154,10 +176,7 @@ window.ExolineMap = (() => {
       if (this.surf) { this._surfaceFrame(ctx, true); return; }
       if(!this.body||!this.master)return;
       const rect=this.mapRect();
-      ctx.drawImage(this.master,rect.x,rect.y,rect.w,rect.h);
-      // wrap the master horizontally
-      if(rect.x>0)ctx.drawImage(this.master,rect.x-rect.w,rect.y,rect.w,rect.h);
-      if(rect.x+rect.w<this.width)ctx.drawImage(this.master,rect.x+rect.w,rect.y,rect.w,rect.h);
+      this._drawMaster(ctx,rect);
       const level=this.levelForZoom();
       if(level && this.zoom>=1.45){
         try{await this.drawLevel(level,rect)}catch{}
@@ -167,6 +186,21 @@ window.ExolineMap = (() => {
       // longitude seam hint and latitude guide kept extremely subtle, not baked into terrain.
       ctx.fillStyle='rgba(0,0,0,.16)';ctx.fillRect(0,0,this.width,62);
       if(!this.drag){this.cx=this.wrap01(this.cx-this.vx/Math.max(1,this.mapWidth())*.04);this.cy=Math.max(0,Math.min(1,this.cy-this.vy/Math.max(1,this.mapWidth())*.02));this.vx*=.9;this.vy*=.9}
+    }
+    // Master image plus its two horizontal wrap copies. Filtering follows the
+    // scale: BILINEAR when minifying (a 4096px master shown at ~900px would
+    // otherwise drop 3 of every 4 pixels and alias into noise), NEAREST when
+    // magnifying, which is the documented pixel-art look and is what every
+    // body does today.
+    _drawMaster(ctx,rect){
+      if(!this.master)return;
+      const smooth=rect.w<this.master.naturalWidth;
+      ctx.imageSmoothingEnabled=smooth;
+      if(smooth)ctx.imageSmoothingQuality='high';
+      ctx.drawImage(this.master,rect.x,rect.y,rect.w,rect.h);
+      if(rect.x>0)ctx.drawImage(this.master,rect.x-rect.w,rect.y,rect.w,rect.h);
+      if(rect.x+rect.w<this.width)ctx.drawImage(this.master,rect.x+rect.w,rect.y,rect.w,rect.h);
+      ctx.imageSmoothingEnabled=false;
     }
     zoomAt(f,sx,sy){
       const before=this.screenToWorld(sx,sy);
@@ -199,6 +233,7 @@ window.ExolineMap = (() => {
         markers: null,
       };
       this.manifest = manifest || null;
+      this.assetVersion=(manifest&&manifest.version)||this.assetVersion||null;
       return this._syncSurfView();
     }
     _clampSurfZoom(m){ return Math.max(0.5, Math.min(20000, m)); }
@@ -269,9 +304,7 @@ window.ExolineMap = (() => {
           try {
             if (this.master) {
               const rect = this.mapRect();
-              ctx.drawImage(this.master, rect.x, rect.y, rect.w, rect.h);
-              if (rect.x > 0) ctx.drawImage(this.master, rect.x - rect.w, rect.y, rect.w, rect.h);
-              if (rect.x + rect.w < this.width) ctx.drawImage(this.master, rect.x + rect.w, rect.y, rect.w, rect.h);
+              this._drawMaster(ctx, rect);
               const level = this.levelForZoom();
               if (level && this.zoom >= 1.45) { try { await this.drawLevel(level, rect); } catch {} }
               ctx.strokeStyle = 'rgba(130,208,230,.2)'; ctx.lineWidth = 1;

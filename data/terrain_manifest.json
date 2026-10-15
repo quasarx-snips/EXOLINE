@@ -1,5 +1,5 @@
 {
-  "version": "0.0.2-renderer-2",
+  "version": "0.2.0-earth-hires",
   "tile_size": 128,
   "bodies": {
     "mercury": {
@@ -206,14 +206,24 @@
               "path": "assets/terrain/earth/z2/x0_y0.png"
             },
             {
-              "x": 0,
-              "y": 1,
-              "path": "assets/terrain/earth/z2/x0_y1.png"
-            },
-            {
               "x": 1,
               "y": 0,
               "path": "assets/terrain/earth/z2/x1_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/earth/z2/x2_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/earth/z2/x3_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/earth/z2/x0_y1.png"
             },
             {
               "x": 1,
@@ -222,18 +232,8 @@
             },
             {
               "x": 2,
-              "y": 0,
-              "path": "assets/terrain/earth/z2/x2_y0.png"
-            },
-            {
-              "x": 2,
               "y": 1,
               "path": "assets/terrain/earth/z2/x2_y1.png"
-            },
-            {
-              "x": 3,
-              "y": 0,
-              "path": "assets/terrain/earth/z2/x3_y0.png"
             },
             {
               "x": 3,
@@ -241,12 +241,3390 @@
               "path": "assets/terrain/earth/z2/x3_y1.png"
             }
           ]
+        },
+        "3": {
+          "tiles_x": 8,
+          "tiles_y": 4,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/earth/z3/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/earth/z3/x1_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/earth/z3/x2_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/earth/z3/x3_y0.png"
+            },
+            {
+              "x": 4,
+              "y": 0,
+              "path": "assets/terrain/earth/z3/x4_y0.png"
+            },
+            {
+              "x": 5,
+              "y": 0,
+              "path": "assets/terrain/earth/z3/x5_y0.png"
+            },
+            {
+              "x": 6,
+              "y": 0,
+              "path": "assets/terrain/earth/z3/x6_y0.png"
+            },
+            {
+              "x": 7,
+              "y": 0,
+              "path": "assets/terrain/earth/z3/x7_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/earth/z3/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/earth/z3/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/earth/z3/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/earth/z3/x3_y1.png"
+            },
+            {
+              "x": 4,
+              "y": 1,
+              "path": "assets/terrain/earth/z3/x4_y1.png"
+            },
+            {
+              "x": 5,
+              "y": 1,
+              "path": "assets/terrain/earth/z3/x5_y1.png"
+            },
+            {
+              "x": 6,
+              "y": 1,
+              "path": "assets/terrain/earth/z3/x6_y1.png"
+            },
+            {
+              "x": 7,
+              "y": 1,
+              "path": "assets/terrain/earth/z3/x7_y1.png"
+            },
+            {
+              "x": 0,
+              "y": 2,
+              "path": "assets/terrain/earth/z3/x0_y2.png"
+            },
+            {
+              "x": 1,
+              "y": 2,
+              "path": "assets/terrain/earth/z3/x1_y2.png"
+            },
+            {
+              "x": 2,
+              "y": 2,
+              "path": "assets/terrain/earth/z3/x2_y2.png"
+            },
+            {
+              "x": 3,
+              "y": 2,
+              "path": "assets/terrain/earth/z3/x3_y2.png"
+            },
+            {
+              "x": 4,
+              "y": 2,
+              "path": "assets/terrain/earth/z3/x4_y2.png"
+            },
+            {
+              "x": 5,
+              "y": 2,
+              "path": "assets/terrain/earth/z3/x5_y2.png"
+            },
+            {
+              "x": 6,
+              "y": 2,
+              "path": "assets/terrain/earth/z3/x6_y2.png"
+            },
+            {
+              "x": 7,
+              "y": 2,
+              "path": "assets/terrain/earth/z3/x7_y2.png"
+            },
+            {
+              "x": 0,
+              "y": 3,
+              "path": "assets/terrain/earth/z3/x0_y3.png"
+            },
+            {
+              "x": 1,
+              "y": 3,
+              "path": "assets/terrain/earth/z3/x1_y3.png"
+            },
+            {
+              "x": 2,
+              "y": 3,
+              "path": "assets/terrain/earth/z3/x2_y3.png"
+            },
+            {
+              "x": 3,
+              "y": 3,
+              "path": "assets/terrain/earth/z3/x3_y3.png"
+            },
+            {
+              "x": 4,
+              "y": 3,
+              "path": "assets/terrain/earth/z3/x4_y3.png"
+            },
+            {
+              "x": 5,
+              "y": 3,
+              "path": "assets/terrain/earth/z3/x5_y3.png"
+            },
+            {
+              "x": 6,
+              "y": 3,
+              "path": "assets/terrain/earth/z3/x6_y3.png"
+            },
+            {
+              "x": 7,
+              "y": 3,
+              "path": "assets/terrain/earth/z3/x7_y3.png"
+            }
+          ]
+        },
+        "4": {
+          "tiles_x": 16,
+          "tiles_y": 8,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/earth/z4/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/earth/z4/x1_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/earth/z4/x2_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/earth/z4/x3_y0.png"
+            },
+            {
+              "x": 4,
+              "y": 0,
+              "path": "assets/terrain/earth/z4/x4_y0.png"
+            },
+            {
+              "x": 5,
+              "y": 0,
+              "path": "assets/terrain/earth/z4/x5_y0.png"
+            },
+            {
+              "x": 6,
+              "y": 0,
+              "path": "assets/terrain/earth/z4/x6_y0.png"
+            },
+            {
+              "x": 7,
+              "y": 0,
+              "path": "assets/terrain/earth/z4/x7_y0.png"
+            },
+            {
+              "x": 8,
+              "y": 0,
+              "path": "assets/terrain/earth/z4/x8_y0.png"
+            },
+            {
+              "x": 9,
+              "y": 0,
+              "path": "assets/terrain/earth/z4/x9_y0.png"
+            },
+            {
+              "x": 10,
+              "y": 0,
+              "path": "assets/terrain/earth/z4/x10_y0.png"
+            },
+            {
+              "x": 11,
+              "y": 0,
+              "path": "assets/terrain/earth/z4/x11_y0.png"
+            },
+            {
+              "x": 12,
+              "y": 0,
+              "path": "assets/terrain/earth/z4/x12_y0.png"
+            },
+            {
+              "x": 13,
+              "y": 0,
+              "path": "assets/terrain/earth/z4/x13_y0.png"
+            },
+            {
+              "x": 14,
+              "y": 0,
+              "path": "assets/terrain/earth/z4/x14_y0.png"
+            },
+            {
+              "x": 15,
+              "y": 0,
+              "path": "assets/terrain/earth/z4/x15_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/earth/z4/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/earth/z4/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/earth/z4/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/earth/z4/x3_y1.png"
+            },
+            {
+              "x": 4,
+              "y": 1,
+              "path": "assets/terrain/earth/z4/x4_y1.png"
+            },
+            {
+              "x": 5,
+              "y": 1,
+              "path": "assets/terrain/earth/z4/x5_y1.png"
+            },
+            {
+              "x": 6,
+              "y": 1,
+              "path": "assets/terrain/earth/z4/x6_y1.png"
+            },
+            {
+              "x": 7,
+              "y": 1,
+              "path": "assets/terrain/earth/z4/x7_y1.png"
+            },
+            {
+              "x": 8,
+              "y": 1,
+              "path": "assets/terrain/earth/z4/x8_y1.png"
+            },
+            {
+              "x": 9,
+              "y": 1,
+              "path": "assets/terrain/earth/z4/x9_y1.png"
+            },
+            {
+              "x": 10,
+              "y": 1,
+              "path": "assets/terrain/earth/z4/x10_y1.png"
+            },
+            {
+              "x": 11,
+              "y": 1,
+              "path": "assets/terrain/earth/z4/x11_y1.png"
+            },
+            {
+              "x": 12,
+              "y": 1,
+              "path": "assets/terrain/earth/z4/x12_y1.png"
+            },
+            {
+              "x": 13,
+              "y": 1,
+              "path": "assets/terrain/earth/z4/x13_y1.png"
+            },
+            {
+              "x": 14,
+              "y": 1,
+              "path": "assets/terrain/earth/z4/x14_y1.png"
+            },
+            {
+              "x": 15,
+              "y": 1,
+              "path": "assets/terrain/earth/z4/x15_y1.png"
+            },
+            {
+              "x": 0,
+              "y": 2,
+              "path": "assets/terrain/earth/z4/x0_y2.png"
+            },
+            {
+              "x": 1,
+              "y": 2,
+              "path": "assets/terrain/earth/z4/x1_y2.png"
+            },
+            {
+              "x": 2,
+              "y": 2,
+              "path": "assets/terrain/earth/z4/x2_y2.png"
+            },
+            {
+              "x": 3,
+              "y": 2,
+              "path": "assets/terrain/earth/z4/x3_y2.png"
+            },
+            {
+              "x": 4,
+              "y": 2,
+              "path": "assets/terrain/earth/z4/x4_y2.png"
+            },
+            {
+              "x": 5,
+              "y": 2,
+              "path": "assets/terrain/earth/z4/x5_y2.png"
+            },
+            {
+              "x": 6,
+              "y": 2,
+              "path": "assets/terrain/earth/z4/x6_y2.png"
+            },
+            {
+              "x": 7,
+              "y": 2,
+              "path": "assets/terrain/earth/z4/x7_y2.png"
+            },
+            {
+              "x": 8,
+              "y": 2,
+              "path": "assets/terrain/earth/z4/x8_y2.png"
+            },
+            {
+              "x": 9,
+              "y": 2,
+              "path": "assets/terrain/earth/z4/x9_y2.png"
+            },
+            {
+              "x": 10,
+              "y": 2,
+              "path": "assets/terrain/earth/z4/x10_y2.png"
+            },
+            {
+              "x": 11,
+              "y": 2,
+              "path": "assets/terrain/earth/z4/x11_y2.png"
+            },
+            {
+              "x": 12,
+              "y": 2,
+              "path": "assets/terrain/earth/z4/x12_y2.png"
+            },
+            {
+              "x": 13,
+              "y": 2,
+              "path": "assets/terrain/earth/z4/x13_y2.png"
+            },
+            {
+              "x": 14,
+              "y": 2,
+              "path": "assets/terrain/earth/z4/x14_y2.png"
+            },
+            {
+              "x": 15,
+              "y": 2,
+              "path": "assets/terrain/earth/z4/x15_y2.png"
+            },
+            {
+              "x": 0,
+              "y": 3,
+              "path": "assets/terrain/earth/z4/x0_y3.png"
+            },
+            {
+              "x": 1,
+              "y": 3,
+              "path": "assets/terrain/earth/z4/x1_y3.png"
+            },
+            {
+              "x": 2,
+              "y": 3,
+              "path": "assets/terrain/earth/z4/x2_y3.png"
+            },
+            {
+              "x": 3,
+              "y": 3,
+              "path": "assets/terrain/earth/z4/x3_y3.png"
+            },
+            {
+              "x": 4,
+              "y": 3,
+              "path": "assets/terrain/earth/z4/x4_y3.png"
+            },
+            {
+              "x": 5,
+              "y": 3,
+              "path": "assets/terrain/earth/z4/x5_y3.png"
+            },
+            {
+              "x": 6,
+              "y": 3,
+              "path": "assets/terrain/earth/z4/x6_y3.png"
+            },
+            {
+              "x": 7,
+              "y": 3,
+              "path": "assets/terrain/earth/z4/x7_y3.png"
+            },
+            {
+              "x": 8,
+              "y": 3,
+              "path": "assets/terrain/earth/z4/x8_y3.png"
+            },
+            {
+              "x": 9,
+              "y": 3,
+              "path": "assets/terrain/earth/z4/x9_y3.png"
+            },
+            {
+              "x": 10,
+              "y": 3,
+              "path": "assets/terrain/earth/z4/x10_y3.png"
+            },
+            {
+              "x": 11,
+              "y": 3,
+              "path": "assets/terrain/earth/z4/x11_y3.png"
+            },
+            {
+              "x": 12,
+              "y": 3,
+              "path": "assets/terrain/earth/z4/x12_y3.png"
+            },
+            {
+              "x": 13,
+              "y": 3,
+              "path": "assets/terrain/earth/z4/x13_y3.png"
+            },
+            {
+              "x": 14,
+              "y": 3,
+              "path": "assets/terrain/earth/z4/x14_y3.png"
+            },
+            {
+              "x": 15,
+              "y": 3,
+              "path": "assets/terrain/earth/z4/x15_y3.png"
+            },
+            {
+              "x": 0,
+              "y": 4,
+              "path": "assets/terrain/earth/z4/x0_y4.png"
+            },
+            {
+              "x": 1,
+              "y": 4,
+              "path": "assets/terrain/earth/z4/x1_y4.png"
+            },
+            {
+              "x": 2,
+              "y": 4,
+              "path": "assets/terrain/earth/z4/x2_y4.png"
+            },
+            {
+              "x": 3,
+              "y": 4,
+              "path": "assets/terrain/earth/z4/x3_y4.png"
+            },
+            {
+              "x": 4,
+              "y": 4,
+              "path": "assets/terrain/earth/z4/x4_y4.png"
+            },
+            {
+              "x": 5,
+              "y": 4,
+              "path": "assets/terrain/earth/z4/x5_y4.png"
+            },
+            {
+              "x": 6,
+              "y": 4,
+              "path": "assets/terrain/earth/z4/x6_y4.png"
+            },
+            {
+              "x": 7,
+              "y": 4,
+              "path": "assets/terrain/earth/z4/x7_y4.png"
+            },
+            {
+              "x": 8,
+              "y": 4,
+              "path": "assets/terrain/earth/z4/x8_y4.png"
+            },
+            {
+              "x": 9,
+              "y": 4,
+              "path": "assets/terrain/earth/z4/x9_y4.png"
+            },
+            {
+              "x": 10,
+              "y": 4,
+              "path": "assets/terrain/earth/z4/x10_y4.png"
+            },
+            {
+              "x": 11,
+              "y": 4,
+              "path": "assets/terrain/earth/z4/x11_y4.png"
+            },
+            {
+              "x": 12,
+              "y": 4,
+              "path": "assets/terrain/earth/z4/x12_y4.png"
+            },
+            {
+              "x": 13,
+              "y": 4,
+              "path": "assets/terrain/earth/z4/x13_y4.png"
+            },
+            {
+              "x": 14,
+              "y": 4,
+              "path": "assets/terrain/earth/z4/x14_y4.png"
+            },
+            {
+              "x": 15,
+              "y": 4,
+              "path": "assets/terrain/earth/z4/x15_y4.png"
+            },
+            {
+              "x": 0,
+              "y": 5,
+              "path": "assets/terrain/earth/z4/x0_y5.png"
+            },
+            {
+              "x": 1,
+              "y": 5,
+              "path": "assets/terrain/earth/z4/x1_y5.png"
+            },
+            {
+              "x": 2,
+              "y": 5,
+              "path": "assets/terrain/earth/z4/x2_y5.png"
+            },
+            {
+              "x": 3,
+              "y": 5,
+              "path": "assets/terrain/earth/z4/x3_y5.png"
+            },
+            {
+              "x": 4,
+              "y": 5,
+              "path": "assets/terrain/earth/z4/x4_y5.png"
+            },
+            {
+              "x": 5,
+              "y": 5,
+              "path": "assets/terrain/earth/z4/x5_y5.png"
+            },
+            {
+              "x": 6,
+              "y": 5,
+              "path": "assets/terrain/earth/z4/x6_y5.png"
+            },
+            {
+              "x": 7,
+              "y": 5,
+              "path": "assets/terrain/earth/z4/x7_y5.png"
+            },
+            {
+              "x": 8,
+              "y": 5,
+              "path": "assets/terrain/earth/z4/x8_y5.png"
+            },
+            {
+              "x": 9,
+              "y": 5,
+              "path": "assets/terrain/earth/z4/x9_y5.png"
+            },
+            {
+              "x": 10,
+              "y": 5,
+              "path": "assets/terrain/earth/z4/x10_y5.png"
+            },
+            {
+              "x": 11,
+              "y": 5,
+              "path": "assets/terrain/earth/z4/x11_y5.png"
+            },
+            {
+              "x": 12,
+              "y": 5,
+              "path": "assets/terrain/earth/z4/x12_y5.png"
+            },
+            {
+              "x": 13,
+              "y": 5,
+              "path": "assets/terrain/earth/z4/x13_y5.png"
+            },
+            {
+              "x": 14,
+              "y": 5,
+              "path": "assets/terrain/earth/z4/x14_y5.png"
+            },
+            {
+              "x": 15,
+              "y": 5,
+              "path": "assets/terrain/earth/z4/x15_y5.png"
+            },
+            {
+              "x": 0,
+              "y": 6,
+              "path": "assets/terrain/earth/z4/x0_y6.png"
+            },
+            {
+              "x": 1,
+              "y": 6,
+              "path": "assets/terrain/earth/z4/x1_y6.png"
+            },
+            {
+              "x": 2,
+              "y": 6,
+              "path": "assets/terrain/earth/z4/x2_y6.png"
+            },
+            {
+              "x": 3,
+              "y": 6,
+              "path": "assets/terrain/earth/z4/x3_y6.png"
+            },
+            {
+              "x": 4,
+              "y": 6,
+              "path": "assets/terrain/earth/z4/x4_y6.png"
+            },
+            {
+              "x": 5,
+              "y": 6,
+              "path": "assets/terrain/earth/z4/x5_y6.png"
+            },
+            {
+              "x": 6,
+              "y": 6,
+              "path": "assets/terrain/earth/z4/x6_y6.png"
+            },
+            {
+              "x": 7,
+              "y": 6,
+              "path": "assets/terrain/earth/z4/x7_y6.png"
+            },
+            {
+              "x": 8,
+              "y": 6,
+              "path": "assets/terrain/earth/z4/x8_y6.png"
+            },
+            {
+              "x": 9,
+              "y": 6,
+              "path": "assets/terrain/earth/z4/x9_y6.png"
+            },
+            {
+              "x": 10,
+              "y": 6,
+              "path": "assets/terrain/earth/z4/x10_y6.png"
+            },
+            {
+              "x": 11,
+              "y": 6,
+              "path": "assets/terrain/earth/z4/x11_y6.png"
+            },
+            {
+              "x": 12,
+              "y": 6,
+              "path": "assets/terrain/earth/z4/x12_y6.png"
+            },
+            {
+              "x": 13,
+              "y": 6,
+              "path": "assets/terrain/earth/z4/x13_y6.png"
+            },
+            {
+              "x": 14,
+              "y": 6,
+              "path": "assets/terrain/earth/z4/x14_y6.png"
+            },
+            {
+              "x": 15,
+              "y": 6,
+              "path": "assets/terrain/earth/z4/x15_y6.png"
+            },
+            {
+              "x": 0,
+              "y": 7,
+              "path": "assets/terrain/earth/z4/x0_y7.png"
+            },
+            {
+              "x": 1,
+              "y": 7,
+              "path": "assets/terrain/earth/z4/x1_y7.png"
+            },
+            {
+              "x": 2,
+              "y": 7,
+              "path": "assets/terrain/earth/z4/x2_y7.png"
+            },
+            {
+              "x": 3,
+              "y": 7,
+              "path": "assets/terrain/earth/z4/x3_y7.png"
+            },
+            {
+              "x": 4,
+              "y": 7,
+              "path": "assets/terrain/earth/z4/x4_y7.png"
+            },
+            {
+              "x": 5,
+              "y": 7,
+              "path": "assets/terrain/earth/z4/x5_y7.png"
+            },
+            {
+              "x": 6,
+              "y": 7,
+              "path": "assets/terrain/earth/z4/x6_y7.png"
+            },
+            {
+              "x": 7,
+              "y": 7,
+              "path": "assets/terrain/earth/z4/x7_y7.png"
+            },
+            {
+              "x": 8,
+              "y": 7,
+              "path": "assets/terrain/earth/z4/x8_y7.png"
+            },
+            {
+              "x": 9,
+              "y": 7,
+              "path": "assets/terrain/earth/z4/x9_y7.png"
+            },
+            {
+              "x": 10,
+              "y": 7,
+              "path": "assets/terrain/earth/z4/x10_y7.png"
+            },
+            {
+              "x": 11,
+              "y": 7,
+              "path": "assets/terrain/earth/z4/x11_y7.png"
+            },
+            {
+              "x": 12,
+              "y": 7,
+              "path": "assets/terrain/earth/z4/x12_y7.png"
+            },
+            {
+              "x": 13,
+              "y": 7,
+              "path": "assets/terrain/earth/z4/x13_y7.png"
+            },
+            {
+              "x": 14,
+              "y": 7,
+              "path": "assets/terrain/earth/z4/x14_y7.png"
+            },
+            {
+              "x": 15,
+              "y": 7,
+              "path": "assets/terrain/earth/z4/x15_y7.png"
+            }
+          ]
+        },
+        "5": {
+          "tiles_x": 32,
+          "tiles_y": 16,
+          "tiles": [
+            {
+              "x": 0,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x0_y0.png"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x1_y0.png"
+            },
+            {
+              "x": 2,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x2_y0.png"
+            },
+            {
+              "x": 3,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x3_y0.png"
+            },
+            {
+              "x": 4,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x4_y0.png"
+            },
+            {
+              "x": 5,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x5_y0.png"
+            },
+            {
+              "x": 6,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x6_y0.png"
+            },
+            {
+              "x": 7,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x7_y0.png"
+            },
+            {
+              "x": 8,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x8_y0.png"
+            },
+            {
+              "x": 9,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x9_y0.png"
+            },
+            {
+              "x": 10,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x10_y0.png"
+            },
+            {
+              "x": 11,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x11_y0.png"
+            },
+            {
+              "x": 12,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x12_y0.png"
+            },
+            {
+              "x": 13,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x13_y0.png"
+            },
+            {
+              "x": 14,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x14_y0.png"
+            },
+            {
+              "x": 15,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x15_y0.png"
+            },
+            {
+              "x": 16,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x16_y0.png"
+            },
+            {
+              "x": 17,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x17_y0.png"
+            },
+            {
+              "x": 18,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x18_y0.png"
+            },
+            {
+              "x": 19,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x19_y0.png"
+            },
+            {
+              "x": 20,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x20_y0.png"
+            },
+            {
+              "x": 21,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x21_y0.png"
+            },
+            {
+              "x": 22,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x22_y0.png"
+            },
+            {
+              "x": 23,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x23_y0.png"
+            },
+            {
+              "x": 24,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x24_y0.png"
+            },
+            {
+              "x": 25,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x25_y0.png"
+            },
+            {
+              "x": 26,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x26_y0.png"
+            },
+            {
+              "x": 27,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x27_y0.png"
+            },
+            {
+              "x": 28,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x28_y0.png"
+            },
+            {
+              "x": 29,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x29_y0.png"
+            },
+            {
+              "x": 30,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x30_y0.png"
+            },
+            {
+              "x": 31,
+              "y": 0,
+              "path": "assets/terrain/earth/z5/x31_y0.png"
+            },
+            {
+              "x": 0,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x0_y1.png"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x1_y1.png"
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x2_y1.png"
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x3_y1.png"
+            },
+            {
+              "x": 4,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x4_y1.png"
+            },
+            {
+              "x": 5,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x5_y1.png"
+            },
+            {
+              "x": 6,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x6_y1.png"
+            },
+            {
+              "x": 7,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x7_y1.png"
+            },
+            {
+              "x": 8,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x8_y1.png"
+            },
+            {
+              "x": 9,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x9_y1.png"
+            },
+            {
+              "x": 10,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x10_y1.png"
+            },
+            {
+              "x": 11,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x11_y1.png"
+            },
+            {
+              "x": 12,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x12_y1.png"
+            },
+            {
+              "x": 13,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x13_y1.png"
+            },
+            {
+              "x": 14,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x14_y1.png"
+            },
+            {
+              "x": 15,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x15_y1.png"
+            },
+            {
+              "x": 16,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x16_y1.png"
+            },
+            {
+              "x": 17,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x17_y1.png"
+            },
+            {
+              "x": 18,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x18_y1.png"
+            },
+            {
+              "x": 19,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x19_y1.png"
+            },
+            {
+              "x": 20,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x20_y1.png"
+            },
+            {
+              "x": 21,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x21_y1.png"
+            },
+            {
+              "x": 22,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x22_y1.png"
+            },
+            {
+              "x": 23,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x23_y1.png"
+            },
+            {
+              "x": 24,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x24_y1.png"
+            },
+            {
+              "x": 25,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x25_y1.png"
+            },
+            {
+              "x": 26,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x26_y1.png"
+            },
+            {
+              "x": 27,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x27_y1.png"
+            },
+            {
+              "x": 28,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x28_y1.png"
+            },
+            {
+              "x": 29,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x29_y1.png"
+            },
+            {
+              "x": 30,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x30_y1.png"
+            },
+            {
+              "x": 31,
+              "y": 1,
+              "path": "assets/terrain/earth/z5/x31_y1.png"
+            },
+            {
+              "x": 0,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x0_y2.png"
+            },
+            {
+              "x": 1,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x1_y2.png"
+            },
+            {
+              "x": 2,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x2_y2.png"
+            },
+            {
+              "x": 3,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x3_y2.png"
+            },
+            {
+              "x": 4,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x4_y2.png"
+            },
+            {
+              "x": 5,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x5_y2.png"
+            },
+            {
+              "x": 6,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x6_y2.png"
+            },
+            {
+              "x": 7,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x7_y2.png"
+            },
+            {
+              "x": 8,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x8_y2.png"
+            },
+            {
+              "x": 9,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x9_y2.png"
+            },
+            {
+              "x": 10,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x10_y2.png"
+            },
+            {
+              "x": 11,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x11_y2.png"
+            },
+            {
+              "x": 12,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x12_y2.png"
+            },
+            {
+              "x": 13,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x13_y2.png"
+            },
+            {
+              "x": 14,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x14_y2.png"
+            },
+            {
+              "x": 15,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x15_y2.png"
+            },
+            {
+              "x": 16,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x16_y2.png"
+            },
+            {
+              "x": 17,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x17_y2.png"
+            },
+            {
+              "x": 18,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x18_y2.png"
+            },
+            {
+              "x": 19,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x19_y2.png"
+            },
+            {
+              "x": 20,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x20_y2.png"
+            },
+            {
+              "x": 21,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x21_y2.png"
+            },
+            {
+              "x": 22,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x22_y2.png"
+            },
+            {
+              "x": 23,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x23_y2.png"
+            },
+            {
+              "x": 24,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x24_y2.png"
+            },
+            {
+              "x": 25,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x25_y2.png"
+            },
+            {
+              "x": 26,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x26_y2.png"
+            },
+            {
+              "x": 27,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x27_y2.png"
+            },
+            {
+              "x": 28,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x28_y2.png"
+            },
+            {
+              "x": 29,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x29_y2.png"
+            },
+            {
+              "x": 30,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x30_y2.png"
+            },
+            {
+              "x": 31,
+              "y": 2,
+              "path": "assets/terrain/earth/z5/x31_y2.png"
+            },
+            {
+              "x": 0,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x0_y3.png"
+            },
+            {
+              "x": 1,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x1_y3.png"
+            },
+            {
+              "x": 2,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x2_y3.png"
+            },
+            {
+              "x": 3,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x3_y3.png"
+            },
+            {
+              "x": 4,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x4_y3.png"
+            },
+            {
+              "x": 5,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x5_y3.png"
+            },
+            {
+              "x": 6,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x6_y3.png"
+            },
+            {
+              "x": 7,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x7_y3.png"
+            },
+            {
+              "x": 8,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x8_y3.png"
+            },
+            {
+              "x": 9,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x9_y3.png"
+            },
+            {
+              "x": 10,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x10_y3.png"
+            },
+            {
+              "x": 11,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x11_y3.png"
+            },
+            {
+              "x": 12,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x12_y3.png"
+            },
+            {
+              "x": 13,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x13_y3.png"
+            },
+            {
+              "x": 14,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x14_y3.png"
+            },
+            {
+              "x": 15,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x15_y3.png"
+            },
+            {
+              "x": 16,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x16_y3.png"
+            },
+            {
+              "x": 17,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x17_y3.png"
+            },
+            {
+              "x": 18,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x18_y3.png"
+            },
+            {
+              "x": 19,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x19_y3.png"
+            },
+            {
+              "x": 20,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x20_y3.png"
+            },
+            {
+              "x": 21,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x21_y3.png"
+            },
+            {
+              "x": 22,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x22_y3.png"
+            },
+            {
+              "x": 23,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x23_y3.png"
+            },
+            {
+              "x": 24,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x24_y3.png"
+            },
+            {
+              "x": 25,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x25_y3.png"
+            },
+            {
+              "x": 26,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x26_y3.png"
+            },
+            {
+              "x": 27,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x27_y3.png"
+            },
+            {
+              "x": 28,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x28_y3.png"
+            },
+            {
+              "x": 29,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x29_y3.png"
+            },
+            {
+              "x": 30,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x30_y3.png"
+            },
+            {
+              "x": 31,
+              "y": 3,
+              "path": "assets/terrain/earth/z5/x31_y3.png"
+            },
+            {
+              "x": 0,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x0_y4.png"
+            },
+            {
+              "x": 1,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x1_y4.png"
+            },
+            {
+              "x": 2,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x2_y4.png"
+            },
+            {
+              "x": 3,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x3_y4.png"
+            },
+            {
+              "x": 4,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x4_y4.png"
+            },
+            {
+              "x": 5,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x5_y4.png"
+            },
+            {
+              "x": 6,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x6_y4.png"
+            },
+            {
+              "x": 7,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x7_y4.png"
+            },
+            {
+              "x": 8,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x8_y4.png"
+            },
+            {
+              "x": 9,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x9_y4.png"
+            },
+            {
+              "x": 10,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x10_y4.png"
+            },
+            {
+              "x": 11,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x11_y4.png"
+            },
+            {
+              "x": 12,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x12_y4.png"
+            },
+            {
+              "x": 13,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x13_y4.png"
+            },
+            {
+              "x": 14,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x14_y4.png"
+            },
+            {
+              "x": 15,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x15_y4.png"
+            },
+            {
+              "x": 16,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x16_y4.png"
+            },
+            {
+              "x": 17,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x17_y4.png"
+            },
+            {
+              "x": 18,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x18_y4.png"
+            },
+            {
+              "x": 19,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x19_y4.png"
+            },
+            {
+              "x": 20,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x20_y4.png"
+            },
+            {
+              "x": 21,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x21_y4.png"
+            },
+            {
+              "x": 22,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x22_y4.png"
+            },
+            {
+              "x": 23,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x23_y4.png"
+            },
+            {
+              "x": 24,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x24_y4.png"
+            },
+            {
+              "x": 25,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x25_y4.png"
+            },
+            {
+              "x": 26,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x26_y4.png"
+            },
+            {
+              "x": 27,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x27_y4.png"
+            },
+            {
+              "x": 28,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x28_y4.png"
+            },
+            {
+              "x": 29,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x29_y4.png"
+            },
+            {
+              "x": 30,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x30_y4.png"
+            },
+            {
+              "x": 31,
+              "y": 4,
+              "path": "assets/terrain/earth/z5/x31_y4.png"
+            },
+            {
+              "x": 0,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x0_y5.png"
+            },
+            {
+              "x": 1,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x1_y5.png"
+            },
+            {
+              "x": 2,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x2_y5.png"
+            },
+            {
+              "x": 3,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x3_y5.png"
+            },
+            {
+              "x": 4,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x4_y5.png"
+            },
+            {
+              "x": 5,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x5_y5.png"
+            },
+            {
+              "x": 6,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x6_y5.png"
+            },
+            {
+              "x": 7,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x7_y5.png"
+            },
+            {
+              "x": 8,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x8_y5.png"
+            },
+            {
+              "x": 9,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x9_y5.png"
+            },
+            {
+              "x": 10,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x10_y5.png"
+            },
+            {
+              "x": 11,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x11_y5.png"
+            },
+            {
+              "x": 12,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x12_y5.png"
+            },
+            {
+              "x": 13,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x13_y5.png"
+            },
+            {
+              "x": 14,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x14_y5.png"
+            },
+            {
+              "x": 15,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x15_y5.png"
+            },
+            {
+              "x": 16,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x16_y5.png"
+            },
+            {
+              "x": 17,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x17_y5.png"
+            },
+            {
+              "x": 18,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x18_y5.png"
+            },
+            {
+              "x": 19,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x19_y5.png"
+            },
+            {
+              "x": 20,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x20_y5.png"
+            },
+            {
+              "x": 21,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x21_y5.png"
+            },
+            {
+              "x": 22,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x22_y5.png"
+            },
+            {
+              "x": 23,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x23_y5.png"
+            },
+            {
+              "x": 24,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x24_y5.png"
+            },
+            {
+              "x": 25,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x25_y5.png"
+            },
+            {
+              "x": 26,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x26_y5.png"
+            },
+            {
+              "x": 27,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x27_y5.png"
+            },
+            {
+              "x": 28,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x28_y5.png"
+            },
+            {
+              "x": 29,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x29_y5.png"
+            },
+            {
+              "x": 30,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x30_y5.png"
+            },
+            {
+              "x": 31,
+              "y": 5,
+              "path": "assets/terrain/earth/z5/x31_y5.png"
+            },
+            {
+              "x": 0,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x0_y6.png"
+            },
+            {
+              "x": 1,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x1_y6.png"
+            },
+            {
+              "x": 2,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x2_y6.png"
+            },
+            {
+              "x": 3,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x3_y6.png"
+            },
+            {
+              "x": 4,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x4_y6.png"
+            },
+            {
+              "x": 5,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x5_y6.png"
+            },
+            {
+              "x": 6,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x6_y6.png"
+            },
+            {
+              "x": 7,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x7_y6.png"
+            },
+            {
+              "x": 8,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x8_y6.png"
+            },
+            {
+              "x": 9,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x9_y6.png"
+            },
+            {
+              "x": 10,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x10_y6.png"
+            },
+            {
+              "x": 11,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x11_y6.png"
+            },
+            {
+              "x": 12,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x12_y6.png"
+            },
+            {
+              "x": 13,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x13_y6.png"
+            },
+            {
+              "x": 14,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x14_y6.png"
+            },
+            {
+              "x": 15,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x15_y6.png"
+            },
+            {
+              "x": 16,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x16_y6.png"
+            },
+            {
+              "x": 17,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x17_y6.png"
+            },
+            {
+              "x": 18,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x18_y6.png"
+            },
+            {
+              "x": 19,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x19_y6.png"
+            },
+            {
+              "x": 20,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x20_y6.png"
+            },
+            {
+              "x": 21,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x21_y6.png"
+            },
+            {
+              "x": 22,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x22_y6.png"
+            },
+            {
+              "x": 23,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x23_y6.png"
+            },
+            {
+              "x": 24,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x24_y6.png"
+            },
+            {
+              "x": 25,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x25_y6.png"
+            },
+            {
+              "x": 26,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x26_y6.png"
+            },
+            {
+              "x": 27,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x27_y6.png"
+            },
+            {
+              "x": 28,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x28_y6.png"
+            },
+            {
+              "x": 29,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x29_y6.png"
+            },
+            {
+              "x": 30,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x30_y6.png"
+            },
+            {
+              "x": 31,
+              "y": 6,
+              "path": "assets/terrain/earth/z5/x31_y6.png"
+            },
+            {
+              "x": 0,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x0_y7.png"
+            },
+            {
+              "x": 1,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x1_y7.png"
+            },
+            {
+              "x": 2,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x2_y7.png"
+            },
+            {
+              "x": 3,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x3_y7.png"
+            },
+            {
+              "x": 4,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x4_y7.png"
+            },
+            {
+              "x": 5,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x5_y7.png"
+            },
+            {
+              "x": 6,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x6_y7.png"
+            },
+            {
+              "x": 7,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x7_y7.png"
+            },
+            {
+              "x": 8,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x8_y7.png"
+            },
+            {
+              "x": 9,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x9_y7.png"
+            },
+            {
+              "x": 10,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x10_y7.png"
+            },
+            {
+              "x": 11,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x11_y7.png"
+            },
+            {
+              "x": 12,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x12_y7.png"
+            },
+            {
+              "x": 13,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x13_y7.png"
+            },
+            {
+              "x": 14,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x14_y7.png"
+            },
+            {
+              "x": 15,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x15_y7.png"
+            },
+            {
+              "x": 16,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x16_y7.png"
+            },
+            {
+              "x": 17,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x17_y7.png"
+            },
+            {
+              "x": 18,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x18_y7.png"
+            },
+            {
+              "x": 19,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x19_y7.png"
+            },
+            {
+              "x": 20,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x20_y7.png"
+            },
+            {
+              "x": 21,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x21_y7.png"
+            },
+            {
+              "x": 22,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x22_y7.png"
+            },
+            {
+              "x": 23,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x23_y7.png"
+            },
+            {
+              "x": 24,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x24_y7.png"
+            },
+            {
+              "x": 25,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x25_y7.png"
+            },
+            {
+              "x": 26,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x26_y7.png"
+            },
+            {
+              "x": 27,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x27_y7.png"
+            },
+            {
+              "x": 28,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x28_y7.png"
+            },
+            {
+              "x": 29,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x29_y7.png"
+            },
+            {
+              "x": 30,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x30_y7.png"
+            },
+            {
+              "x": 31,
+              "y": 7,
+              "path": "assets/terrain/earth/z5/x31_y7.png"
+            },
+            {
+              "x": 0,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x0_y8.png"
+            },
+            {
+              "x": 1,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x1_y8.png"
+            },
+            {
+              "x": 2,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x2_y8.png"
+            },
+            {
+              "x": 3,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x3_y8.png"
+            },
+            {
+              "x": 4,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x4_y8.png"
+            },
+            {
+              "x": 5,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x5_y8.png"
+            },
+            {
+              "x": 6,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x6_y8.png"
+            },
+            {
+              "x": 7,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x7_y8.png"
+            },
+            {
+              "x": 8,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x8_y8.png"
+            },
+            {
+              "x": 9,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x9_y8.png"
+            },
+            {
+              "x": 10,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x10_y8.png"
+            },
+            {
+              "x": 11,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x11_y8.png"
+            },
+            {
+              "x": 12,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x12_y8.png"
+            },
+            {
+              "x": 13,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x13_y8.png"
+            },
+            {
+              "x": 14,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x14_y8.png"
+            },
+            {
+              "x": 15,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x15_y8.png"
+            },
+            {
+              "x": 16,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x16_y8.png"
+            },
+            {
+              "x": 17,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x17_y8.png"
+            },
+            {
+              "x": 18,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x18_y8.png"
+            },
+            {
+              "x": 19,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x19_y8.png"
+            },
+            {
+              "x": 20,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x20_y8.png"
+            },
+            {
+              "x": 21,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x21_y8.png"
+            },
+            {
+              "x": 22,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x22_y8.png"
+            },
+            {
+              "x": 23,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x23_y8.png"
+            },
+            {
+              "x": 24,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x24_y8.png"
+            },
+            {
+              "x": 25,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x25_y8.png"
+            },
+            {
+              "x": 26,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x26_y8.png"
+            },
+            {
+              "x": 27,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x27_y8.png"
+            },
+            {
+              "x": 28,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x28_y8.png"
+            },
+            {
+              "x": 29,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x29_y8.png"
+            },
+            {
+              "x": 30,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x30_y8.png"
+            },
+            {
+              "x": 31,
+              "y": 8,
+              "path": "assets/terrain/earth/z5/x31_y8.png"
+            },
+            {
+              "x": 0,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x0_y9.png"
+            },
+            {
+              "x": 1,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x1_y9.png"
+            },
+            {
+              "x": 2,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x2_y9.png"
+            },
+            {
+              "x": 3,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x3_y9.png"
+            },
+            {
+              "x": 4,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x4_y9.png"
+            },
+            {
+              "x": 5,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x5_y9.png"
+            },
+            {
+              "x": 6,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x6_y9.png"
+            },
+            {
+              "x": 7,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x7_y9.png"
+            },
+            {
+              "x": 8,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x8_y9.png"
+            },
+            {
+              "x": 9,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x9_y9.png"
+            },
+            {
+              "x": 10,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x10_y9.png"
+            },
+            {
+              "x": 11,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x11_y9.png"
+            },
+            {
+              "x": 12,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x12_y9.png"
+            },
+            {
+              "x": 13,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x13_y9.png"
+            },
+            {
+              "x": 14,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x14_y9.png"
+            },
+            {
+              "x": 15,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x15_y9.png"
+            },
+            {
+              "x": 16,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x16_y9.png"
+            },
+            {
+              "x": 17,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x17_y9.png"
+            },
+            {
+              "x": 18,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x18_y9.png"
+            },
+            {
+              "x": 19,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x19_y9.png"
+            },
+            {
+              "x": 20,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x20_y9.png"
+            },
+            {
+              "x": 21,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x21_y9.png"
+            },
+            {
+              "x": 22,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x22_y9.png"
+            },
+            {
+              "x": 23,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x23_y9.png"
+            },
+            {
+              "x": 24,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x24_y9.png"
+            },
+            {
+              "x": 25,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x25_y9.png"
+            },
+            {
+              "x": 26,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x26_y9.png"
+            },
+            {
+              "x": 27,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x27_y9.png"
+            },
+            {
+              "x": 28,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x28_y9.png"
+            },
+            {
+              "x": 29,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x29_y9.png"
+            },
+            {
+              "x": 30,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x30_y9.png"
+            },
+            {
+              "x": 31,
+              "y": 9,
+              "path": "assets/terrain/earth/z5/x31_y9.png"
+            },
+            {
+              "x": 0,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x0_y10.png"
+            },
+            {
+              "x": 1,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x1_y10.png"
+            },
+            {
+              "x": 2,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x2_y10.png"
+            },
+            {
+              "x": 3,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x3_y10.png"
+            },
+            {
+              "x": 4,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x4_y10.png"
+            },
+            {
+              "x": 5,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x5_y10.png"
+            },
+            {
+              "x": 6,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x6_y10.png"
+            },
+            {
+              "x": 7,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x7_y10.png"
+            },
+            {
+              "x": 8,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x8_y10.png"
+            },
+            {
+              "x": 9,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x9_y10.png"
+            },
+            {
+              "x": 10,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x10_y10.png"
+            },
+            {
+              "x": 11,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x11_y10.png"
+            },
+            {
+              "x": 12,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x12_y10.png"
+            },
+            {
+              "x": 13,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x13_y10.png"
+            },
+            {
+              "x": 14,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x14_y10.png"
+            },
+            {
+              "x": 15,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x15_y10.png"
+            },
+            {
+              "x": 16,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x16_y10.png"
+            },
+            {
+              "x": 17,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x17_y10.png"
+            },
+            {
+              "x": 18,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x18_y10.png"
+            },
+            {
+              "x": 19,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x19_y10.png"
+            },
+            {
+              "x": 20,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x20_y10.png"
+            },
+            {
+              "x": 21,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x21_y10.png"
+            },
+            {
+              "x": 22,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x22_y10.png"
+            },
+            {
+              "x": 23,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x23_y10.png"
+            },
+            {
+              "x": 24,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x24_y10.png"
+            },
+            {
+              "x": 25,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x25_y10.png"
+            },
+            {
+              "x": 26,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x26_y10.png"
+            },
+            {
+              "x": 27,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x27_y10.png"
+            },
+            {
+              "x": 28,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x28_y10.png"
+            },
+            {
+              "x": 29,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x29_y10.png"
+            },
+            {
+              "x": 30,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x30_y10.png"
+            },
+            {
+              "x": 31,
+              "y": 10,
+              "path": "assets/terrain/earth/z5/x31_y10.png"
+            },
+            {
+              "x": 0,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x0_y11.png"
+            },
+            {
+              "x": 1,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x1_y11.png"
+            },
+            {
+              "x": 2,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x2_y11.png"
+            },
+            {
+              "x": 3,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x3_y11.png"
+            },
+            {
+              "x": 4,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x4_y11.png"
+            },
+            {
+              "x": 5,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x5_y11.png"
+            },
+            {
+              "x": 6,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x6_y11.png"
+            },
+            {
+              "x": 7,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x7_y11.png"
+            },
+            {
+              "x": 8,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x8_y11.png"
+            },
+            {
+              "x": 9,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x9_y11.png"
+            },
+            {
+              "x": 10,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x10_y11.png"
+            },
+            {
+              "x": 11,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x11_y11.png"
+            },
+            {
+              "x": 12,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x12_y11.png"
+            },
+            {
+              "x": 13,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x13_y11.png"
+            },
+            {
+              "x": 14,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x14_y11.png"
+            },
+            {
+              "x": 15,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x15_y11.png"
+            },
+            {
+              "x": 16,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x16_y11.png"
+            },
+            {
+              "x": 17,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x17_y11.png"
+            },
+            {
+              "x": 18,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x18_y11.png"
+            },
+            {
+              "x": 19,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x19_y11.png"
+            },
+            {
+              "x": 20,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x20_y11.png"
+            },
+            {
+              "x": 21,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x21_y11.png"
+            },
+            {
+              "x": 22,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x22_y11.png"
+            },
+            {
+              "x": 23,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x23_y11.png"
+            },
+            {
+              "x": 24,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x24_y11.png"
+            },
+            {
+              "x": 25,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x25_y11.png"
+            },
+            {
+              "x": 26,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x26_y11.png"
+            },
+            {
+              "x": 27,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x27_y11.png"
+            },
+            {
+              "x": 28,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x28_y11.png"
+            },
+            {
+              "x": 29,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x29_y11.png"
+            },
+            {
+              "x": 30,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x30_y11.png"
+            },
+            {
+              "x": 31,
+              "y": 11,
+              "path": "assets/terrain/earth/z5/x31_y11.png"
+            },
+            {
+              "x": 0,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x0_y12.png"
+            },
+            {
+              "x": 1,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x1_y12.png"
+            },
+            {
+              "x": 2,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x2_y12.png"
+            },
+            {
+              "x": 3,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x3_y12.png"
+            },
+            {
+              "x": 4,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x4_y12.png"
+            },
+            {
+              "x": 5,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x5_y12.png"
+            },
+            {
+              "x": 6,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x6_y12.png"
+            },
+            {
+              "x": 7,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x7_y12.png"
+            },
+            {
+              "x": 8,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x8_y12.png"
+            },
+            {
+              "x": 9,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x9_y12.png"
+            },
+            {
+              "x": 10,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x10_y12.png"
+            },
+            {
+              "x": 11,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x11_y12.png"
+            },
+            {
+              "x": 12,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x12_y12.png"
+            },
+            {
+              "x": 13,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x13_y12.png"
+            },
+            {
+              "x": 14,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x14_y12.png"
+            },
+            {
+              "x": 15,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x15_y12.png"
+            },
+            {
+              "x": 16,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x16_y12.png"
+            },
+            {
+              "x": 17,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x17_y12.png"
+            },
+            {
+              "x": 18,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x18_y12.png"
+            },
+            {
+              "x": 19,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x19_y12.png"
+            },
+            {
+              "x": 20,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x20_y12.png"
+            },
+            {
+              "x": 21,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x21_y12.png"
+            },
+            {
+              "x": 22,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x22_y12.png"
+            },
+            {
+              "x": 23,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x23_y12.png"
+            },
+            {
+              "x": 24,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x24_y12.png"
+            },
+            {
+              "x": 25,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x25_y12.png"
+            },
+            {
+              "x": 26,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x26_y12.png"
+            },
+            {
+              "x": 27,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x27_y12.png"
+            },
+            {
+              "x": 28,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x28_y12.png"
+            },
+            {
+              "x": 29,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x29_y12.png"
+            },
+            {
+              "x": 30,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x30_y12.png"
+            },
+            {
+              "x": 31,
+              "y": 12,
+              "path": "assets/terrain/earth/z5/x31_y12.png"
+            },
+            {
+              "x": 0,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x0_y13.png"
+            },
+            {
+              "x": 1,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x1_y13.png"
+            },
+            {
+              "x": 2,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x2_y13.png"
+            },
+            {
+              "x": 3,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x3_y13.png"
+            },
+            {
+              "x": 4,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x4_y13.png"
+            },
+            {
+              "x": 5,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x5_y13.png"
+            },
+            {
+              "x": 6,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x6_y13.png"
+            },
+            {
+              "x": 7,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x7_y13.png"
+            },
+            {
+              "x": 8,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x8_y13.png"
+            },
+            {
+              "x": 9,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x9_y13.png"
+            },
+            {
+              "x": 10,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x10_y13.png"
+            },
+            {
+              "x": 11,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x11_y13.png"
+            },
+            {
+              "x": 12,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x12_y13.png"
+            },
+            {
+              "x": 13,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x13_y13.png"
+            },
+            {
+              "x": 14,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x14_y13.png"
+            },
+            {
+              "x": 15,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x15_y13.png"
+            },
+            {
+              "x": 16,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x16_y13.png"
+            },
+            {
+              "x": 17,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x17_y13.png"
+            },
+            {
+              "x": 18,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x18_y13.png"
+            },
+            {
+              "x": 19,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x19_y13.png"
+            },
+            {
+              "x": 20,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x20_y13.png"
+            },
+            {
+              "x": 21,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x21_y13.png"
+            },
+            {
+              "x": 22,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x22_y13.png"
+            },
+            {
+              "x": 23,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x23_y13.png"
+            },
+            {
+              "x": 24,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x24_y13.png"
+            },
+            {
+              "x": 25,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x25_y13.png"
+            },
+            {
+              "x": 26,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x26_y13.png"
+            },
+            {
+              "x": 27,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x27_y13.png"
+            },
+            {
+              "x": 28,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x28_y13.png"
+            },
+            {
+              "x": 29,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x29_y13.png"
+            },
+            {
+              "x": 30,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x30_y13.png"
+            },
+            {
+              "x": 31,
+              "y": 13,
+              "path": "assets/terrain/earth/z5/x31_y13.png"
+            },
+            {
+              "x": 0,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x0_y14.png"
+            },
+            {
+              "x": 1,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x1_y14.png"
+            },
+            {
+              "x": 2,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x2_y14.png"
+            },
+            {
+              "x": 3,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x3_y14.png"
+            },
+            {
+              "x": 4,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x4_y14.png"
+            },
+            {
+              "x": 5,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x5_y14.png"
+            },
+            {
+              "x": 6,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x6_y14.png"
+            },
+            {
+              "x": 7,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x7_y14.png"
+            },
+            {
+              "x": 8,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x8_y14.png"
+            },
+            {
+              "x": 9,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x9_y14.png"
+            },
+            {
+              "x": 10,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x10_y14.png"
+            },
+            {
+              "x": 11,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x11_y14.png"
+            },
+            {
+              "x": 12,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x12_y14.png"
+            },
+            {
+              "x": 13,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x13_y14.png"
+            },
+            {
+              "x": 14,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x14_y14.png"
+            },
+            {
+              "x": 15,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x15_y14.png"
+            },
+            {
+              "x": 16,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x16_y14.png"
+            },
+            {
+              "x": 17,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x17_y14.png"
+            },
+            {
+              "x": 18,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x18_y14.png"
+            },
+            {
+              "x": 19,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x19_y14.png"
+            },
+            {
+              "x": 20,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x20_y14.png"
+            },
+            {
+              "x": 21,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x21_y14.png"
+            },
+            {
+              "x": 22,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x22_y14.png"
+            },
+            {
+              "x": 23,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x23_y14.png"
+            },
+            {
+              "x": 24,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x24_y14.png"
+            },
+            {
+              "x": 25,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x25_y14.png"
+            },
+            {
+              "x": 26,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x26_y14.png"
+            },
+            {
+              "x": 27,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x27_y14.png"
+            },
+            {
+              "x": 28,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x28_y14.png"
+            },
+            {
+              "x": 29,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x29_y14.png"
+            },
+            {
+              "x": 30,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x30_y14.png"
+            },
+            {
+              "x": 31,
+              "y": 14,
+              "path": "assets/terrain/earth/z5/x31_y14.png"
+            },
+            {
+              "x": 0,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x0_y15.png"
+            },
+            {
+              "x": 1,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x1_y15.png"
+            },
+            {
+              "x": 2,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x2_y15.png"
+            },
+            {
+              "x": 3,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x3_y15.png"
+            },
+            {
+              "x": 4,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x4_y15.png"
+            },
+            {
+              "x": 5,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x5_y15.png"
+            },
+            {
+              "x": 6,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x6_y15.png"
+            },
+            {
+              "x": 7,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x7_y15.png"
+            },
+            {
+              "x": 8,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x8_y15.png"
+            },
+            {
+              "x": 9,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x9_y15.png"
+            },
+            {
+              "x": 10,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x10_y15.png"
+            },
+            {
+              "x": 11,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x11_y15.png"
+            },
+            {
+              "x": 12,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x12_y15.png"
+            },
+            {
+              "x": 13,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x13_y15.png"
+            },
+            {
+              "x": 14,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x14_y15.png"
+            },
+            {
+              "x": 15,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x15_y15.png"
+            },
+            {
+              "x": 16,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x16_y15.png"
+            },
+            {
+              "x": 17,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x17_y15.png"
+            },
+            {
+              "x": 18,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x18_y15.png"
+            },
+            {
+              "x": 19,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x19_y15.png"
+            },
+            {
+              "x": 20,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x20_y15.png"
+            },
+            {
+              "x": 21,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x21_y15.png"
+            },
+            {
+              "x": 22,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x22_y15.png"
+            },
+            {
+              "x": 23,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x23_y15.png"
+            },
+            {
+              "x": 24,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x24_y15.png"
+            },
+            {
+              "x": 25,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x25_y15.png"
+            },
+            {
+              "x": 26,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x26_y15.png"
+            },
+            {
+              "x": 27,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x27_y15.png"
+            },
+            {
+              "x": 28,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x28_y15.png"
+            },
+            {
+              "x": 29,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x29_y15.png"
+            },
+            {
+              "x": 30,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x30_y15.png"
+            },
+            {
+              "x": 31,
+              "y": 15,
+              "path": "assets/terrain/earth/z5/x31_y15.png"
+            }
+          ]
         }
       },
       "wrap_x": true,
       "wrap_y": false,
-      "master_width": 512,
-      "master_height": 256
+      "master_width": 4096,
+      "master_height": 2048
     },
     "mars": {
       "master": "assets/surface/mars/mars_surface.png",
