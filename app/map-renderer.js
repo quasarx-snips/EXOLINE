@@ -11,7 +11,17 @@ window.ExolineMap = (() => {
       this.manifest=null;
       this.assetVersion=null;
       this.images=new Map();
-      this.tileImages=new Map();
+      // v0.2.1 tile streaming: a bounded LRU of decoded tiles, the in-flight
+      // requests (each with its own AbortController), and the src set that the
+      // current view actually wants. Tiles outside that set are aborted.
+      this.radiusM=0;
+      this.tileCache=new Map();      // src -> { bmp, used }
+      this.tilePending=new Map();    // src -> { promise, controller }
+      this.tileWanted=new Set();
+      this.tileSeq=0;
+      this.tileStats={hits:0,misses:0,cancelled:0};
+      this.tileCacheCap=256;
+      this.tileCacheVersion=null;    // manifest revision the decoded tiles belong to
       this.width=1; this.height=1;
       this.zoom=1; this.cx=.5; this.cy=.5;
       this.drag=null; this.vx=0; this.vy=0;
@@ -91,32 +101,78 @@ window.ExolineMap = (() => {
       this.ctx.setTransform(d,0,0,d,0,0); this.draw();
     }
     wrap01(v){v%=1;if(v<0)v+=1;return v}
-    async open(body,manifest){
+    async open(body,manifest,radiusM){
       this.body=body; this.manifest=manifest||null;
+      if(radiusM>0)this.radiusM=radiusM;
+      this._abortPendingTiles();
       // Surface assets are not cache-busted by index.html, so a regenerated
       // map would otherwise keep showing the browser's stale copy forever.
       // The terrain manifest's version is the cache key.
       this.assetVersion=(manifest&&manifest.version)||this.assetVersion||null;
       this.zoom=1; this.cx=.5; this.cy=.5; this.vx=this.vy=0;
-      this.images.clear(); this.tileImages.clear();
+      this.images.clear();
+      // Tiles are keyed by PATH, so a regenerated pyramid served under the same
+      // path would otherwise be drawn from this in-memory cache forever. Drop
+      // the decoded tiles whenever the manifest revision changes, and on every
+      // body switch (the old code did the same to its tile image map).
+      if(this.tileCacheVersion!==this.assetVersion){this.tileCache.clear();this.tileCacheVersion=this.assetVersion;}
       this.opts.onZoom?.(this.zoom);
       this.opts.onLoading?.(true);
       try{this.master=await this.load(body.surface_asset)}finally{this.opts.onLoading?.(false)}
       this.draw();
     }
+    versionQuery(src){
+      return this.assetVersion?('?'+(/\?/.test(src)?'&':'')+'v='+encodeURIComponent(this.assetVersion)):'';
+    }
     load(src){
       if(this.images.has(src)) return this.images.get(src);
-      const v=this.assetVersion?('?'+(/\?/.test(src)?'&':'')+'v='+encodeURIComponent(this.assetVersion)):'';
-      const p=new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>rej(new Error('Asset failed: '+src));im.src='../'+src+v});
+      const p=new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>rej(new Error('Asset failed: '+src));im.src='../'+src+this.versionQuery(src)});
       this.images.set(src,p); return p;
     }
-    // Pick the LOWEST pyramid level whose native width still covers the map's
-    // on-screen width, so tiles are never upscaled while a sharper level is
-    // available. (The old fixed zoom thresholds could hand back a level far
-    // COARSER than the master, painting a blur over a sharp image at mid
-    // zoom.) Falls back to the finest level when the map is magnified past
-    // every level, and null when the body has no pyramid.
-    levelForZoom(){
+    // ---- v0.2.1 level selection. Levels are ordered coarse -> fine; a level's
+    // native resolution is its (tile_size * tiles_x) pixels across 360 deg, so
+    // its native metres-per-pixel is arc*360/that. We want the COARSEST level
+    // that is still at least as fine as the requested mPerPx, which is the same
+    // rule as "never cover the screen with fewer pixels than we display", just
+    // expressed in metres. When mPerPx is finer than every level we fall back to
+    // the finest level (the only case where magnification is unavoidable).
+    chooseLevel(mPerPx){
+      const m=this.manifest;
+      if(!m?.levels)return null;
+      const levels=Object.keys(m.levels).map(Number).filter(Number.isFinite).sort((a,b)=>a-b);
+      if(!levels.length)return null;
+      const tile=(m.tile_size|0)||128;
+      const arc=this._arcPerDeg();
+      const finest=m.levels[String(levels[levels.length-1])];
+      if(!(arc>0)||!(mPerPx>0))return finest;
+      // Levels run coarse -> fine, so native m/px falls as k rises. The FIRST
+      // level that is at least as fine as the request is therefore the coarsest
+      // one that still avoids upscaling — the cheapest level that can draw this
+      // view sharply. (Taking the LAST match would always end on the finest
+      // level, loading 4x the tiles needed for the same pixels.)
+      for(const k of levels){
+        const level=m.levels[String(k)];
+        if(!level)continue;
+        const nativeMPerPx=(arc*360)/(tile*(level.tiles_x|0));
+        if(nativeMPerPx<=mPerPx)return level;
+      }
+      return finest;
+    }
+    _arcPerDeg(){
+      if(this.surf&&this.surf.radiusM)return Math.PI*this.surf.radiusM/180;
+      if(this.radiusM)return Math.PI*this.radiusM/180;
+      return 0;
+    }
+    // The metres-per-pixel the current view is asking for.
+    _modeMPerPx(){
+      const arc=this._arcPerDeg();
+      if(!(arc>0))return 0;
+      if(this.surf&&this.surf.mPerPx>0)return this.surf.mPerPx;
+      return (arc*360)/Math.max(1e-9,this.mapWidth());
+    }
+    // Fallback when the body radius is unknown: pick the lowest level whose
+    // native width still covers the on-screen width.
+    _levelByNativeWidth(){
       const m=this.manifest;
       if(!m?.levels)return null;
       const levels=Object.keys(m.levels).map(Number).filter(Number.isFinite).sort((a,b)=>a-b);
@@ -129,11 +185,84 @@ window.ExolineMap = (() => {
       }
       return m.levels[String(levels[levels.length-1])];
     }
+    levelForZoom(){
+      const mPerPx=this._modeMPerPx();
+      return (mPerPx>0?this.chooseLevel(mPerPx):null)||this._levelByNativeWidth();
+    }
     mapWidth(){return Math.min(this.width*0.96,this.height*1.62)*this.zoom}
     mapRect(){const w=this.mapWidth();const h=w/2;return{x:this.width/2-w*this.cx+this.xOffset(),y:this.height/2-h*this.cy+this.yOffset(),w,h}}
     xOffset(){return 0}
     yOffset(){return 0}
     tileSrc(tile){return tile.path}
+    // ---- v0.2.1 tile requests: fetch + decode with one AbortController each,
+    // bounded by an LRU of decoded bitmaps.
+    _decodeTile(src,controller){
+      const url='../'+src+this.versionQuery(src);
+      const viaImage=()=>new Promise((res,rej)=>{
+        const image=new Image();
+        image.onload=()=>res(image);
+        image.onerror=()=>rej(new Error('tile decode failed '+src));
+        image.src=url;
+      });
+      const viaFetch=()=>fetch(url,{signal:controller.signal}).then(response=>{
+        if(!response.ok)throw new Error('tile '+response.status+' '+src);
+        return response.blob();
+      }).then(blob=>{
+        if(typeof createImageBitmap==='function')return createImageBitmap(blob);
+        return new Promise((res,rej)=>{
+          const objectUrl=URL.createObjectURL(blob);
+          const image=new Image();
+          image.onload=()=>{URL.revokeObjectURL(objectUrl);res(image)};
+          image.onerror=()=>{URL.revokeObjectURL(objectUrl);rej(new Error('tile decode failed '+src))};
+          image.src=objectUrl;
+        });
+      });
+      return viaFetch().catch(error=>{
+        // An abort is deliberate; anything else (no fetch outside a document
+        // served over http, a decode the browser refuses) falls back to the
+        // v0.2.0 <img> path so tiles still appear.
+        if(error&&error.name==='AbortError')throw error;
+        if(controller.signal.aborted)throw error;
+        return viaImage();
+      });
+    }
+    _trimTileCache(){
+      while(this.tileCache.size>this.tileCacheCap){
+        let oldestKey=null,oldestUsed=Infinity;
+        for(const [key,entry] of this.tileCache){
+          if(entry.used<oldestUsed){oldestUsed=entry.used;oldestKey=key;}
+        }
+        if(oldestKey===null)return;
+        this.tileCache.delete(oldestKey);
+      }
+    }
+    requestTile(src){
+      const cached=this.tileCache.get(src);
+      if(cached){this.tileStats.hits++;cached.used=++this.tileSeq;return Promise.resolve(cached);}
+      const inflight=this.tilePending.get(src);
+      if(inflight)return inflight.promise;
+      this.tileStats.misses++;
+      const controller=new AbortController();
+      const promise=this._decodeTile(src,controller).then(bitmap=>{
+        this.tilePending.delete(src);
+        const entry={bmp:bitmap,used:++this.tileSeq};
+        this.tileCache.set(src,entry);
+        this._trimTileCache();
+        return entry;
+      }).catch(error=>{
+        this.tilePending.delete(src);
+        if(error&&error.name==='AbortError'){this.tileStats.cancelled++;return null;}
+        return null;
+      });
+      this.tilePending.set(src,{promise,controller});
+      return promise;
+    }
+    _abortPendingTiles(){
+      for(const [,entry] of this.tilePending)entry.controller.abort();
+    }
+    getTileCacheStats(){
+      return {hits:this.tileStats.hits,misses:this.tileStats.misses,size:this.tileCache.size,cancelled:this.tileStats.cancelled};
+    }
     async drawLevel(level, rect){
       const ctx=this.ctx;
       const baseW=level.tiles_x, baseH=level.tiles_y;
@@ -143,25 +272,70 @@ window.ExolineMap = (() => {
       // drawn narrower than that is a minification.
       ctx.imageSmoothingEnabled=tw<128;
       if(tw<128)ctx.imageSmoothingQuality='high';
-      const tasks=[];
-      // Only tiles that actually touch the viewport are drawn. A hero body's
-      // finest level can hold hundreds of tiles and a deep zoom shows a
-      // handful of them, so this culling keeps high-resolution pyramids cheap
-      // without changing a single pixel of what ends up on screen.
+      // Only tiles that touch the viewport are drawn. A hero body's finest
+      // level can hold hundreds of tiles and a deep zoom shows a handful of
+      // them, so culling keeps high-resolution pyramids cheap without changing
+      // a single pixel of what ends up on screen. The map wraps in x, so a tile
+      // can land at up to three horizontal positions; draw the visible copies.
+      const draws=[];
+      const visible=new Set();
       for(const tile of level.tiles){
         const src=this.tileSrc(tile);
         const x0=rect.x+tile.x*tw, y0=rect.y+tile.y*th;
-        // The map wraps in x, so a tile can land at up to three horizontal
-        // positions; draw whichever copies are visible.
+        let onScreen=false;
         for(const k of [-1,0,1]){
           const dx=x0+k*rect.w;
           if(dx+tw<=0||dx>=vw||y0+th<=0||y0>=vh)continue;
-          tasks.push(this.load(src).then(im=>{
-            ctx.drawImage(im,dx,y0,tw,th);
-          }).catch(()=>{}));
+          onScreen=true;
+          draws.push({src,dx,y:y0});
+        }
+        if(onScreen)visible.add(tile.x+','+tile.y);
+      }
+      // 8-neighbour ring of the visible set, requested after it. Deterministic:
+      // tiles come from the manifest array order, so the same view always asks
+      // for the same tiles in the same order.
+      const ring=[];
+      const neighbours=new Map();
+      for(const tile of level.tiles)neighbours.set(tile.x+','+tile.y,tile);
+      for(const key of visible){
+        const comma=key.indexOf(',');
+        const tx=Number(key.slice(0,comma)),ty=Number(key.slice(comma+1));
+        for(let dy=-1;dy<=1;dy++){
+          for(let dx=-1;dx<=1;dx++){
+            if(!dx&&!dy)continue;
+            if(visible.has((tx+dx)+','+(ty+dy)))continue;
+            const tile=neighbours.get((tx+dx)+','+(ty+dy));
+            if(tile)ring.push(this.tileSrc(tile));
+          }
         }
       }
-      await Promise.all(tasks);
+      // Remember what this view wants, then cancel anything that left the set
+      // (a flick-pan must not keep paying for tiles already scrolled away).
+      const wanted=new Set();
+      for(const entry of draws)wanted.add(entry.src);
+      for(const src of ring)wanted.add(src);
+      this.tileWanted=wanted;
+      for(const [src,entry] of this.tilePending){
+        if(!wanted.has(src))entry.controller.abort();
+      }
+      // Draw whatever is already decoded; the master underneath covers the rest.
+      for(const entry of draws){
+        const cached=this.tileCache.get(entry.src);
+        if(!cached)continue;
+        this.tileStats.hits++;
+        cached.used=++this.tileSeq;
+        ctx.drawImage(cached.bmp,entry.dx,entry.y,tw,th);
+      }
+      const visibleRequests=[];
+      for(const src of wanted)if(!this.tileCache.has(src))visibleRequests.push(this.requestTile(src));
+      for(const src of ring)if(!this.tileCache.has(src))this.requestTile(src);
+      if(visibleRequests.length){
+        Promise.all(visibleRequests).then(()=>{
+          // Repaint once the visible tiles land, so the planet-map path (which is
+          // event-driven) is not left showing only the master until the next input.
+          if(this.tileWanted===wanted)this.draw();
+        }).catch(()=>{});
+      }
       ctx.imageSmoothingEnabled=false;
     }
     async draw(){
@@ -287,7 +461,7 @@ window.ExolineMap = (() => {
       return this._syncSurfView();
     }
     registerMarkerLayer(drawFn){ if (this.surf) this.surf.markers = (typeof drawFn === 'function') ? drawFn : null; return this; }
-    closeSurface(){ this.surf = null; this.vx = this.vy = 0; this.opts.onZoom?.(this.zoom); this.draw(); }
+    closeSurface(){ this.surf = null; this.vx = this.vy = 0; this._abortPendingTiles(); this.opts.onZoom?.(this.zoom); this.draw(); }
     _surfaceFrame(ctx, fromTop){
       // Reuse the uncalibrated tile path (master + LOD + wrap), then fire the
       // marker layer. Inertial glide is applied to the SURFACE center with a

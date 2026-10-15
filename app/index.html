@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
   <meta name="theme-color" content="#06090d">
   <title>EXOLINE v0.0.5 — Solar System</title>
-  <link rel="stylesheet" href="style.css?v=11">
+  <link rel="stylesheet" href="style.css?v=12">
 </head>
 <body>
   <div id="app">
@@ -16,6 +16,7 @@
         <button class="icon-btn" id="settingsBtn" title="Settings" aria-label="Settings"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       <button class="small-btn" id="viewBtn" title="View" aria-label="View"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>VIEW</span></button>
       <button class="small-btn" id="surfaceBtn" title="Surface view" aria-label="Surface view" disabled><span>SURFACE</span></button>
+      <button class="small-btn" id="profileBtn" title="Terrain profile" aria-label="Terrain profile" aria-pressed="true"><span>PROFILE</span></button>
     </nav>
 
     <section class="flight-status" aria-label="Status strip">
@@ -179,18 +180,25 @@
         <button class="pitch-btn" id="turnRight" aria-label="Pitch right" title="Pitch right"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
       </div>
     </aside>
-    <!-- v0.2.0 surface HUD: equatorial-band telemetry, throttled hud() rate. -->
+    <!-- v0.2.1 terrain profile: elevation cross-section pinned to the bottom of
+         the surface view. Its x-axis is the map's own horizontal span (same
+         center, same m/px), so panning and zooming move it in lockstep. -->
+    <canvas id="profileCanvas" height="120" aria-label="Terrain profile"></canvas>
+    <!-- v0.2.0 surface HUD: equatorial-band telemetry, throttled hud() rate.
+         v0.2.1 adds deterministic terrain readings at the stored craft lon/lat. -->
     <aside class="surface-hud hidden" id="surfaceHud" aria-label="Surface telemetry">
       <div class="surf-row"><span>BODY <b id="surfBody">—</b></span><span>LON <b id="surfLon">—</b></span><span>LAT <b id="surfLat">0.00°</b></span><span>STATUS <b id="surfStatus">—</b></span></div>
       <div class="surf-row"><span>SITE OFFSET E <b id="surfOffE">—</b></span><span>N <b id="surfOffN">—</b></span><span>LOCAL G <b id="surfG">—</b></span></div>
       <div class="surf-row"><span>SURFACE PRESSURE <b id="surfP">—</b></span><span>AMBIENT TEMP <b id="surfT">—</b></span><span>ZOOM <b id="surfZoom">—</b></span></div>
+      <div class="surf-row"><span>ELEV <b id="surfElev">—</b></span><span>SLOPE <b id="surfSlope">—</b></span><span>ROUGH <b id="surfRough">—</b></span><span>SITE SCORE <b id="surfScore">—</b></span></div>
     </aside>
   </div>
-  <script src="orbit-engine.js?v=25"></script>
-  <script src="flight-engine.js?v=25"></script>
-  <script src="map-renderer.js?v=25"></script>
-  <script src="navigation-engine.js?v=25"></script>
-  <script src="physics-agent.js?v=25"></script>
-  <script src="app.js?v=25"></script>
+  <script src="orbit-engine.js?v=26"></script>
+  <script src="flight-engine.js?v=26"></script>
+  <script src="map-renderer.js?v=26"></script>
+  <script src="terrain-engine.js?v=26"></script>
+  <script src="navigation-engine.js?v=26"></script>
+  <script src="physics-agent.js?v=26"></script>
+  <script src="app.js?v=26"></script>
 </body>
 </html>

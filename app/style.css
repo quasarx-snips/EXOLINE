@@ -183,6 +183,14 @@ button { font-family:var(--font-ui); color:inherit; }
 .surf-row { display:flex; flex-wrap:wrap; justify-content:center; gap:5px; margin-bottom:6px; }
 .surf-row span { display:inline-flex; align-items:baseline; gap:5px; padding:3px 8px; border:1px solid rgba(255,255,255,.10); border-radius:9px; background:rgba(4,11,18,.58); backdrop-filter:blur(6px); color:#9db4c2; font-size:7.5px; letter-spacing:.12em; }
 .surf-row b { color:#eaf7ff; font-size:9px; font-weight:800; font-variant-numeric:tabular-nums; }
+/* v0.2.1 terrain profile strip: pinned to the bottom of the surface view. It is
+   pointer-transparent so map drags still reach the canvas underneath, and it is
+   only laid out while the surface view is active and the profile is switched on
+   (the HUD lifts clear of it so the two never overlap). */
+#profileCanvas { position:absolute; z-index:12; left:0; right:0; bottom:0; width:100%; height:120px; display:none; border-top:1px solid rgba(159,216,255,.28); background:rgba(4,10,16,.9); pointer-events:none; }
+#app.surface-mode.profile-on #profileCanvas { display:block; }
+#app.surface-mode.profile-on .surface-hud { bottom:132px; }
+#profileBtn.is-on { border-color:var(--accent); background:var(--btn-bg-hover); }
 /* v0.1.3: atmospheric telemetry strip + q bar + flashing callout chip. */
 .hud-atmo { margin-bottom:4px; }
 .hud-qwrap { min-width:150px; }

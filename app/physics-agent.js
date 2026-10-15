@@ -16,6 +16,38 @@ window.ExolinePhysicsAgent = (() => {
     lastCheckFrame = frameCount;
     if (frameCount % 10 === 0) lightChecks(flight, bodies);
     if (frameCount % 60 === 0) deepChecks(flight, bodies);
+    // v0.2.1 Light Check 8: terrain is a pure function, so it only needs the
+    // occasional audit rather than a per-frame one.
+    if (frameCount % 600 === 0) checkTerrainDeterminism();
+  }
+
+  // v0.2.1 Light Check 8 — TERRAIN DETERMINISM. Read-only: every branch only
+  // reads. Elevation must be a pure function of (bodyId, lon, lat), slope must
+  // be a real angle, and a profile must be complete and finite.
+  function checkTerrainDeterminism() {
+    if (typeof window === 'undefined' || !window.ExolineTerrain) return;
+    const stored = window.ExolineSurfaceState;
+    if (!stored || !stored.bodyId || !Number.isFinite(stored.lonDeg)) return;
+    const terrain = window.ExolineTerrain;
+    if (typeof terrain.isReady !== 'function' || !terrain.isReady(stored.bodyId)) return;
+    const bodyId = stored.bodyId, lon = stored.lonDeg;
+    try {
+      const first = terrain.elevation(bodyId, lon, 0);
+      const second = terrain.elevation(bodyId, lon, 0);
+      if (first !== second) {
+        logViolation('terrain nondeterminism', 'WARNING', 'elevation() returned two different values for the same query', 'identical results', `${first} vs ${second}`);
+      }
+      const slope = terrain.slopeDeg(bodyId, lon, 0);
+      if (!Number.isFinite(slope) || slope < 0 || slope >= 90) {
+        logViolation('terrain nondeterminism', 'WARNING', 'slopeDeg() outside [0, 90)', '0 <= slope < 90', slope);
+      }
+      const profile = terrain.profilePoints(bodyId, lon, 0, 100000, 240);
+      if (!Array.isArray(profile) || profile.length !== 240 || profile.some(point => !Number.isFinite(point.elev))) {
+        logViolation('terrain nondeterminism', 'WARNING', 'profilePoints() incomplete or non-finite', '240 finite samples', Array.isArray(profile) ? profile.length : 'not an array');
+      }
+    } catch (error) {
+      logViolation('terrain nondeterminism', 'WARNING', `terrain query threw: ${error.message}`, 'no throw', 'threw');
+    }
   }
 
   function lightChecks(flight, bodies) {

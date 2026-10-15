@@ -123,6 +123,9 @@
     const entry = D && D.bodies.find(b => b.id === st.bodyId);
     terrain = terrain || await (await fetch('../data/terrain_manifest.json')).json();
     const manifest = (terrain && terrain.bodies && terrain.bodies[st.bodyId]) ? { ...terrain.bodies[st.bodyId], version: terrain.version } : null;
+    // v0.2.1: hand the terrain engine the manifest revision so it samples the
+    // exact same PNG revision the tile renderer draws underneath the profile.
+    if (window.ExolineTerrain && terrain) ExolineTerrain.setContext({ assetVersion: terrain.version });
     if (!mapRenderer) mapRenderer = new ExolineMap.MapRenderer($('mapCanvas'), { terrainManifest: manifest, onZoom: mpp => { setText('surfZoom', `${Number(mpp).toFixed(1)} m/px`); } });
     C.style.display = 'none';
     $('mapCanvas').classList.remove('hidden'); $('mapCanvas').style.display = 'block';
@@ -132,7 +135,7 @@
     // calibrated zoom explodes (~227000x on the Moon -> solid color).
     // Re-measure AFTER unhiding, before openSurface calibrates.
     try { mapRenderer.resize(); } catch { /* keep constructor size */ }
-    if (entry && mapRenderer.body !== entry) { try { await mapRenderer.open(entry, manifest); } catch { /* tiles optional */ } }
+    if (entry && mapRenderer.body !== entry) { try { await mapRenderer.open(entry, manifest, physical ? physical.radius_m : 0); } catch { /* tiles optional */ } }
     viewMode = 'surface';
     mapRenderer.openSurface(manifest, st.bodyId, st.lonDeg, 50, physical ? physical.radius_m : 1);
     mapRenderer.registerMarkerLayer(drawSurfaceMarkers);
@@ -141,6 +144,7 @@
     enterSurface._t = setTimeout(() => $('app').classList.remove('surface-fade'), 450);
     $('surfaceHud').classList.remove('hidden');
     syncSurfaceBtn();
+    syncProfileBtn();
     showToast('SURFACE VIEW · ' + surfBodyName(st.bodyId).toUpperCase());
   }
   function exitSurface(fade = true) {
@@ -253,7 +257,142 @@
     setText('surfStatus', F && F.s.crashed ? 'WRECKED' : 'LANDED');
     const tr = (viewMode === 'surface' && mapRenderer) ? mapRenderer.getSurfaceTransform() : null;
     if (tr) setText('surfZoom', `${Number(tr.mPerPx).toFixed(1)} m/px`);
+    // v0.2.1 terrain readings at the stored craft longitude/latitude. The first
+    // surface visit kicks off terrain init once; until it resolves the cells
+    // show an ellipsis rather than a misleading zero.
+    surfTerrainHud(st.bodyId, st.lonDeg, st.latDeg || 0);
   }
+  // v0.2.1 §4: deterministic terrain readouts. Pure reads — no state mutation.
+  function surfTerrainHud(bodyId, lonDeg, latDeg) {
+    const cells = ['surfElev', 'surfSlope', 'surfRough', 'surfScore'];
+    ensureTerrain(bodyId);
+    if (!window.ExolineTerrain || !ExolineTerrain.isReady(bodyId)) {
+      cells.forEach(id => setText(id, '…'));
+      return;
+    }
+    try {
+      const elevation = ExolineTerrain.elevation(bodyId, lonDeg, latDeg);
+      const slope = ExolineTerrain.slopeDeg(bodyId, lonDeg, latDeg);
+      const roughness = ExolineTerrain.roughness(bodyId, lonDeg, latDeg);
+      const score = ExolineTerrain.siteScore(bodyId, lonDeg, latDeg);
+      setText('surfElev', Number.isFinite(elevation) ? `${Math.round(elevation).toLocaleString('en-US')} m` : '…');
+      setText('surfSlope', Number.isFinite(slope) ? `${slope.toFixed(1)}°` : '…');
+      setText('surfRough', Number.isFinite(roughness) ? `${roughness.toFixed(1)} m` : '…');
+      setText('surfScore', Number.isFinite(score) ? String(score) : '…');
+    } catch (error) {
+      cells.forEach(id => setText(id, '…'));
+    }
+  }
+  // ===== v0.2.1 §3 terrain profile strip =====
+  // Horizontal cross-section through the terrain at the surface view's own
+  // center and m/px, so panning or zooming the map moves the profile in exact
+  // lockstep. Redrawn at ~10 Hz instead of per frame: the terrain function is
+  // cheap, but 240 samples x 60 fps is wasted work for a strip nobody can read
+  // that fast.
+  const PROFILE_COUNT = 240, PROFILE_INTERVAL_MS = 100;
+  let profileOn = true, profileNextAt = 0;
+  const terrainInitAsked = new Set();
+  function ensureTerrain(bodyId) {
+    if (!window.ExolineTerrain || !bodyId || ExolineTerrain.isReady(bodyId)) return;
+    if (terrainInitAsked.has(bodyId)) return;
+    terrainInitAsked.add(bodyId);
+    ExolineTerrain.init(bodyId).catch(error => console.warn('Terrain unavailable for ' + bodyId + ':', error.message));
+  }
+  function syncProfileBtn() {
+    const btn = $('profileBtn');
+    if (btn) { btn.classList.toggle('is-on', profileOn); btn.setAttribute('aria-pressed', String(profileOn)); }
+    $('app').classList.toggle('profile-on', profileOn);
+  }
+  function drawProfile() {
+    const cv = $('profileCanvas');
+    if (!cv) return;
+    const dpr = Math.min(2, devicePixelRatio || 1);
+    // Size from the CSS box, and clamp: the canvas's own attributes are the
+    // backdrop size, so a stylesheet that fails to load must not let one
+    // measurement feed the next and grow the element without bound.
+    const rect = cv.getBoundingClientRect();
+    const cssW = Math.max(1, Math.min(4096, Math.round(rect.width || cv.clientWidth || innerWidth)));
+    const cssH = 120;
+    if (cv.width !== Math.floor(cssW * dpr) || cv.height !== Math.floor(cssH * dpr)) {
+      cv.width = Math.floor(cssW * dpr); cv.height = Math.floor(cssH * dpr);
+    }
+    const ctx = cv.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, cssW, cssH);
+    ctx.fillStyle = 'rgba(4,10,16,.9)';
+    ctx.fillRect(0, 0, cssW, cssH);
+    const st = window.ExolineSurfaceState;
+    const bodyId = st && st.bodyId;
+    if (!bodyId || !window.ExolineTerrain || !ExolineTerrain.isReady(bodyId)) {
+      ctx.fillStyle = 'rgba(159,216,255,.55)';
+      ctx.font = '10px sans-serif';
+      ctx.fillText('TERRAIN …', 10, cssH / 2);
+      return;
+    }
+    const centerLon = mapRenderer.surf.centerLon;
+    const spanM = mapRenderer.surf.mPerPx * cssW;
+    const points = ExolineTerrain.profilePoints(bodyId, centerLon, 0, spanM, PROFILE_COUNT);
+    if (!points.length) return;
+    let lo = 0, hi = 0;
+    for (const point of points) { if (point.elev < lo) lo = point.elev; if (point.elev > hi) hi = point.elev; }
+    if (!Number.isFinite(lo) || !Number.isFinite(hi) || hi - lo < 1e-6) { lo -= 0.5; hi += 0.5; }
+    const headroom = (hi - lo) * 0.12;
+    const top = hi + headroom, bottom = lo - headroom;
+    const yOf = elevation => cssH - ((elevation - bottom) / (top - bottom)) * cssH;
+    const xOf = dE => ((dE + spanM / 2) / spanM) * cssW;
+    // Body of the section: filled area under the surface line.
+    ctx.beginPath();
+    ctx.moveTo(xOf(points[0].dE), yOf(points[0].elev));
+    for (let i = 1; i < points.length; i++) ctx.lineTo(xOf(points[i].dE), yOf(points[i].elev));
+    ctx.lineTo(cssW, cssH); ctx.lineTo(0, cssH); ctx.closePath();
+    ctx.fillStyle = 'rgba(40,60,80,0.85)';
+    ctx.fill();
+    // Dashed datum at zero elevation.
+    ctx.save();
+    ctx.setLineDash([6, 5]);
+    ctx.strokeStyle = 'rgba(159,216,255,.35)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, yOf(0)); ctx.lineTo(cssW, yOf(0)); ctx.stroke();
+    ctx.restore();
+    // Surface line, coloured per segment by its local slope band.
+    const stepM = spanM / (points.length - 1);
+    ctx.lineWidth = 1;
+    for (let i = 1; i < points.length; i++) {
+      const a = points[i - 1], b = points[i];
+      const slope = Math.atan(Math.abs(b.elev - a.elev) / Math.max(1e-9, Math.abs(b.dE - a.dE) || stepM)) * 180 / Math.PI;
+      ctx.strokeStyle = slope < 5 ? '#7ee08a' : slope < 15 ? '#ffb347' : '#ff5a4d';
+      ctx.beginPath();
+      ctx.moveTo(xOf(a.dE), yOf(a.elev));
+      ctx.lineTo(xOf(b.dE), yOf(b.elev));
+      ctx.stroke();
+    }
+    // Craft marker: the craft's own longitude mapped through the SAME x axis,
+    // which is the center column while the view sits on the landed site and
+    // slides with the terrain as the map is panned.
+    const craftDE = surfWrap180(st.lonDeg - centerLon) * (st.arcMPerDegLon || 0);
+    const craftX = xOf(craftDE);
+    if (craftX >= 0 && craftX <= cssW) {
+      const craftElev = ExolineTerrain.elevation(bodyId, st.lonDeg, st.latDeg || 0);
+      const craftY = yOf(craftElev);
+      // 4 px tick centred on the surface line (spec §3), thick enough to read
+      // against the 1 px banded line, plus the elevation label beside it.
+      ctx.strokeStyle = '#f8fdff';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(craftX, craftY - 2); ctx.lineTo(craftX, craftY + 2); ctx.stroke();
+      const label = `ELEV ${Math.round(craftElev).toLocaleString('en-US')} m`;
+      ctx.fillStyle = '#eaf7ff';
+      ctx.font = '10px sans-serif';
+      const textX = Math.max(2, Math.min(cssW - ctx.measureText(label).width - 2, craftX + 6));
+      ctx.fillText(label, textX, Math.max(12, craftY - 8));
+    }
+  }
+  function profileTick(now) {
+    if (!profileOn || viewMode !== 'surface' || !mapRenderer || !mapRenderer.surf) return;
+    if (now < profileNextAt) return;
+    profileNextAt = now + PROFILE_INTERVAL_MS;
+    try { drawProfile(); } catch (error) { console.warn('Profile draw failed:', error.message); }
+  }
+  // ===== end v0.2.1 profile =====
   // ===== end v0.2.0 markers/HUD =====
   let bindings = { ...defaultBindings };
   try { bindings = { ...defaultBindings, ...JSON.parse(localStorage.getItem('exoline.keybinds') || '{}') }; } catch { /* use defaults */ }
@@ -1555,6 +1694,7 @@
       // draw() is token-guarded: overlapping async calls abort safely, and
       // image loads are promise-cached, so this is cheap once tiles settle.
       try { if (mapRenderer && mapRenderer.surf) mapRenderer.draw(); } catch { /* surface canvas never breaks HUD */ }
+      profileTick(performance.now());
       try {
         navSnap = ExolineNav.tick();
       } catch (error) {
@@ -1615,7 +1755,7 @@
   }
   function inspect(body) { sel = body; craftSelected = false; lock = 'body'; $('detailPanel').classList.remove('hidden'); $('detailName').textContent = body.name; $('detailKicker').textContent = 'CELESTIAL BODY'; $('detailSub').textContent = body.parent ? `MOON OF ${body.parent.toUpperCase()}` : 'SOL SYSTEM'; $('detailType').textContent = body.type; $('detailOrbit').textContent = body.kind === 'major_moon' ? 'LOCAL ORBIT' : 'HELIOCENTRIC'; $('detailPeriod').textContent = 'LIVE STATE'; $('detailSeed').textContent = body.seed || '—'; $('detailNote').textContent = 'Orbital position and rendered orbit use the same propagated Keplerian state.'; if (minerals) { const data = minerals[body.name]; const box = $('minerals'); if (!data) { box.textContent = 'No mineral profile defined for this body.'; return; } box.textContent = ''; for (const [name, frac] of Object.entries(data).sort((a, b) => b[1] - a[1])) { const row = document.createElement('div'); row.className = 'mineral-row'; const pct = (frac * 100).toFixed(1); row.innerHTML = `<span class="name">${name}</span><span class="value">${pct}%</span><div class="mineral-bar"><i style="width:${pct}%"></i></div>`; box.appendChild(row); } } cam.o = { x: S[body.id].x, y: S[body.id].y }; cam.k = Math.max(cam.k, 24 / P.bodies[body.id].radius_m); }
   function pick(x, y) { let chosen, best = Infinity; for (const body of D.bodies) { const p = ws(S[body.id]), anchor = A[body.id] || A.default || {}, r = Math.max(9, radiusOf(body) * (anchor.disk_scale || .848)), score = Math.hypot(p.x - x, p.y - y) / r; if (score <= 1 && score < best) { chosen = body; best = score; } } return chosen; }
-  async function openMap() { if (!sel) return; if (viewMode === 'surface') exitSurface(false); terrain ??= await (await fetch('../data/terrain_manifest.json')).json(); const manifest = terrain.bodies[sel.id] ? { ...terrain.bodies[sel.id], version: terrain.version } : null; if (!manifest) return; C.style.display = 'none'; $('mapCanvas').classList.remove('hidden'); $('mapCanvas').style.display = 'block'; $('mapTopbar').classList.remove('hidden'); if (!mapRenderer) mapRenderer = new ExolineMap.MapRenderer($('mapCanvas'), { terrainManifest: manifest, onZoom: zoom => { $('mapReadout').textContent = `MAP · ${zoom.toFixed(1)}×`; } }); await mapRenderer.open(sel, manifest); }
+  async function openMap() { if (!sel) return; if (viewMode === 'surface') exitSurface(false); terrain ??= await (await fetch('../data/terrain_manifest.json')).json(); const manifest = terrain.bodies[sel.id] ? { ...terrain.bodies[sel.id], version: terrain.version } : null; if (!manifest) return; if (window.ExolineTerrain) ExolineTerrain.setContext({ assetVersion: terrain.version }); C.style.display = 'none'; $('mapCanvas').classList.remove('hidden'); $('mapCanvas').style.display = 'block'; $('mapTopbar').classList.remove('hidden'); if (!mapRenderer) mapRenderer = new ExolineMap.MapRenderer($('mapCanvas'), { terrainManifest: manifest, onZoom: zoom => { $('mapReadout').textContent = `MAP · ${zoom.toFixed(1)}×`; } }); await mapRenderer.open(sel, manifest, P.bodies[sel.id] ? P.bodies[sel.id].radius_m : 0); }
   function closeMission() { $('missionScreen').classList.add('hidden'); $('app').classList.remove('mission-active'); }
   function renderChangelog(markdown) { const target = $('changelogContent'); target.replaceChildren(); let list; for (const line of markdown.split(/\r?\n/)) { if (line.startsWith('### ')) { list = null; const heading = document.createElement('h2'); heading.textContent = line.slice(4); target.append(heading); } else if (line.startsWith('- ')) { if (!list) { list = document.createElement('ul'); target.append(list); } const item = document.createElement('li'); item.textContent = line.slice(2); list.append(item); } else if (line.trim()) { list = null; const paragraph = document.createElement('p'); paragraph.textContent = line.replace(/^# /, ''); target.append(paragraph); } else list = null; } }
   // Launch-site presets that are not physical bodies, listed after them in the
@@ -1696,7 +1836,7 @@
     $('throttle').oninput = e => setThrottle(e.target.value); $('turnLeft').onpointerdown = () => keys.right = true; $('turnRight').onpointerdown = () => keys.left = true; addEventListener('pointerup', () => { keys.left = false; keys.right = false; });
     $('launchBtn').onclick = () => { if (autoBurn) { showToast('THROTTLE CONTROLLED BY AUTO BURN'); return; } if (F && F.descentMode) { showToast('THROTTLE CONTROLLED BY DESCENT'); return; } craftSelected = true; lock = 'craft'; sel = null; focusCraftView(); setThrottle(F.s.throttle > 0 ? 0 : 100); $('launchBtn').textContent = F.s.throttle ? 'CUTOFF' : 'IGNITION'; }; $('rcsBtn').onclick = () => { rcs = !rcs; $('rcsBtn').classList.toggle('is-on', rcs); $('rcsBtn').setAttribute('aria-pressed', String(rcs)); }; $('ascentBtn').onclick = () => { if (!F) return; if (!F.ascentMode && F.descentMode) F.setDescentMode(false); F.ascentMode = !F.ascentMode; syncDescentBtn(); $('ascentBtn').classList.toggle('is-on', F.ascentMode); $('ascentBtn').setAttribute('aria-pressed', String(F.ascentMode)); showToast(F.ascentMode ? 'ASCENT MODE ON' : 'ASCENT MODE OFF'); }; $('chuteBtn').onclick = () => { if (!F) return; showToast(F.deployChute(S)); syncChuteBtn(); }; $('descentBtn').onclick = () => toggleDescentMode();
     $('orbitNodeAdd').onclick = () => { const seconds = Number($('orbitNodeAdd').dataset.time) || 600; $('orbitNodeAdd').classList.add('hidden'); addNodeForCraft(seconds); };
-    $('resetBtn').onclick = () => { lock = null; cam.o = { x: 0, y: 0 }; cam.k = innerHeight / (2.5 * AU); }; $('closeDetail').onclick = () => { $('detailPanel').classList.add('hidden'); sel = null; lock = null; }; $('openMapBtn').onclick = openMap; $('surfaceBtn').onclick = () => { if (surfAllowed() || viewMode === 'surface') toggleSurface(); else showToast('NO SOLID SURFACE'); }; $('mapResetBtn').onclick = () => { if (viewMode === 'surface' && mapRenderer && mapRenderer.surf && window.ExolineSurfaceState) { mapRenderer.setSurfaceCenter(window.ExolineSurfaceState.lonDeg, 0); mapRenderer.surf.mPerPx = 50; mapRenderer._syncSurfView(); } else mapRenderer?.reset(); }; $('backBtn').onclick = () => { if (viewMode === 'surface') exitSurface(false); C.style.display = 'block'; $('mapCanvas').style.display = 'none'; $('mapCanvas').classList.add('hidden'); $('mapTopbar').classList.add('hidden'); };
+    $('resetBtn').onclick = () => { lock = null; cam.o = { x: 0, y: 0 }; cam.k = innerHeight / (2.5 * AU); }; $('closeDetail').onclick = () => { $('detailPanel').classList.add('hidden'); sel = null; lock = null; }; $('openMapBtn').onclick = openMap; $('surfaceBtn').onclick = () => { if (surfAllowed() || viewMode === 'surface') toggleSurface(); else showToast('NO SOLID SURFACE'); }; $('profileBtn').onclick = () => { profileOn = !profileOn; syncProfileBtn(); if (profileOn && viewMode === 'surface') { profileNextAt = 0; drawProfile(); } }; syncProfileBtn(); $('mapResetBtn').onclick = () => { if (viewMode === 'surface' && mapRenderer && mapRenderer.surf && window.ExolineSurfaceState) { mapRenderer.setSurfaceCenter(window.ExolineSurfaceState.lonDeg, 0); mapRenderer.surf.mPerPx = 50; mapRenderer._syncSurfView(); } else mapRenderer?.reset(); }; $('backBtn').onclick = () => { if (viewMode === 'surface') exitSurface(false); C.style.display = 'block'; $('mapCanvas').style.display = 'none'; $('mapCanvas').classList.add('hidden'); $('mapTopbar').classList.add('hidden'); };
     $('setTargetBtn').onclick = () => { if (sel && ExolineNav.setTarget(sel.id)) showToast(`TARGET: ${ExolineNav.bodyName(sel.id).toUpperCase()}`); else if (sel) showToast('TARGET UNAVAILABLE'); };
     $('navDetailBtn').onclick = () => $('navExtra').classList.toggle('hidden');
     $('navToggle').onclick = () => $('navPanel').classList.toggle('collapsed');
@@ -1911,7 +2051,7 @@
     }
     draw(); requestAnimationFrame(frame);
   }
-  async function start() { [D, P, A, minerals] = await Promise.all(['solar_system.json', 'physics_constants.json', 'render_anchors.json', 'mineral_profiles.json'].map(async file => (await fetch('../data/' + file)).json())); await ExolineOrbit.load(); await updateStates(); F = new ExolineFlight.Flight(P); const savedOrbit = (() => { try { return localStorage.getItem('exoline.orbitSelect'); } catch { return null; } })(); launchSite(savedOrbit && (P.bodies[savedOrbit] || ORBITAL_LAUNCH_SITES[savedOrbit]) ? savedOrbit : 'earth'); ExolineNav.init({ catalog: D, constants: P, flight: F, getBodies: () => S, getDate: () => date, getRefId: () => soiBody()?.id || F.dominant(S) }); resize(); controls(); setWarp(0); setTimeout(() => { $('introScreen')?.classList.add('is-exiting'); setTimeout(() => { $('introScreen')?.remove(); $('missionScreen')?.classList.remove('hidden'); $('app')?.classList.add('mission-active'); }, 850); }, 4200); requestAnimationFrame(frame); }
+  async function start() { [D, P, A, minerals] = await Promise.all(['solar_system.json', 'physics_constants.json', 'render_anchors.json', 'mineral_profiles.json'].map(async file => (await fetch('../data/' + file)).json())); await ExolineOrbit.load(); if (window.ExolineTerrain) ExolineTerrain.setContext({ catalog: D, physics: P }); await updateStates(); F = new ExolineFlight.Flight(P); const savedOrbit = (() => { try { return localStorage.getItem('exoline.orbitSelect'); } catch { return null; } })(); launchSite(savedOrbit && (P.bodies[savedOrbit] || ORBITAL_LAUNCH_SITES[savedOrbit]) ? savedOrbit : 'earth'); ExolineNav.init({ catalog: D, constants: P, flight: F, getBodies: () => S, getDate: () => date, getRefId: () => soiBody()?.id || F.dominant(S) }); resize(); controls(); setWarp(0); setTimeout(() => { $('introScreen')?.classList.add('is-exiting'); setTimeout(() => { $('introScreen')?.remove(); $('missionScreen')?.classList.remove('hidden'); $('app')?.classList.add('mission-active'); }, 850); }, 4200); requestAnimationFrame(frame); }
   addEventListener('resize', resize);
   start().catch(error => {
     // Do not leave the player behind an opaque splash screen if data or a
