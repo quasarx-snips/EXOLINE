@@ -176,6 +176,13 @@ button { font-family:var(--font-ui); color:inherit; }
 .hud-therm .ok { color:#8ff0b4; } .hud-therm .bad { color:#ff9a8a; }
 @keyframes therm-flash { 0%,100% { opacity:1; } 50% { opacity:.55; } }
 @keyframes twr-pulse { 0%,100% { opacity:1; } 50% { opacity:.28; } }
+/* v0.2.0 surface framework: fade transition + surface HUD panel. */
+#app.surface-fade #scene, #app.surface-fade #mapCanvas { animation:surf-fade .4s ease; }
+@keyframes surf-fade { from { opacity:0; } to { opacity:1; } }
+.surface-hud { position:absolute; z-index:10; left:50%; transform:translateX(-50%); bottom:12px; width:min(560px,calc(100vw - 16px)); font-size:9px; letter-spacing:.08em; }
+.surf-row { display:flex; flex-wrap:wrap; justify-content:center; gap:5px; margin-bottom:6px; }
+.surf-row span { display:inline-flex; align-items:baseline; gap:5px; padding:3px 8px; border:1px solid rgba(255,255,255,.10); border-radius:9px; background:rgba(4,11,18,.58); backdrop-filter:blur(6px); color:#9db4c2; font-size:7.5px; letter-spacing:.12em; }
+.surf-row b { color:#eaf7ff; font-size:9px; font-weight:800; font-variant-numeric:tabular-nums; }
 /* v0.1.3: atmospheric telemetry strip + q bar + flashing callout chip. */
 .hud-atmo { margin-bottom:4px; }
 .hud-qwrap { min-width:150px; }
@@ -216,6 +223,13 @@ body:has(#mapCanvas:not(.hidden)) .detail-panel,
 body:has(#mapCanvas:not(.hidden)) .nav-panel,
 body:has(#mapCanvas:not(.hidden)) .corner-reset,
 body:has(#mapCanvas:not(.hidden)) .flight-hud { display:none !important; }
+
+/* v0.2.0: in surface mode keep the top chrome visible so the SURFACE toggle
+   (the way back to orbit) is always reachable. The planet-map rule above would
+   otherwise force-hide it the moment the calibrated surface tiles appear,
+   leaving the player with no obvious escape. Higher specificity + !important
+   wins over the map-open rule; the surface HUD still supplies telemetry. */
+#app.surface-mode .flight-top-actions { display:flex !important; }
 
 /* Below 1180px give the detail panel more headroom under the chrome. */
 @media (max-width:1179px) {

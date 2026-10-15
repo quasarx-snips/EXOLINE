@@ -48,6 +48,24 @@ window.ExolinePhysicsAgent = (() => {
       }
     }
 
+    // v0.2.0 Light Check 7 — PIN INTEGRITY (read-only, no state mutation).
+    // While landed with surface coordinates stored, the in-plane landing
+    // angle must still agree with the stored longitude within 0.01 deg.
+    if (typeof window !== 'undefined' && window.ExolineSurfaceState && s.landed && !s.crashed) {
+      try {
+        const stored = window.ExolineSurfaceState;
+        const parked = bodies && stored.bodyId && bodies[stored.bodyId];
+        if (parked && Number.isFinite(stored.lonDeg)) {
+          const thetaNow = Math.atan2(s.r.y - parked.y, s.r.x - parked.x) * 180 / Math.PI;
+          const wrap180 = v => ((v + 180) % 360 + 360) % 360 - 180;
+          const drift = Math.abs(wrap180(thetaNow - stored.lonDeg));
+          if (Number.isFinite(drift) && drift > 0.01) {
+            logViolation('SurfacePinIntegrity', 'WARNING', 'surface pin drift', '<= 0.01 deg', drift.toFixed(4) + ' deg');
+          }
+        }
+      } catch { /* pin check is advisory; never breaks the agent */ }
+    }
+
     if (flight.circularHold) {
       if (s.throttle !== 0) {
         logViolation('CircularHoldConsistency', 'WARNING', 'Circular hold active but throttle != 0', 'throttle = 0', s.throttle);

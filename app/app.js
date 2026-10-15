@@ -6,8 +6,255 @@
   let panning = false, panDrag = { x: 0, y: 0 }, panned = false;
   keys.pan = { up: false, down: false, left: false, right: false };
   let navSnap = null, activeNodeId = null, toastTimer = 0, autoBurn = null, nodeHitRegions = [], orbitHitRegions = [];
+  // ===== v0.2.0 SURFACE FRAMEWORK =====
+  // EQUATORIAL BAND DOCTRINE (design law): EXOLINE orbits in a single 2D
+  // plane. That plane maps to each body's EQUATOR on its equirectangular
+  // surface map. Every landing therefore has latitude exactly 0.0; surface
+  // longitude comes from the in-plane landing angle theta. No rotation, no
+  // spin, no axial tilt, no 3D projection is invented here — all surface
+  // activity happens in the equatorial band. This is intentional.
+  const SURFACE_TEMP_C = { mercury: 167, venus: 464, earth: 15, mars: -63, moon: -20, titan: -179 };
+  const SURF_SITES_KEY = 'exoline.sites.v1';
+  let viewMode = 'orbit'; // 'orbit' | 'surface'
+  let surfSites = [];
+  try { const raw = localStorage.getItem(SURF_SITES_KEY); if (raw) { const arr = JSON.parse(raw); if (Array.isArray(arr)) surfSites = arr; } } catch { surfSites = []; }
+  let surfPrevLanded = false, surfPrevCrashed = false, surfPinWarned = false;
+  const surfWrap180 = x => ((x + 180) % 360 + 360) % 360 - 180;
+  window.ExolineSurfaceState = null;
+  function surfBodyName(id) { try { return ExolineNav.bodyName(id); } catch { const b = D && D.bodies.find(q => q.id === id); return (b && b.name) || id; } }
+  function getSites() { return surfSites; }
+  window.ExolineSites = { getSites };
+  // ===== end v0.2.0 surface state =====
   const nodeAnchors = new Map();
   const defaultBindings = { pause: 'Space', warpDown: 'BracketLeft', warpUp: 'BracketRight', focusCraft: 'KeyF', resetView: 'KeyR', addNode: 'KeyN', autoBurn: 'KeyB', stage: 'KeyX', chute: 'KeyP', descent: 'KeyV' };
+  // v0.2.0 §1: edge-triggered coordinate capture on landed/crashed edges.
+  // silent=true adopts coordinates without minting a registry entry (used
+  // once at startup so a parked pad start doesn't pollute the registry on
+  // every page reload).
+  function surfCapture(kind, silent = false) {
+    if (!F || !S) return;
+    const id = (kind === 'wreck') ? null : (F.landedBody || null);
+    const refId = id || (typeof F.referenceBody === 'function' ? F.referenceBody(S, F.s) : (typeof F.dominant === 'function' ? F.dominant(S) : null));
+    const body = refId && S[refId], physical = refId && P.bodies[refId];
+    if (!body || !physical) return;
+    const rx = F.s.r.x - body.x, ry = F.s.r.y - body.y;
+    const theta = Math.atan2(ry, rx);
+    const lonDeg = surfWrap180(theta * 180 / Math.PI);
+    const arcMPerDegLon = Math.PI * physical.radius_m / 180;
+    window.ExolineSurfaceState = { bodyId: refId, lonDeg, latDeg: 0.0, arcMPerDegLon, kind };
+    surfPinWarned = false;
+    if (mapRenderer && mapRenderer.surf) mapRenderer.surf.siteLon = lonDeg;
+    if (!silent) surfRegisterSite(refId, lonDeg, kind);
+    syncSurfaceBtn();
+  }
+  // v0.2.0 §2: sites registry in localStorage, cap 50, persist on push.
+  function surfRegisterSite(bodyId, lonDeg, kind) {
+    const n = (surfRegisterSite._next = (surfRegisterSite._next || (surfSites.reduce((m, s) => Math.max(m, s.id || 0), 0) + 1)));
+    surfRegisterSite._next = n + 1;
+    surfSites.push({ id: n, bodyId, lonDeg: +lonDeg.toFixed(4), latDeg: 0, kind, t: new Date().toISOString(), name: 'SITE-' + String(n).padStart(3, '0') + ' ' + surfBodyName(bodyId) });
+    while (surfSites.length > 50) surfSites.shift();
+    try { localStorage.setItem(SURF_SITES_KEY, JSON.stringify(surfSites)); } catch { /* sites stay in memory */ }
+  }
+  // v0.2.0 §1: per-frame edge detection + pin-integrity watchdog.
+  let surfPrimed = false;
+  function surfTrackTransitions() {
+    if (!F) return;
+    const landed = !!F.s.landed, crashed = !!F.s.crashed;
+    if (!surfPrimed) {
+      // First frame: adopt current parked/pad coordinates silently so the
+      // surface button works from a pad start, without writing a registry
+      // entry. A real touchdown later still fires the edge.
+      surfPrimed = true;
+      surfPrevLanded = landed; surfPrevCrashed = crashed;
+      if (landed && !window.ExolineSurfaceState) surfCapture('landing', true);
+      if (crashed && !window.ExolineSurfaceState) {
+        try {
+          const refId = (typeof F.referenceBody === 'function') ? F.referenceBody(S, F.s) : null;
+          if (refId && P.bodies[refId] && P.bodies[refId].solidSurface) surfCapture('wreck', true);
+        } catch { /* no solid reference */ }
+      }
+      syncSurfaceBtn();
+      return;
+    }
+    if (landed && !surfPrevLanded) surfCapture('landing');
+    if (crashed && !surfPrevCrashed) {
+      try {
+        const refId = (typeof F.referenceBody === 'function') ? F.referenceBody(S, F.s) : null;
+        if (refId && P.bodies[refId] && P.bodies[refId].solidSurface) surfCapture('wreck');
+      } catch { /* no solid reference: no wreck site */ }
+    }
+    if (!landed && !crashed && viewMode === 'surface') exitSurface(false);
+    if (landed && window.ExolineSurfaceState && !surfPinWarned) {
+      const st = window.ExolineSurfaceState, body = S[st.bodyId];
+      if (body) {
+        const th = Math.atan2(F.s.r.y - body.y, F.s.r.x - body.x) * 180 / Math.PI;
+        if (Math.abs(surfWrap180(th - st.lonDeg)) > 0.01) { surfPinWarned = true; console.warn('[surface] pin drift: live lon differs from stored lon'); }
+      }
+    }
+    surfPrevLanded = landed; surfPrevCrashed = crashed;
+    syncSurfaceBtn();
+  }
+  // v0.2.0 §4: view state machine. enterSurface never writes cam, so the
+  // orbit camera survives untouched and exitSurface restores it exactly.
+  function surfAllowed() {
+    if (!F) return false;
+    if (!(F.s.landed || F.s.crashed)) return false;
+    const st = window.ExolineSurfaceState;
+    if (st) { const p = P.bodies[st.bodyId]; return !!(p && p.solidSurface); }
+    try {
+      const refId = (typeof F.referenceBody === 'function') ? F.referenceBody(S, F.s) : null;
+      const p = refId && P.bodies[refId];
+      return !!(p && p.solidSurface);
+    } catch { return false; }
+  }
+  function syncSurfaceBtn() {
+    const btn = $('surfaceBtn');
+    if (!btn) return;
+    const ok = surfAllowed();
+    btn.disabled = !ok;
+    btn.title = ok ? 'Surface view (Enter)' : 'No solid surface';
+    btn.classList.toggle('is-on', viewMode === 'surface');
+    btn.setAttribute('aria-pressed', String(viewMode === 'surface'));
+  }
+  async function enterSurface() {
+    const st = window.ExolineSurfaceState;
+    if (!st || !surfAllowed()) { showToast('NO SOLID SURFACE'); return; }
+    const physical = P.bodies[st.bodyId];
+    const entry = D && D.bodies.find(b => b.id === st.bodyId);
+    terrain = terrain || await (await fetch('../data/terrain_manifest.json')).json();
+    const manifest = (terrain && terrain.bodies && terrain.bodies[st.bodyId]) || null;
+    if (!mapRenderer) mapRenderer = new ExolineMap.MapRenderer($('mapCanvas'), { terrainManifest: manifest, onZoom: mpp => { setText('surfZoom', `${Number(mpp).toFixed(1)} m/px`); } });
+    C.style.display = 'none';
+    $('mapCanvas').classList.remove('hidden'); $('mapCanvas').style.display = 'block';
+    $('mapTopbar').classList.add('hidden');
+    // v0.2.0 FIX: a hidden canvas reports 0x0, so a renderer built while
+    // #mapCanvas is display:none locks in a 1x1 backing store and the
+    // calibrated zoom explodes (~227000x on the Moon -> solid color).
+    // Re-measure AFTER unhiding, before openSurface calibrates.
+    try { mapRenderer.resize(); } catch { /* keep constructor size */ }
+    if (entry && mapRenderer.body !== entry) { try { await mapRenderer.open(entry, manifest); } catch { /* tiles optional */ } }
+    viewMode = 'surface';
+    mapRenderer.openSurface(manifest, st.bodyId, st.lonDeg, 50, physical ? physical.radius_m : 1);
+    mapRenderer.registerMarkerLayer(drawSurfaceMarkers);
+    $('app').classList.add('surface-fade', 'surface-mode');
+    clearTimeout(enterSurface._t);
+    enterSurface._t = setTimeout(() => $('app').classList.remove('surface-fade'), 450);
+    $('surfaceHud').classList.remove('hidden');
+    syncSurfaceBtn();
+    showToast('SURFACE VIEW · ' + surfBodyName(st.bodyId).toUpperCase());
+  }
+  function exitSurface(fade = true) {
+    if (viewMode !== 'surface') return;
+    viewMode = 'orbit';
+    $('app').classList.remove('surface-mode');
+    if (mapRenderer) { try { mapRenderer.registerMarkerLayer(null); mapRenderer.closeSurface(); } catch { /* never break exit */ } }
+    $('mapCanvas').classList.add('hidden'); $('mapCanvas').style.display = 'none';
+    C.style.display = 'block';
+    $('surfaceHud').classList.add('hidden');
+    if (fade) {
+      $('app').classList.add('surface-fade');
+      clearTimeout(exitSurface._t);
+      exitSurface._t = setTimeout(() => $('app').classList.remove('surface-fade'), 450);
+    } else $('app').classList.remove('surface-fade');
+    syncSurfaceBtn();
+  }
+  function toggleSurface() { if (viewMode === 'surface') exitSurface(true); else enterSurface(); }
+  // ===== end v0.2.0 view machine =====
+  // v0.2.0 §6: surface markers via registerMarkerLayer; orbit site ticks.
+  function surfActiveSite() {
+    const st = window.ExolineSurfaceState;
+    if (!st) return null;
+    let best = null;
+    for (const s of surfSites) {
+      if (s.bodyId !== st.bodyId) continue;
+      if (Math.abs(surfWrap180(s.lonDeg - st.lonDeg)) < 0.05) { best = s; break; }
+      if (!best) best = s;
+    }
+    return best;
+  }
+  function drawSurfaceMarkers(ctx, tr) {
+    const st = window.ExolineSurfaceState;
+    if (!st || !tr || !mapRenderer || !mapRenderer.surf) return;
+    const R = mapRenderer.surfaceMetersToScreen.bind(mapRenderer);
+    const arc = st.arcMPerDegLon;
+    const cLon = mapRenderer.surf.centerLon, cLat = mapRenderer.surf.centerLat || 0;
+    for (const s of surfSites) {
+      if (s.bodyId !== st.bodyId) continue;
+      // Offsets from the CURRENT pan center (the transform origin), not from
+      // the stored craft lon, so markers track correctly while panning.
+      const dE = surfWrap180(s.lonDeg - cLon) * arc, dN = ((s.latDeg || 0) - cLat) * arc;
+      const p = R(dE, dN);
+      if (!p || p.x < -20 || p.y < -20 || p.x > mapRenderer.width + 20 || p.y > mapRenderer.height + 20) continue;
+      ctx.save();
+      ctx.strokeStyle = s.kind === 'wreck' ? '#ff5555' : '#66ff99';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, Math.PI * 2); ctx.stroke();
+      if (tr.mPerPx < 500 && s.name) { ctx.fillStyle = '#eaf7ff'; ctx.font = '9px sans-serif'; ctx.fillText(s.name, p.x + 8, p.y - 6); }
+      ctx.restore();
+    }
+    const cp = R(surfWrap180(st.lonDeg - cLon) * arc, (st.latDeg - cLat) * arc);
+    if (cp && cp.x > -30 && cp.y > -30 && cp.x < mapRenderer.width + 30 && cp.y < mapRenderer.height + 30) {
+      ctx.save();
+      ctx.fillStyle = '#f8fdff'; ctx.strokeStyle = '#0b3040'; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(cp.x, cp.y - 7); ctx.lineTo(cp.x + 6, cp.y + 6); ctx.lineTo(cp.x - 6, cp.y + 6); ctx.closePath();
+      ctx.fill(); ctx.stroke();
+      ctx.restore();
+    }
+  }
+  function drawSiteTicks() {
+    if (!surfSites.length || viewMode !== 'orbit' || !P) return;
+    for (const s of surfSites) {
+      const body = S[s.bodyId], physical = P.bodies[s.bodyId];
+      if (!body || !physical) continue;
+      const screenR = physical.radius_m * cam.k;
+      if (screenR < 4) continue;
+      const th = s.lonDeg * Math.PI / 180;
+      const p = ws({ x: body.x + Math.cos(th) * physical.radius_m, y: body.y + Math.sin(th) * physical.radius_m });
+      const c = ws(body);
+      const dx = p.x - c.x, dy = p.y - c.y, m = Math.hypot(dx, dy) || 1;
+      X.save();
+      X.strokeStyle = s.kind === 'wreck' ? '#ff5555' : '#66ff99';
+      X.lineWidth = 1.6;
+      X.beginPath();
+      X.moveTo(c.x + dx / m * (m - 4), c.y + dy / m * (m - 4));
+      X.lineTo(c.x + dx / m * (m + 4), c.y + dy / m * (m + 4));
+      X.stroke();
+      X.restore();
+    }
+  }
+  // v0.2.0 §5: surface HUD at the existing throttled hud() rate.
+  function surfaceHud() {
+    const st = window.ExolineSurfaceState;
+    setText('surfLat', '0.00°');
+    if (!st) return;
+    const physical = P.bodies[st.bodyId];
+    setText('surfBody', surfBodyName(st.bodyId).toUpperCase());
+    setText('surfLon', `${st.lonDeg.toFixed(2)}°`);
+    const site = surfActiveSite();
+    if (site) {
+      const dE = surfWrap180(st.lonDeg - site.lonDeg) * st.arcMPerDegLon;
+      const dN = (st.latDeg - (site.latDeg || 0)) * st.arcMPerDegLon;
+      setText('surfOffE', `${Math.round(dE).toLocaleString('en-US')} m`);
+      setText('surfOffN', `${Math.round(dN).toLocaleString('en-US')} m`);
+    } else { setText('surfOffE', '0 m'); setText('surfOffN', '0 m'); }
+    if (physical) {
+      const g = P.G * physical.mass / (physical.radius_m * physical.radius_m);
+      setText('surfG', `${g.toFixed(2)} m/s²`);
+      let p0 = 0;
+      try {
+        const atm = ExolineFlight.atmospheres && (ExolineFlight.atmospheres[st.bodyId] || ExolineFlight.atmospheres[(st.bodyId.split(':')[1] || st.bodyId)]);
+        if (atm && physical.solidSurface) p0 = atm.surfaceDensity || 0;
+      } catch { p0 = 0; }
+      setText('surfP', `${Number(p0).toLocaleString('en-US')} Pa`);
+    }
+    const short = st.bodyId.split(':').pop();
+    const tc = (SURFACE_TEMP_C[st.bodyId] !== undefined) ? SURFACE_TEMP_C[st.bodyId] : (SURFACE_TEMP_C[short] !== undefined ? SURFACE_TEMP_C[short] : -150);
+    setText('surfT', `${tc} °C`);
+    setText('surfStatus', F && F.s.crashed ? 'WRECKED' : 'LANDED');
+    const tr = (viewMode === 'surface' && mapRenderer) ? mapRenderer.getSurfaceTransform() : null;
+    if (tr) setText('surfZoom', `${Number(tr.mPerPx).toFixed(1)} m/px`);
+  }
+  // ===== end v0.2.0 markers/HUD =====
   let bindings = { ...defaultBindings };
   try { bindings = { ...defaultBindings, ...JSON.parse(localStorage.getItem('exoline.keybinds') || '{}') }; } catch { /* use defaults */ }
   const bindingLabel = code => code === 'Space' ? 'Space' : code.replace(/^Key/, '').replace(/^Digit/, '');
@@ -1296,6 +1543,35 @@
     const soi = soiBody();
     if (soi) currentSoi = soi;
     else currentSoi = null;
+    // v0.2.0: edge-triggered surface capture runs before anything draws.
+    try { surfTrackTransitions(); } catch { /* surface bookkeeping never breaks orbit view */ }
+    if (viewMode === 'surface') {
+      // Surface mode: orbit canvas draw skipped entirely; nav tick and
+      // physics keep running normally (frame() is untouched). The tile
+      // renderer owns #mapCanvas; only HUD panels update here.
+      // v0.2.0 FIX: MapRenderer has no internal loop — redraw event-driven
+      // only — so without a per-frame draw() here the surface canvas freezes
+      // on its entry paint (tiles never stream in, markers/glide stall).
+      // draw() is token-guarded: overlapping async calls abort safely, and
+      // image loads are promise-cached, so this is cheap once tiles settle.
+      try { if (mapRenderer && mapRenderer.surf) mapRenderer.draw(); } catch { /* surface canvas never breaks HUD */ }
+      try {
+        navSnap = ExolineNav.tick();
+      } catch (error) {
+        console.error('Navigation preview unavailable:', error);
+        navSnap = null;
+      }
+      hud();
+      surfaceHud();
+      navUi();
+      vehicleReadout();
+      $('simDate').textContent = date.toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+      updateWarp();
+      if (window.ExolinePhysicsAgent && window.ExolinePhysicsAgent.drawDebugOverlay) {
+        window.ExolinePhysicsAgent.drawDebugOverlay(X);
+      }
+      return;
+    }
     follow();
     // Continuous keyboard pan (held keys) -- independent of the mouse drag.
     const panSpeed = 5 / (cam.k || 1);
@@ -1320,6 +1596,7 @@
     D.bodies.forEach(b => orbit(b.id));
     body({ id: 'sun', name: 'Sun', orbital_asset: D.sun.asset }, S.sun);
     D.bodies.forEach(b => body(b, S[b.id]));
+    try { drawSiteTicks(); } catch { /* site ticks never break orbit view */ }
     trajectory();
     navPaths();
     impactMarker();
@@ -1327,6 +1604,7 @@
     craft();
     drawVectors();
     hud();
+    try { if (viewMode === 'orbit') surfaceHud(); } catch { /* surface HUD never breaks orbit view */ }
     navUi();
     vehicleReadout();
     $('simDate').textContent = date.toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
@@ -1337,7 +1615,7 @@
   }
   function inspect(body) { sel = body; craftSelected = false; lock = 'body'; $('detailPanel').classList.remove('hidden'); $('detailName').textContent = body.name; $('detailKicker').textContent = 'CELESTIAL BODY'; $('detailSub').textContent = body.parent ? `MOON OF ${body.parent.toUpperCase()}` : 'SOL SYSTEM'; $('detailType').textContent = body.type; $('detailOrbit').textContent = body.kind === 'major_moon' ? 'LOCAL ORBIT' : 'HELIOCENTRIC'; $('detailPeriod').textContent = 'LIVE STATE'; $('detailSeed').textContent = body.seed || '—'; $('detailNote').textContent = 'Orbital position and rendered orbit use the same propagated Keplerian state.'; if (minerals) { const data = minerals[body.name]; const box = $('minerals'); if (!data) { box.textContent = 'No mineral profile defined for this body.'; return; } box.textContent = ''; for (const [name, frac] of Object.entries(data).sort((a, b) => b[1] - a[1])) { const row = document.createElement('div'); row.className = 'mineral-row'; const pct = (frac * 100).toFixed(1); row.innerHTML = `<span class="name">${name}</span><span class="value">${pct}%</span><div class="mineral-bar"><i style="width:${pct}%"></i></div>`; box.appendChild(row); } } cam.o = { x: S[body.id].x, y: S[body.id].y }; cam.k = Math.max(cam.k, 24 / P.bodies[body.id].radius_m); }
   function pick(x, y) { let chosen, best = Infinity; for (const body of D.bodies) { const p = ws(S[body.id]), anchor = A[body.id] || A.default || {}, r = Math.max(9, radiusOf(body) * (anchor.disk_scale || .848)), score = Math.hypot(p.x - x, p.y - y) / r; if (score <= 1 && score < best) { chosen = body; best = score; } } return chosen; }
-  async function openMap() { if (!sel) return; terrain ??= await (await fetch('../data/terrain_manifest.json')).json(); const manifest = terrain.bodies[sel.id]; if (!manifest) return; C.style.display = 'none'; $('mapCanvas').classList.remove('hidden'); $('mapCanvas').style.display = 'block'; $('mapTopbar').classList.remove('hidden'); if (!mapRenderer) mapRenderer = new ExolineMap.MapRenderer($('mapCanvas'), { terrainManifest: manifest, onZoom: zoom => { $('mapReadout').textContent = `MAP · ${zoom.toFixed(1)}×`; } }); await mapRenderer.open(sel, manifest); }
+  async function openMap() { if (!sel) return; if (viewMode === 'surface') exitSurface(false); terrain ??= await (await fetch('../data/terrain_manifest.json')).json(); const manifest = terrain.bodies[sel.id]; if (!manifest) return; C.style.display = 'none'; $('mapCanvas').classList.remove('hidden'); $('mapCanvas').style.display = 'block'; $('mapTopbar').classList.remove('hidden'); if (!mapRenderer) mapRenderer = new ExolineMap.MapRenderer($('mapCanvas'), { terrainManifest: manifest, onZoom: zoom => { $('mapReadout').textContent = `MAP · ${zoom.toFixed(1)}×`; } }); await mapRenderer.open(sel, manifest); }
   function closeMission() { $('missionScreen').classList.add('hidden'); $('app').classList.remove('mission-active'); }
   function renderChangelog(markdown) { const target = $('changelogContent'); target.replaceChildren(); let list; for (const line of markdown.split(/\r?\n/)) { if (line.startsWith('### ')) { list = null; const heading = document.createElement('h2'); heading.textContent = line.slice(4); target.append(heading); } else if (line.startsWith('- ')) { if (!list) { list = document.createElement('ul'); target.append(list); } const item = document.createElement('li'); item.textContent = line.slice(2); list.append(item); } else if (line.trim()) { list = null; const paragraph = document.createElement('p'); paragraph.textContent = line.replace(/^# /, ''); target.append(paragraph); } else list = null; } }
   // Launch-site presets that are not physical bodies, listed after them in the
@@ -1418,7 +1696,7 @@
     $('throttle').oninput = e => setThrottle(e.target.value); $('turnLeft').onpointerdown = () => keys.right = true; $('turnRight').onpointerdown = () => keys.left = true; addEventListener('pointerup', () => { keys.left = false; keys.right = false; });
     $('launchBtn').onclick = () => { if (autoBurn) { showToast('THROTTLE CONTROLLED BY AUTO BURN'); return; } if (F && F.descentMode) { showToast('THROTTLE CONTROLLED BY DESCENT'); return; } craftSelected = true; lock = 'craft'; sel = null; focusCraftView(); setThrottle(F.s.throttle > 0 ? 0 : 100); $('launchBtn').textContent = F.s.throttle ? 'CUTOFF' : 'IGNITION'; }; $('rcsBtn').onclick = () => { rcs = !rcs; $('rcsBtn').classList.toggle('is-on', rcs); $('rcsBtn').setAttribute('aria-pressed', String(rcs)); }; $('ascentBtn').onclick = () => { if (!F) return; if (!F.ascentMode && F.descentMode) F.setDescentMode(false); F.ascentMode = !F.ascentMode; syncDescentBtn(); $('ascentBtn').classList.toggle('is-on', F.ascentMode); $('ascentBtn').setAttribute('aria-pressed', String(F.ascentMode)); showToast(F.ascentMode ? 'ASCENT MODE ON' : 'ASCENT MODE OFF'); }; $('chuteBtn').onclick = () => { if (!F) return; showToast(F.deployChute(S)); syncChuteBtn(); }; $('descentBtn').onclick = () => toggleDescentMode();
     $('orbitNodeAdd').onclick = () => { const seconds = Number($('orbitNodeAdd').dataset.time) || 600; $('orbitNodeAdd').classList.add('hidden'); addNodeForCraft(seconds); };
-    $('resetBtn').onclick = () => { lock = null; cam.o = { x: 0, y: 0 }; cam.k = innerHeight / (2.5 * AU); }; $('closeDetail').onclick = () => { $('detailPanel').classList.add('hidden'); sel = null; lock = null; }; $('openMapBtn').onclick = openMap; $('mapResetBtn').onclick = () => mapRenderer?.reset(); $('backBtn').onclick = () => { C.style.display = 'block'; $('mapCanvas').style.display = 'none'; $('mapCanvas').classList.add('hidden'); $('mapTopbar').classList.add('hidden'); };
+    $('resetBtn').onclick = () => { lock = null; cam.o = { x: 0, y: 0 }; cam.k = innerHeight / (2.5 * AU); }; $('closeDetail').onclick = () => { $('detailPanel').classList.add('hidden'); sel = null; lock = null; }; $('openMapBtn').onclick = openMap; $('surfaceBtn').onclick = () => { if (surfAllowed() || viewMode === 'surface') toggleSurface(); else showToast('NO SOLID SURFACE'); }; $('mapResetBtn').onclick = () => { if (viewMode === 'surface' && mapRenderer && mapRenderer.surf && window.ExolineSurfaceState) { mapRenderer.setSurfaceCenter(window.ExolineSurfaceState.lonDeg, 0); mapRenderer.surf.mPerPx = 50; mapRenderer._syncSurfView(); } else mapRenderer?.reset(); }; $('backBtn').onclick = () => { if (viewMode === 'surface') exitSurface(false); C.style.display = 'block'; $('mapCanvas').style.display = 'none'; $('mapCanvas').classList.add('hidden'); $('mapTopbar').classList.add('hidden'); };
     $('setTargetBtn').onclick = () => { if (sel && ExolineNav.setTarget(sel.id)) showToast(`TARGET: ${ExolineNav.bodyName(sel.id).toUpperCase()}`); else if (sel) showToast('TARGET UNAVAILABLE'); };
     $('navDetailBtn').onclick = () => $('navExtra').classList.toggle('hidden');
     $('navToggle').onclick = () => $('navPanel').classList.toggle('collapsed');
@@ -1559,6 +1837,10 @@
       if (e.key === 'ArrowRight') { e.preventDefault(); keys.pan.right = true; }
       if (e.key === 't' || e.key === 'T') { if (sel && ExolineNav.isTargetable(sel.id)) { ExolineNav.setTarget(sel.id); showToast(`TARGET: ${ExolineNav.bodyName(sel.id).toUpperCase()}`); } }
       if (e.key === 'c' || e.key === 'C') { if (ExolineNav.getTarget()) { ExolineNav.clearTarget(); showToast('TARGET CLEARED'); } }
+      // v0.2.0: Enter toggles surface/orbit when allowed; Esc exits surface.
+      // While the mission menu owns the screen, Enter belongs to it.
+      if (e.code === 'Enter' && !(e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT')) && $('missionScreen') && $('missionScreen').classList.contains('hidden')) { e.preventDefault(); if (surfAllowed() || viewMode === 'surface') toggleSurface(); return; }
+      if (e.code === 'Escape' && viewMode === 'surface') { e.preventDefault(); exitSurface(true); return; }
       if (matches(e, 'addNode')) addNodeForCraft();
       if (matches(e, 'focusCraft')) { craftSelected = true; sel = null; lock = 'craft'; focusCraftView(); }
       if (matches(e, 'resetView')) resetView();

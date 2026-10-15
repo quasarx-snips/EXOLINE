@@ -15,6 +15,7 @@
     <nav class="flight-top-actions" aria-label="Settings and view">
         <button class="icon-btn" id="settingsBtn" title="Settings" aria-label="Settings"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       <button class="small-btn" id="viewBtn" title="View" aria-label="View"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>VIEW</span></button>
+      <button class="small-btn" id="surfaceBtn" title="Surface view" aria-label="Surface view" disabled><span>SURFACE</span></button>
     </nav>
 
     <section class="flight-status" aria-label="Status strip">
@@ -177,6 +178,12 @@
         </div>
         <button class="pitch-btn" id="turnRight" aria-label="Pitch right" title="Pitch right"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
       </div>
+    </aside>
+    <!-- v0.2.0 surface HUD: equatorial-band telemetry, throttled hud() rate. -->
+    <aside class="surface-hud hidden" id="surfaceHud" aria-label="Surface telemetry">
+      <div class="surf-row"><span>BODY <b id="surfBody">—</b></span><span>LON <b id="surfLon">—</b></span><span>LAT <b id="surfLat">0.00°</b></span><span>STATUS <b id="surfStatus">—</b></span></div>
+      <div class="surf-row"><span>SITE OFFSET E <b id="surfOffE">—</b></span><span>N <b id="surfOffN">—</b></span><span>LOCAL G <b id="surfG">—</b></span></div>
+      <div class="surf-row"><span>SURFACE PRESSURE <b id="surfP">—</b></span><span>AMBIENT TEMP <b id="surfT">—</b></span><span>ZOOM <b id="surfZoom">—</b></span></div>
     </aside>
   </div>
   <script src="orbit-engine.js?v=24"></script>
